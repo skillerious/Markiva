@@ -14,7 +14,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt, QRect, QSize, QTimer, QRegularExpression, QModelIndex, QDir, QFileInfo, QUrl, QItemSelectionModel, pyqtSlot
 from PyQt5.QtGui import QFont, QColor, QPainter, QTextFormat, QPalette, QTextCursor, QTextCharFormat, QSyntaxHighlighter, QIcon, QDesktopServices
 from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEngineSettings
-from PyQt5.QtWebChannel import QWebChannel  # <-- Add this line
+from PyQt5.QtWebChannel import QWebChannel
 from PyQt5.QtPrintSupport import QPrinter
 import subprocess  # For integrated terminal
 from spellchecker import SpellChecker
@@ -25,17 +25,17 @@ from Settings import SettingsWindow  # Import SettingsWindow
 from about import AboutDialog
 
 
-
 class LineNumberArea(QWidget):
     def __init__(self, editor):
         super().__init__(editor)
         self.editor = editor
 
-    def sizeHint(self):
+    def sizeHint(self) -> QSize:
         return QSize(self.editor.line_number_area_width(), 0)
 
     def paintEvent(self, event):
         self.editor.line_number_area_paint_event(event)
+
 
 class MarkdownHighlighter(QSyntaxHighlighter):
     def __init__(self, document):
@@ -62,6 +62,7 @@ class MarkdownHighlighter(QSyntaxHighlighter):
             while iterator.hasNext():
                 match = iterator.next()
                 self.setFormat(match.capturedStart(), match.capturedLength(), fmt)
+
 
 class CodeEditor(QPlainTextEdit):
     def __init__(self, font_size=14):
@@ -315,6 +316,7 @@ class CodeEditor(QPlainTextEdit):
         elif window.current_file:
             window.setWindowTitle(f"{os.path.basename(window.current_file)} - Markdown Editor")
 
+
 class EmojiPicker(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -339,6 +341,7 @@ class EmojiPicker(QDialog):
         # Emit a signal to insert the selected emoji
         self.parent().editor.insertPlainText(emoji)
         self.close()
+
 
 class CustomFileSystemModel(QFileSystemModel):
     def __init__(self, parent=None):
@@ -448,34 +451,56 @@ class CustomTreeView(QTreeView):
 class TemplateDialog(QDialog):
     def __init__(self, templates_dir, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Load Template")
-        self.setFixedSize(600, 400)
+        self.setWindowTitle("Manage Templates")
+        self.setFixedSize(800, 600)  # Adjust size to accommodate both the list and preview
 
         self.templates_dir = templates_dir
 
-        # Main layout
-        layout = QVBoxLayout(self)
+        # Main layout (horizontal to place list and preview side by side)
+        main_layout = QHBoxLayout(self)
+
+        # List layout (vertical to hold the search bar and template list)
+        list_layout = QVBoxLayout()
 
         # Search bar
         self.search_bar = QLineEdit(self)
         self.search_bar.setPlaceholderText("Search templates...")
         self.search_bar.textChanged.connect(self.filter_templates)
-        layout.addWidget(self.search_bar)
+        list_layout.addWidget(self.search_bar)
 
         # List widget to display templates
         self.list_widget = QListWidget(self)
         self.list_widget.itemClicked.connect(self.show_template_preview)
-        layout.addWidget(self.list_widget)
+        list_layout.addWidget(self.list_widget)
 
-        # Preview area
-        self.preview_area = QTextEdit(self)
-        self.preview_area.setReadOnly(True)
-        layout.addWidget(self.preview_area)
+        # Add the list layout to the main layout
+        main_layout.addLayout(list_layout)
+
+        # Web view to display rendered markdown (this will be placed next to the list)
+        self.preview_area = QWebEngineView(self)
+        self.preview_area.setMinimumWidth(400)  # Ensure the preview area has enough space
+        main_layout.addWidget(self.preview_area)
+
+        # Button layout
+        button_layout = QHBoxLayout()
 
         # Load button
         load_button = QPushButton("Load Template", self)
         load_button.clicked.connect(self.load_selected_template)
-        layout.addWidget(load_button)
+        button_layout.addWidget(load_button)
+
+        # Rename button
+        rename_button = QPushButton("Rename Template", self)
+        rename_button.clicked.connect(self.rename_selected_template)
+        button_layout.addWidget(rename_button)
+
+        # Delete button
+        delete_button = QPushButton("Delete Template", self)
+        delete_button.clicked.connect(self.delete_selected_template)
+        button_layout.addWidget(delete_button)
+
+        # Add the button layout below the preview area
+        list_layout.addLayout(button_layout)
 
         # Load templates initially
         self.load_templates()
@@ -483,6 +508,7 @@ class TemplateDialog(QDialog):
     def load_templates(self):
         """Load the list of templates from the directory."""
         self.templates = [f for f in os.listdir(self.templates_dir) if f.endswith('.md')]
+        self.list_widget.clear()
         self.list_widget.addItems(self.templates)
 
     def filter_templates(self, text):
@@ -492,21 +518,104 @@ class TemplateDialog(QDialog):
         self.list_widget.addItems(filtered_templates)
 
     def show_template_preview(self, item):
-        """Display the selected template's content in the preview area."""
+        """Display the selected template's content rendered as HTML in the preview area."""
         template_path = os.path.join(self.templates_dir, item.text())
         with open(template_path, 'r') as file:
             content = file.read()
-        self.preview_area.setPlainText(content)
+
+        # Convert Markdown to HTML using markdown2
+        html = markdown2.markdown(content, extras=["fenced-code-blocks", "tables", "strike"])
+
+        # Add dark theme CSS and dark scrollbar
+        css = """
+        <style>
+            body { font-family: Arial, sans-serif; padding: 15px; background-color: #2e2e2e; color: #f8f8f2; }
+            pre { background-color: #444; color: #f8f8f2; padding: 10px; border-radius: 8px; }
+            code { background-color: #444; color: #f8f8f2; padding: 2px 4px; border-radius: 4px; }
+            blockquote { border-left: 5px solid #888; padding-left: 10px; color: #aaa; }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { padding: 8px 12px; border: 1px solid #444; }
+            th { background-color: #555; color: #f8f8f2; }
+            ::-webkit-scrollbar {
+                width: 12px;
+            }
+            ::-webkit-scrollbar-track {
+                background: #2e2e2e;
+            }
+            ::-webkit-scrollbar-thumb {
+                background-color: #888;
+                border-radius: 10px;
+            }
+            ::-webkit-scrollbar-thumb:hover {
+                background-color: #555;
+            }
+        </style>
+        """
+
+        # Set the HTML content in the web view
+        self.preview_area.setHtml(css + html)
 
     def load_selected_template(self):
-        """Load the selected template into the main editor."""
+        """Load the selected template into the main editor and create a new .md file with a unique name if necessary."""
         selected_item = self.list_widget.currentItem()
         if selected_item:
-            template_path = os.path.join(self.templates_dir, selected_item.text())
+            template_name = selected_item.text()
+            template_path = os.path.join(self.templates_dir, template_name)
+            
             with open(template_path, 'r') as file:
                 content = file.read()
-            self.parent().editor.setPlainText(content)
+            
+            # Get the project folder from settings or use a default path
+            project_folder = self.parent().settings.get("default_project_folder", QDir.currentPath() + "/projectfolder/mymd")
+            if not os.path.exists(project_folder):
+                os.makedirs(project_folder)
+            
+            # Create a unique file name
+            base_name, extension = os.path.splitext(template_name)
+            new_file_name = template_name
+            counter = 1
+            while os.path.exists(os.path.join(project_folder, new_file_name)):
+                new_file_name = f"{base_name}_{counter}{extension}"
+                counter += 1
+            
+            new_file_path = os.path.join(project_folder, new_file_name)
+            
+            # Write the content to the new file
+            with open(new_file_path, 'w', encoding='utf-8') as new_file:
+                new_file.write(content)
+            
+            # Load the new file into the editor
+            self.parent().open_file_by_path(new_file_path)
             self.accept()
+
+    def rename_selected_template(self):
+        """Rename the selected template file."""
+        selected_item = self.list_widget.currentItem()
+        if selected_item:
+            old_name = selected_item.text()
+            new_name, ok = QInputDialog.getText(self, "Rename Template", "Enter new name:", text=old_name)
+            if ok and new_name:
+                old_path = os.path.join(self.templates_dir, old_name)
+                new_path = os.path.join(self.templates_dir, f"{new_name}.md")
+                if os.path.exists(new_path):
+                    QMessageBox.warning(self, "Error", f"A template named '{new_name}' already exists.")
+                else:
+                    os.rename(old_path, new_path)
+                    self.load_templates()  # Refresh the list
+                    QMessageBox.information(self, "Template Renamed", f"Template '{old_name}' renamed to '{new_name}'.")
+
+    def delete_selected_template(self):
+        """Delete the selected template file."""
+        selected_item = self.list_widget.currentItem()
+        if selected_item:
+            template_name = selected_item.text()
+            confirm = QMessageBox.question(self, "Delete Template", f"Are you sure you want to delete '{template_name}'?", QMessageBox.Yes | QMessageBox.No)
+            if confirm == QMessageBox.Yes:
+                os.remove(os.path.join(self.templates_dir, template_name))
+                self.load_templates()  # Refresh the list
+                self.preview_area.setHtml("")  # Clear the preview area
+                QMessageBox.information(self, "Template Deleted", f"Template '{template_name}' has been deleted.")
+
 
 class MarkdownEditor(QMainWindow):
     def __init__(self):
@@ -571,10 +680,18 @@ class MarkdownEditor(QMainWindow):
         # Create menu bar
         self.createMenuBar()
 
-        # Then create the toolbar after the editor has been initialized
-        self.createToolbar()
+        # Create the main toolbar
+        self.toolbar = QToolBar("Markdown Toolbar", self)
+        self.toolbar.setObjectName("MarkdownToolbar")
+        self.addToolBar(self.toolbar)
 
-        # Create secondary toolbar for editor settings
+        # Create the settings toolbar
+        self.settings_toolbar = QToolBar("Editor Settings", self)
+        self.settings_toolbar.setObjectName("EditorSettingsToolbar")
+        self.addToolBar(self.settings_toolbar)
+
+        # Add actions to the toolbars
+        self.update_toolbar_icons()
         self.createEditorSettingsToolbar()
 
         # Set up file explorer
@@ -638,29 +755,47 @@ class MarkdownEditor(QMainWindow):
         self.status_bar = QStatusBar()
         self.status_bar.setStyleSheet("""
             QStatusBar {
-                background-color: #444;
-                color: #f8f8f2;
+                background-color: #333333;  /* Darker background */
+                color: #ffffff;              /* White text */
                 font-family: Consolas, "Courier New", monospace;
                 font-size: 14px;
-                padding: 5px;
+                padding: 5px;                /* More padding for a better appearance */
+                border-top: 1px solid #007acc;  /* Thinner blue border at the top */
             }
             QLabel {
-                margin-right: 20px;
+                margin-right: 20px;          /* Space between different labels */
             }
         """)
+
+        # Add an icon to the far left of the status bar
+        self.icon_label = QLabel()
+        icon = QIcon(qta.icon('fa.info-circle', color='white').pixmap(16, 16))  # Using qtawesome for the icon
+        self.icon_label.setPixmap(icon.pixmap(16, 16))
+        self.icon_label.mousePressEvent = self.show_status_info  # Connect to a method when clicked
 
         # Status bar widgets
         self.file_name_label = QLabel("No file open")
         self.word_count_label = QLabel("Words: 0")
+        self.char_count_label = QLabel("Characters: 0")
         self.reading_time_label = QLabel("Reading Time: 0 min")
         self.cursor_position_label = QLabel("Line: 1, Col: 1")
+        self.modified_label = QLabel("Modified: No")
+        self.current_word_label = QLabel("Word: ")
+        self.syntax_label = QLabel("Syntax: Markdown")
+        self.zoom_level_label = QLabel("Zoom: 100%")
         self.date_time_label = QLabel()
 
-        # Add widgets to status bar
+        # Add the icon and widgets to the status bar
+        self.status_bar.addWidget(self.icon_label)
         self.status_bar.addPermanentWidget(self.file_name_label)
         self.status_bar.addPermanentWidget(self.word_count_label)
+        self.status_bar.addPermanentWidget(self.char_count_label)
         self.status_bar.addPermanentWidget(self.reading_time_label)
         self.status_bar.addPermanentWidget(self.cursor_position_label)
+        self.status_bar.addPermanentWidget(self.modified_label)
+        self.status_bar.addPermanentWidget(self.current_word_label)
+        self.status_bar.addPermanentWidget(self.syntax_label)
+        self.status_bar.addPermanentWidget(self.zoom_level_label)
         self.status_bar.addPermanentWidget(self.date_time_label)
 
         self.setStatusBar(self.status_bar)
@@ -674,9 +809,11 @@ class MarkdownEditor(QMainWindow):
     def update_status_bar(self):
         text = self.editor.toPlainText()
         word_count = len(text.split()) if text.strip() else 0
+        char_count = len(text) if text.strip() else 0
         reading_time = round(word_count / 200)  # Assuming 200 words per minute reading speed
 
         self.word_count_label.setText(f"Words: {word_count}")
+        self.char_count_label.setText(f"Characters: {char_count}")
         self.reading_time_label.setText(f"Reading Time: {reading_time} min")
 
         if self.current_file:
@@ -684,6 +821,23 @@ class MarkdownEditor(QMainWindow):
             self.file_name_label.setText(f"File: {file_name}")
         else:
             self.file_name_label.setText("No file open")
+
+        modified_status = "Yes" if self.editor.document().isModified() else "No"
+        self.modified_label.setText(f"Modified: {modified_status}")
+
+        # Update current word under cursor
+        cursor = self.editor.textCursor()
+        cursor.select(QTextCursor.WordUnderCursor)
+        current_word = cursor.selectedText().strip()
+        self.current_word_label.setText(f"Word: {current_word}")
+
+        # Update syntax label (assuming Markdown, but could be extended for other formats)
+        syntax = "Markdown"  # You could detect other formats if necessary
+        self.syntax_label.setText(f"Syntax: {syntax}")
+
+        # Update zoom level
+        zoom_level = int(self.editor.font().pointSize() / self.settings.get("font_size", 14) * 100)  # Assuming font size is related to zoom
+        self.zoom_level_label.setText(f"Zoom: {zoom_level}%")
 
     def update_cursor_position(self):
         cursor = self.editor.textCursor()
@@ -694,6 +848,25 @@ class MarkdownEditor(QMainWindow):
     def update_date_time(self):
         current_date_time = time.strftime("%Y-%m-%d %H:%M:%S")
         self.date_time_label.setText(f"{current_date_time}")
+
+    def show_status_info(self, event):
+        """Display a dialog with information about the status bar items."""
+        info_text = """
+        - **File**: Name of the currently opened file.
+        - **Words**: Number of words in the document.
+        - **Characters**: Number of characters in the document.
+        - **Reading Time**: Estimated reading time based on word count.
+        - **Line, Col**: Current line and column number.
+        - **Modified**: Indicates if the document has unsaved changes.
+        - **Word**: Current word under the cursor.
+        - **Syntax**: Syntax highlighting mode (e.g., Markdown).
+        - **Zoom**: Current zoom level of the editor.
+        - **Date & Time**: Current system date and time.
+        """
+        QMessageBox.information(self, "Status Bar Information", info_text)
+
+
+
 
     def update_preview(self):
         raw_markdown = self.editor.toPlainText()
@@ -813,8 +986,6 @@ class MarkdownEditor(QMainWindow):
         # Set the HTML content in the preview pane
         self.preview.page().setHtml(full_html)
 
-
-
     def set_initial_preview_content(self):
         # This sets the initial content of the preview pane with the correct background style
         initial_html = """
@@ -896,7 +1067,6 @@ class MarkdownEditor(QMainWindow):
 
         self.file_tree_view = explorer_widget
 
-
     def open_default_file(self):
         default_file = self.settings.get("default_open_file")
         if default_file and os.path.exists(default_file):
@@ -942,8 +1112,15 @@ class MarkdownEditor(QMainWindow):
                 self.setWindowTitle(f"{os.path.basename(self.current_file)} - Markdown Editor")
                 self.editor.document().setModified(False)  # Reset modified status
                 self.update_status_bar()  # Ensure status bar is updated after file is opened
+
+                # Highlight the file in the tree view
+                index = self.file_model.index(file_path)
+                self.tree.setCurrentIndex(index)
+                self.tree.scrollTo(index)  # Ensure the file is visible
         except Exception as e:
             QMessageBox.warning(self, "Error", f"Could not open file: {str(e)}")
+
+
 
     def open_context_menu(self, position):
         index = self.tree.indexAt(position)
@@ -1105,13 +1282,7 @@ class MarkdownEditor(QMainWindow):
         about_action.triggered.connect(self.show_about_dialog)
         help_menu.addAction(about_action)
 
-
     def createToolbar(self):
-        self.toolbar = QToolBar("Markdown Toolbar")
-        self.toolbar.setMovable(True)  # Allow the toolbar to be draggable
-        self.toolbar.setFloatable(True)  # Allow it to float
-        self.addToolBar(Qt.TopToolBarArea, self.toolbar)
-
         self.update_toolbar_icons()
 
     def update_toolbar_icons(self):
@@ -1281,72 +1452,67 @@ class MarkdownEditor(QMainWindow):
         self.toolbar.addAction(settings_action)
 
     def createEditorSettingsToolbar(self):
-        self.editor_settings_toolbar = QToolBar("Editor Settings")
-        self.editor_settings_toolbar.setMovable(True)  # Allow this toolbar to be draggable
-        self.editor_settings_toolbar.setFloatable(True)  # Allow it to float
-        self.addToolBar(Qt.TopToolBarArea, self.editor_settings_toolbar)
-
-    # Font Family
+        # Font Family
         font_family_combo = QComboBox(self)
         font_family_combo.addItems(["Fira Code", "Consolas", "Courier New", "Arial", "Times New Roman"])
         font_family_combo.setCurrentText(self.editor.font().family())
         font_family_combo.currentTextChanged.connect(lambda text: self.editor.set_font_family(text))
-        self.editor_settings_toolbar.addWidget(QLabel("Font:"))
-        self.editor_settings_toolbar.addWidget(font_family_combo)
+        self.settings_toolbar.addWidget(QLabel("Font:"))
+        self.settings_toolbar.addWidget(font_family_combo)
 
-    # Add a spacer
-        self.editor_settings_toolbar.addSeparator()
+        # Add a spacer
+        self.settings_toolbar.addSeparator()
 
-    # Font Size
+        # Font Size
         font_size_spinbox = QSpinBox(self)
         font_size_spinbox.setRange(8, 36)
         font_size_spinbox.setValue(self.editor.font().pointSize())
         font_size_spinbox.valueChanged.connect(self.editor.set_font_size)
-        self.editor_settings_toolbar.addWidget(QLabel("Size:"))
-        self.editor_settings_toolbar.addWidget(font_size_spinbox)
+        self.settings_toolbar.addWidget(QLabel("Size:"))
+        self.settings_toolbar.addWidget(font_size_spinbox)
 
-    # Add a spacer
-        self.editor_settings_toolbar.addSeparator()
+        # Add a spacer
+        self.settings_toolbar.addSeparator()
 
-    # Background Color
+        # Background Color
         background_color_button = QPushButton("Background Color", self)
         background_color_button.clicked.connect(self.choose_background_color)
-        self.editor_settings_toolbar.addWidget(background_color_button)
+        self.settings_toolbar.addWidget(background_color_button)
 
-    # Add a spacer
-        self.editor_settings_toolbar.addSeparator()
+        # Add a spacer
+        self.settings_toolbar.addSeparator()
 
-    # Text Color
+        # Text Color
         text_color_button = QPushButton("Text Color", self)
         text_color_button.clicked.connect(self.choose_text_color)
-        self.editor_settings_toolbar.addWidget(text_color_button)
+        self.settings_toolbar.addWidget(text_color_button)
 
-    # Add a spacer
-        self.editor_settings_toolbar.addSeparator()
+        # Add a spacer
+        self.settings_toolbar.addSeparator()
 
-    # Line Numbers
+        # Line Numbers
         line_numbers_checkbox = QCheckBox("Show Line Numbers", self)
         line_numbers_checkbox.setChecked(True)
         line_numbers_checkbox.toggled.connect(self.toggle_line_numbers)
-        self.editor_settings_toolbar.addWidget(line_numbers_checkbox)
+        self.settings_toolbar.addWidget(line_numbers_checkbox)
 
-    # Add a spacer
-        self.editor_settings_toolbar.addSeparator()
+        # Add a spacer
+        self.settings_toolbar.addSeparator()
 
-    # Spell Check
+        # Spell Check
         spell_check_checkbox = QCheckBox("Enable Spell Check", self)
         spell_check_checkbox.setChecked(True)
         spell_check_checkbox.toggled.connect(self.toggle_spell_check)
-        self.editor_settings_toolbar.addWidget(spell_check_checkbox)
+        self.settings_toolbar.addWidget(spell_check_checkbox)
 
-    # Add a spacer
-        self.editor_settings_toolbar.addSeparator()
+        # Add a spacer
+        self.settings_toolbar.addSeparator()
 
-    # Word Wrap
+        # Word Wrap
         word_wrap_checkbox = QCheckBox("Enable Word Wrap", self)
         word_wrap_checkbox.setChecked(True)
         word_wrap_checkbox.toggled.connect(self.toggle_word_wrap)
-        self.editor_settings_toolbar.addWidget(word_wrap_checkbox)
+        self.settings_toolbar.addWidget(word_wrap_checkbox)
 
     def choose_background_color(self):
         color = QColorDialog.getColor()
@@ -1688,7 +1854,6 @@ class MarkdownEditor(QMainWindow):
                 file.write(self.editor.toPlainText())
             QMessageBox.information(self, "Template Saved", f"Template '{template_name}' saved successfully.")
 
-
     def load_template(self):
         templates_dir = "templates"
         if not os.path.exists(templates_dir):
@@ -1696,6 +1861,7 @@ class MarkdownEditor(QMainWindow):
             return
         dialog = TemplateDialog(templates_dir, self)
         dialog.exec_()
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
