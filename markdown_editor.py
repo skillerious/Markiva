@@ -11,9 +11,10 @@ from PyQt5.QtWidgets import (
     QGridLayout, QPushButton, QMenuBar, QMenu, QInputDialog, QLineEdit, QLabel, QPlainTextDocumentLayout,
     QTreeView, QFileSystemModel, QHBoxLayout, QDesktopWidget, QDialogButtonBox, QListWidget, QSizePolicy, QAbstractItemView, QComboBox, QSpinBox, QColorDialog, QCheckBox, QToolButton
 )
-from PyQt5.QtCore import Qt, QRect, QSize, QTimer, QRegularExpression, QModelIndex, QDir, QFileInfo, QUrl, QItemSelectionModel
+from PyQt5.QtCore import Qt, QRect, QSize, QTimer, QRegularExpression, QModelIndex, QDir, QFileInfo, QUrl, QItemSelectionModel, pyqtSlot
 from PyQt5.QtGui import QFont, QColor, QPainter, QTextFormat, QPalette, QTextCursor, QTextCharFormat, QSyntaxHighlighter, QIcon, QDesktopServices
 from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEngineSettings
+from PyQt5.QtWebChannel import QWebChannel  # <-- Add this line
 from PyQt5.QtPrintSupport import QPrinter
 import subprocess  # For integrated terminal
 from spellchecker import SpellChecker
@@ -22,6 +23,8 @@ import difflib
 from startup import StartupDialog  # Import the new startup dialog
 from Settings import SettingsWindow  # Import SettingsWindow
 from about import AboutDialog
+
+
 
 class LineNumberArea(QWidget):
     def __init__(self, editor):
@@ -442,7 +445,68 @@ class CustomTreeView(QTreeView):
         else:
             super().dropEvent(event)
 
+class TemplateDialog(QDialog):
+    def __init__(self, templates_dir, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Load Template")
+        self.setFixedSize(600, 400)
 
+        self.templates_dir = templates_dir
+
+        # Main layout
+        layout = QVBoxLayout(self)
+
+        # Search bar
+        self.search_bar = QLineEdit(self)
+        self.search_bar.setPlaceholderText("Search templates...")
+        self.search_bar.textChanged.connect(self.filter_templates)
+        layout.addWidget(self.search_bar)
+
+        # List widget to display templates
+        self.list_widget = QListWidget(self)
+        self.list_widget.itemClicked.connect(self.show_template_preview)
+        layout.addWidget(self.list_widget)
+
+        # Preview area
+        self.preview_area = QTextEdit(self)
+        self.preview_area.setReadOnly(True)
+        layout.addWidget(self.preview_area)
+
+        # Load button
+        load_button = QPushButton("Load Template", self)
+        load_button.clicked.connect(self.load_selected_template)
+        layout.addWidget(load_button)
+
+        # Load templates initially
+        self.load_templates()
+
+    def load_templates(self):
+        """Load the list of templates from the directory."""
+        self.templates = [f for f in os.listdir(self.templates_dir) if f.endswith('.md')]
+        self.list_widget.addItems(self.templates)
+
+    def filter_templates(self, text):
+        """Filter the templates in the list widget based on the search text."""
+        self.list_widget.clear()
+        filtered_templates = [t for t in self.templates if text.lower() in t.lower()]
+        self.list_widget.addItems(filtered_templates)
+
+    def show_template_preview(self, item):
+        """Display the selected template's content in the preview area."""
+        template_path = os.path.join(self.templates_dir, item.text())
+        with open(template_path, 'r') as file:
+            content = file.read()
+        self.preview_area.setPlainText(content)
+
+    def load_selected_template(self):
+        """Load the selected template into the main editor."""
+        selected_item = self.list_widget.currentItem()
+        if selected_item:
+            template_path = os.path.join(self.templates_dir, selected_item.text())
+            with open(template_path, 'r') as file:
+                content = file.read()
+            self.parent().editor.setPlainText(content)
+            self.accept()
 
 class MarkdownEditor(QMainWindow):
     def __init__(self):
@@ -459,9 +523,23 @@ class MarkdownEditor(QMainWindow):
         self.check_startup_dialog()  # Check and possibly show the startup dialog
 
         self.current_file = None  # Track the currently open file
+
+        # Set up the preview panel with QWebEngineView (initializing preview here)
+        self.preview = QWebEngineView()
+
+        # Now set up the web channel
+        self.setup_web_channel()
+
+        # Initialize the rest of the UI
         self.initUI()
 
         self.apply_settings()  # Apply settings after loading UI
+
+    def setup_web_channel(self):
+        # Setup the channel for JavaScript to PyQt communication
+        self.channel = QWebChannel()
+        self.preview.page().setWebChannel(self.channel)
+        self.channel.registerObject('external', self)
 
     def load_settings(self):
         if os.path.exists(self.settings_file):
@@ -620,13 +698,33 @@ class MarkdownEditor(QMainWindow):
     def update_preview(self):
         raw_markdown = self.editor.toPlainText()
 
+        # Replace Markdown checkboxes with HTML checkboxes
+        raw_markdown = raw_markdown.replace('- [ ]', '<input type="checkbox">').replace('- [x]', '<input type="checkbox" checked>')
+
         # Use markdown2 with extras to support tables, fenced-code-blocks, and other features
         html = markdown2.markdown(
             raw_markdown,
             extras=["fenced-code-blocks", "tables", "strike"]
         )
 
-        # Add custom CSS for code blocks and blockquotes
+        # JavaScript to make checkboxes functional
+        js_code = """
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('input[type="checkbox"]').forEach(function(checkbox) {
+                checkbox.addEventListener('change', function() {
+                    if (checkbox.checked) {
+                        checkbox.nextElementSibling.style.textDecoration = 'line-through';
+                    } else {
+                        checkbox.nextElementSibling.style.textDecoration = 'none';
+                    }
+                });
+            });
+        });
+        </script>
+        """
+
+        # Add custom CSS for code blocks, blockquotes, and scrollbar
         custom_css = """
         <style>
             body {
@@ -634,6 +732,7 @@ class MarkdownEditor(QMainWindow):
                 color: #f8f8f2;
                 background-color: #1e1e1e;
                 padding: 15px;
+                margin: 0;
             }
             pre {
                 background-color: #2b2b2b;
@@ -647,7 +746,6 @@ class MarkdownEditor(QMainWindow):
                 font-size: 14px;
                 white-space: pre-wrap; /* Ensure code block retains formatting */
                 word-wrap: break-word; /* Ensure long lines wrap */
-                margin: 0; /* Remove default margin */
             }
             blockquote {
                 background-color: #2e2e2e;
@@ -678,6 +776,28 @@ class MarkdownEditor(QMainWindow):
                 max-width: 100%;
                 height: auto;
             }
+            /* Custom scrollbar styling */
+            ::-webkit-scrollbar {
+                width: 8px;
+                height: 8px;
+            }
+            ::-webkit-scrollbar-track {
+                background: #1e1e1e;
+            }
+            ::-webkit-scrollbar-thumb {
+                background-color: #444;
+                border-radius: 4px;
+            }
+            ::-webkit-scrollbar-thumb:hover {
+                background-color: #555;
+            }
+            /* Checkbox styling */
+            input[type="checkbox"] {
+                margin-right: 8px;
+            }
+            input[type="checkbox"]:checked + label {
+                text-decoration: line-through;
+            }
         </style>
         """
 
@@ -687,11 +807,13 @@ class MarkdownEditor(QMainWindow):
         # Ensure newlines within code blocks are treated as literal
         html = html.replace('<pre><code>', '<pre style="white-space:pre-wrap;"><code style="white-space:pre-wrap;">')
 
-        # Insert the CSS into the HTML
-        full_html = custom_css + html
+        # Insert the CSS and JS into the HTML
+        full_html = custom_css + html + js_code
 
         # Set the HTML content in the preview pane
         self.preview.page().setHtml(full_html)
+
+
 
     def set_initial_preview_content(self):
         # This sets the initial content of the preview pane with the correct background style
@@ -1158,7 +1280,6 @@ class MarkdownEditor(QMainWindow):
         settings_action.triggered.connect(self.open_settings_window)
         self.toolbar.addAction(settings_action)
 
-
     def createEditorSettingsToolbar(self):
         self.editor_settings_toolbar = QToolBar("Editor Settings")
         self.editor_settings_toolbar.setMovable(True)  # Allow this toolbar to be draggable
@@ -1226,7 +1347,6 @@ class MarkdownEditor(QMainWindow):
         word_wrap_checkbox.setChecked(True)
         word_wrap_checkbox.toggled.connect(self.toggle_word_wrap)
         self.editor_settings_toolbar.addWidget(word_wrap_checkbox)
-
 
     def choose_background_color(self):
         color = QColorDialog.getColor()
@@ -1468,15 +1588,19 @@ class MarkdownEditor(QMainWindow):
         self.terminal_layout = QVBoxLayout()
         self.terminal.setLayout(self.terminal_layout)
 
-        self.output = QLabel()
+        self.output = QTextEdit(self.terminal)
+        self.output.setReadOnly(True)
         self.output.setStyleSheet("background-color: black; color: white; font-family: Consolas, monospace;")
-        self.output.setWordWrap(True)
         self.terminal_layout.addWidget(self.output)
 
-        self.command_input = QLineEdit()
+        self.command_input = QLineEdit(self.terminal)
         self.command_input.setPlaceholderText("Enter command...")
         self.command_input.returnPressed.connect(self.run_command)
         self.terminal_layout.addWidget(self.command_input)
+
+        self.clear_button = QPushButton("Clear", self.terminal)
+        self.clear_button.clicked.connect(self.clear_terminal)
+        self.terminal_layout.addWidget(self.clear_button)
 
         self.terminal.show()
 
@@ -1484,11 +1608,14 @@ class MarkdownEditor(QMainWindow):
         command = self.command_input.text()
         if command:
             try:
-                output = subprocess.check_output(command, shell=True, text=True)
-                self.output.setText(output)
+                output = subprocess.check_output(command, shell=True, text=True, stderr=subprocess.STDOUT)
+                self.output.append(f"> {command}\n{output}")
             except subprocess.CalledProcessError as e:
-                self.output.setText(f"Error: {e.output}")
+                self.output.append(f"> {command}\nError: {e.output}")
             self.command_input.clear()
+
+    def clear_terminal(self):
+        self.output.clear()
 
     def save_file(self):
         if self.current_file:
@@ -1557,21 +1684,18 @@ class MarkdownEditor(QMainWindow):
             if not os.path.exists(templates_dir):
                 os.makedirs(templates_dir)
             template_path = os.path.join(templates_dir, f"{template_name}.md")
-            with open(template_path, 'w') as file:
+            with open(template_path, 'w', encoding='utf-8') as file:
                 file.write(self.editor.toPlainText())
             QMessageBox.information(self, "Template Saved", f"Template '{template_name}' saved successfully.")
+
 
     def load_template(self):
         templates_dir = "templates"
         if not os.path.exists(templates_dir):
             QMessageBox.warning(self, "No Templates", "No templates found. Please save a template first.")
             return
-        template_files = [f for f in os.listdir(templates_dir) if f.endswith('.md')]
-        template_name, ok = QInputDialog.getItem(self, "Load Template", "Select a template:", template_files, 0, False)
-        if ok and template_name:
-            template_path = os.path.join(templates_dir, template_name)
-            with open(template_path, 'r') as file:
-                self.editor.setPlainText(file.read())
+        dialog = TemplateDialog(templates_dir, self)
+        dialog.exec_()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
