@@ -12,8 +12,6 @@ In addition to its core functionality, Markiva provides a host of markdown-speci
 
 Markiva's integrated file explorer makes managing project files easy, with support for drag-and-drop functionality, file renaming, and the ability to set default open files. The editor also includes spell-checking, auto-save functionality, and the capability to export markdown content as PDF or HTML files.
 
-Overall, Markiva is designed to be a comprehensive, reliable tool for anyone working with markdown, providing all the necessary features directly within the application to minimize reliance on external tools. Its name, inspired by the Swedish word for brandy, perfectly captures its blend of power, refinement, and functionality.
-
 # Examples
 
 This is a sampe of the code block
