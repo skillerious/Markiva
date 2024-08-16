@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QPlainTextEdit, QSplitter, QAction,
     QToolBar, QFileDialog, QMessageBox, QStatusBar, QTextEdit, QStyleFactory, QDialog,
     QGridLayout, QPushButton, QMenuBar, QMenu, QInputDialog, QLineEdit, QLabel, QPlainTextDocumentLayout,
-    QTreeView, QFileSystemModel, QHBoxLayout, QDesktopWidget, QDialogButtonBox, QListWidget, QSizePolicy, QAbstractItemView, QComboBox, QSpinBox, QColorDialog, QCheckBox, QToolButton, QTabWidget, QTableWidget, QTableWidgetItem, QHeaderView
+    QTreeView, QFileSystemModel, QHBoxLayout, QDesktopWidget, QDialogButtonBox, QListWidget, QSizePolicy, QAbstractItemView, QComboBox, QSpinBox, QColorDialog, QCheckBox, QToolButton, QTabWidget, QTableWidget, QTableWidgetItem, QHeaderView, QProgressBar
 )
 from PyQt5.QtCore import Qt, QRect, QSize, QTimer, QRegularExpression, QModelIndex, QDir, QFileInfo, QUrl, QItemSelectionModel, pyqtSlot
 from PyQt5.QtGui import QFont, QColor, QPainter, QTextFormat, QPalette, QTextCursor, QTextCharFormat, QSyntaxHighlighter, QIcon, QDesktopServices, QStandardItemModel, QStandardItem, QStandardItemModel
@@ -58,7 +58,7 @@ class MarkdownHighlighter(QSyntaxHighlighter):
         code_format = QTextCharFormat()
         code_format.setFontFamily('Courier')
         code_format.setForeground(Qt.darkCyan)
-        self._highlighting_rules.append((r'`[^`]+`', code_format))  # Inline code
+        self._highlighting_rules.append((r'[^]+', code_format))  # Inline code
 
         blockquote_format = QTextCharFormat()
         blockquote_format.setForeground(Qt.darkGray)
@@ -789,6 +789,9 @@ class MarkdownEditor(QMainWindow):
         self.editor.textChanged.connect(self.update_status_bar)  # Update status bar on text change
         self.editor.cursorPositionChanged.connect(self.update_cursor_position)
 
+        # Connect scroll event to preview synchronization
+        self.editor.verticalScrollBar().valueChanged.connect(self.update_preview_scroll_position)
+
         # Create status bar
         self.create_status_bar()
 
@@ -912,6 +915,12 @@ class MarkdownEditor(QMainWindow):
         self.status_bar.addPermanentWidget(self.syntax_label)
         self.status_bar.addPermanentWidget(self.zoom_level_label)
         self.status_bar.addPermanentWidget(self.date_time_label)
+
+        # Adding a progress bar to the status bar
+        self.progress_bar = QProgressBar(self)
+        self.progress_bar.setMaximumWidth(200)
+        self.progress_bar.setVisible(False)
+        self.status_bar.addPermanentWidget(self.progress_bar)
 
         self.setStatusBar(self.status_bar)
 
@@ -1098,6 +1107,20 @@ class MarkdownEditor(QMainWindow):
 
         # Set the HTML content in the preview pane
         self.preview.page().setHtml(full_html)
+
+    def update_preview_scroll_position(self):
+        """
+        Synchronize the scroll position between the editor and the preview pane.
+        """
+        # Calculate the percentage of scroll in the editor
+        editor_scroll_position = self.editor.verticalScrollBar().value()
+        editor_scroll_range = self.editor.verticalScrollBar().maximum()
+        editor_scroll_percentage = editor_scroll_position / editor_scroll_range if editor_scroll_range else 0
+
+        # Apply the same percentage to the preview pane
+        preview_scroll_range = self.preview.page().contentsSize().height() - self.preview.height()
+        preview_scroll_position = preview_scroll_range * editor_scroll_percentage
+        self.preview.page().runJavaScript(f"window.scrollTo(0, {preview_scroll_position});")
 
     def set_initial_preview_content(self):
         # This sets the initial content of the preview pane with the correct background style
@@ -1486,6 +1509,7 @@ class MarkdownEditor(QMainWindow):
         code_action = QAction(code_icon, "Code", self)
         code_action.triggered.connect(lambda: self.editor.insert_markdown("```", "```", block=True))
         self.toolbar.addAction(code_action)
+
 
         hr_action = QAction(hr_icon, "Horizontal Rule", self)
         hr_action.triggered.connect(lambda: self.editor.insert_markdown("\n---\n", ""))
