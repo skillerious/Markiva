@@ -1,4 +1,4 @@
-# Welcome to MyMarkdown!
+# Welcome to Markiva!
 
 ---
 
@@ -64,6 +64,12 @@ We have them too!!
 ~~Strikethrough~~
 
 - [ ] Checkboxes 
+
+<br />
+Use the handy Table Editor using the table button in the toolbar
+
+
+![](https://i.postimg.cc/DzTGcvyr/Screenshot-2024-08-16-200147.png)
 
 What about images?
 
