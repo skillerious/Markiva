@@ -1,7 +1,5 @@
 # Welcome to Markiva!
 
----
-
 This application was created to make creating markdown text easy!
 
 There is tons of features jammed packed into this nifty app.
@@ -28,8 +26,6 @@ and many many more!
 
 # Examples
 
----
-
 This is a sampe of the code block
 
 ```
@@ -45,14 +41,12 @@ and this is an example of the quote block
 
 # Links
 
----
 We have them too!!
 
 [Here](https://github.com/skillerious) is an example of a hyperlink
 
 # Tables
 
----
 
 | Table Header | Table Header |
 | --- | --- |
@@ -60,7 +54,6 @@ We have them too!!
 
 # Other extras
 
----
 ~~Strikethrough~~
 
 - [ ] Checkboxes 
