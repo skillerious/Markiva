@@ -2,29 +2,17 @@
 
 ---
 
-This application was created to make creating markdown text easy!
+Markiva is a powerful markdown editor designed to enhance the writing experience for users who work extensively with markdown files. It caters to both developers and content creators, offering a range of features including syntax highlighting, real-time live preview synchronization, version control, and a variety of customizable editor settings.
 
-There is tons of features jammed packed into this nifty app.
+The name Markiva is derived from the Swedish word for "brandy," symbolizing the application's strength and sophistication. Just as brandy is known for its rich and bold character, Markiva embodies these qualities through its robust features and refined user experience, making it a powerful tool for anyone working with markdown files.
 
-- Edit .md files
+Markiva stands out with its live preview synchronization, allowing users to see their markdown content rendered in real-time as they type. This feature ensures that any changes made in the editor are immediately visible in the preview pane, streamlining the editing process and enhancing productivity.
 
-- Set default tree view
+In addition to its core functionality, Markiva provides a host of markdown-specific tools accessible via a user-friendly toolbar. These include options for inserting bold, italic, and other text formatting, as well as advanced features like a table editor, an emoji picker, and template management capabilities. The application also supports customizable themes, with both light and dark modes, ensuring a comfortable editing environment for every user.
 
-- Highlight <mark>elements</mark>
+Markiva's integrated file explorer makes managing project files easy, with support for drag-and-drop functionality, file renaming, and the ability to set default open files. The editor also includes spell-checking, auto-save functionality, and the capability to export markdown content as PDF or HTML files.
 
-- Create .md documents
-
-- Delete .md documents
-
-- Insert HTML (Presets/code)
-
-- Version control
-
-- Spellchecking
-
-- Use the many markdown presets in the toolbar
-
-and many many more!
+Overall, Markiva is designed to be a comprehensive, reliable tool for anyone working with markdown, providing all the necessary features directly within the application to minimize reliance on external tools. Its name, inspired by the Swedish word for brandy, perfectly captures its blend of power, refinement, and functionality.
 
 # Examples
 
