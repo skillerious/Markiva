@@ -9,10 +9,10 @@ from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QPlainTextEdit, QSplitter, QAction,
     QToolBar, QFileDialog, QMessageBox, QStatusBar, QTextEdit, QStyleFactory, QDialog,
     QGridLayout, QPushButton, QMenuBar, QMenu, QInputDialog, QLineEdit, QLabel, QPlainTextDocumentLayout,
-    QTreeView, QFileSystemModel, QHBoxLayout, QDesktopWidget, QDialogButtonBox, QListWidget, QSizePolicy, QAbstractItemView, QComboBox, QSpinBox, QColorDialog, QCheckBox, QToolButton
+    QTreeView, QFileSystemModel, QHBoxLayout, QDesktopWidget, QDialogButtonBox, QListWidget, QSizePolicy, QAbstractItemView, QComboBox, QSpinBox, QColorDialog, QCheckBox, QToolButton, QTabWidget, QTableWidget, QTableWidgetItem, QHeaderView
 )
 from PyQt5.QtCore import Qt, QRect, QSize, QTimer, QRegularExpression, QModelIndex, QDir, QFileInfo, QUrl, QItemSelectionModel, pyqtSlot
-from PyQt5.QtGui import QFont, QColor, QPainter, QTextFormat, QPalette, QTextCursor, QTextCharFormat, QSyntaxHighlighter, QIcon, QDesktopServices
+from PyQt5.QtGui import QFont, QColor, QPainter, QTextFormat, QPalette, QTextCursor, QTextCharFormat, QSyntaxHighlighter, QIcon, QDesktopServices, QStandardItemModel, QStandardItem, QStandardItemModel
 from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEngineSettings
 from PyQt5.QtWebChannel import QWebChannel
 from PyQt5.QtPrintSupport import QPrinter
@@ -54,6 +54,17 @@ class MarkdownHighlighter(QSyntaxHighlighter):
         italic_format = QTextCharFormat()
         italic_format.setFontItalic(True)
         self._highlighting_rules.append((r'\*.*?\*', italic_format))  # Italic
+
+        code_format = QTextCharFormat()
+        code_format.setFontFamily('Courier')
+        code_format.setForeground(Qt.darkCyan)
+        self._highlighting_rules.append((r'`[^`]+`', code_format))  # Inline code
+
+        blockquote_format = QTextCharFormat()
+        blockquote_format.setForeground(Qt.darkGray)
+        self._highlighting_rules.append((r'^>\s.*', blockquote_format))  # Blockquotes
+
+        # Add more formats here for different Markdown syntax
 
     def highlightBlock(self, text):
         for pattern, fmt in self._highlighting_rules:
@@ -312,9 +323,9 @@ class CodeEditor(QPlainTextEdit):
     def on_modification_changed(self, modified):
         window = self.window()
         if window.current_file and modified:
-            window.setWindowTitle(f"{os.path.basename(window.current_file)}* - Markdown Editor")
+            window.setWindowTitle(f"{os.path.basename(window.current_file)}* - Markiva")
         elif window.current_file:
-            window.setWindowTitle(f"{os.path.basename(window.current_file)} - Markdown Editor")
+            window.setWindowTitle(f"{os.path.basename(window.current_file)} - Markiva")
 
 
 class EmojiPicker(QDialog):
@@ -447,6 +458,110 @@ class CustomTreeView(QTreeView):
             model.dropMimeData(event.mimeData(), event.dropAction(), -1, -1, self.indexAt(event.pos()))
         else:
             super().dropEvent(event)
+
+
+class TableEditorDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Table Editor")
+        self.setMinimumSize(600, 400)
+
+        # Layouts
+        self.layout = QVBoxLayout(self)
+        
+        # Table widget
+        self.table_widget = QTableWidget(3, 3, self)  # Default 3x3 table
+        self.layout.addWidget(self.table_widget)
+
+        # Check box for headers
+        self.header_checkbox = QCheckBox("Include Header Row", self)
+        self.header_checkbox.setChecked(True)
+        self.layout.addWidget(self.header_checkbox)
+
+        # Buttons for adding/removing rows and columns
+        button_layout = QHBoxLayout()
+        add_row_btn = QPushButton("Add Row")
+        add_col_btn = QPushButton("Add Column")
+        remove_row_btn = QPushButton("Remove Row")
+        remove_col_btn = QPushButton("Remove Column")
+
+        add_row_btn.clicked.connect(self.add_row)
+        add_col_btn.clicked.connect(self.add_column)
+        remove_row_btn.clicked.connect(self.remove_row)
+        remove_col_btn.clicked.connect(self.remove_column)
+
+        button_layout.addWidget(add_row_btn)
+        button_layout.addWidget(add_col_btn)
+        button_layout.addWidget(remove_row_btn)
+        button_layout.addWidget(remove_col_btn)
+
+        self.layout.addLayout(button_layout)
+
+        # Dialog buttons
+        self.dialog_buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        self.dialog_buttons.accepted.connect(self.accept)
+        self.dialog_buttons.rejected.connect(self.reject)
+
+        self.layout.addWidget(self.dialog_buttons)
+
+    def add_row(self):
+        row_position = self.table_widget.rowCount()
+        self.table_widget.insertRow(row_position)
+
+    def add_column(self):
+        col_position = self.table_widget.columnCount()
+        self.table_widget.insertColumn(col_position)
+
+    def remove_row(self):
+        if self.table_widget.rowCount() > 1:
+            self.table_widget.removeRow(self.table_widget.rowCount() - 1)
+
+    def remove_column(self):
+        if self.table_widget.columnCount() > 1:
+            self.table_widget.removeColumn(self.table_widget.columnCount() - 1)
+
+    def get_table_markdown(self):
+        headers = []
+        rows = []
+
+        # If header checkbox is checked, include the first row as headers
+        if self.header_checkbox.isChecked():
+            for col in range(self.table_widget.columnCount()):
+                header_item = self.table_widget.item(0, col)
+                headers.append(header_item.text() if header_item else "Header")
+            data_start_row = 1  # Data starts from the second row
+        else:
+            headers = ["Header"] * self.table_widget.columnCount()
+            data_start_row = 0  # Data starts from the first row
+
+        for row in range(data_start_row, self.table_widget.rowCount()):
+            row_data = []
+            for col in range(self.table_widget.columnCount()):
+                item = self.table_widget.item(row, col)
+                row_data.append(item.text() if item else "")
+            rows.append(row_data)
+
+        # Convert to Markdown table
+        markdown_table = "| " + " | ".join(headers) + " |\n"
+        markdown_table += "| " + " | ".join(["---"] * len(headers)) + " |\n"
+
+        for row in rows:
+            markdown_table += "| " + " | ".join(row) + " |\n"
+
+        return markdown_table
+
+    def accept(self):
+        # Insert the table markdown into the editor
+        table_markdown = self.get_table_markdown()
+        self.parent().editor.insertPlainText(table_markdown)
+        super().accept()
+
+
+    def accept(self):
+        # Insert the table markdown into the editor
+        table_markdown = self.get_table_markdown()
+        self.parent().editor.insertPlainText(table_markdown)
+        super().accept()
 
 class TemplateDialog(QDialog):
     def __init__(self, templates_dir, parent=None):
@@ -621,7 +736,7 @@ class MarkdownEditor(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.setWindowTitle("Markdown Editor with Live Preview")
+        self.setWindowTitle("Markiva")
         self.setGeometry(100, 100, 1200, 800)
         self.dark_mode = True  # Start with dark mode by default
 
@@ -866,8 +981,6 @@ class MarkdownEditor(QMainWindow):
         QMessageBox.information(self, "Status Bar Information", info_text)
 
 
-
-
     def update_preview(self):
         raw_markdown = self.editor.toPlainText()
 
@@ -1109,7 +1222,7 @@ class MarkdownEditor(QMainWindow):
             with open(file_path, 'r', encoding='utf-8') as file:
                 self.editor.setPlainText(file.read())
                 self.current_file = file_path
-                self.setWindowTitle(f"{os.path.basename(self.current_file)} - Markdown Editor")
+                self.setWindowTitle(f"{os.path.basename(self.current_file)} - Markiva")
                 self.editor.document().setModified(False)  # Reset modified status
                 self.update_status_bar()  # Ensure status bar is updated after file is opened
 
@@ -1409,7 +1522,7 @@ class MarkdownEditor(QMainWindow):
         self.toolbar.addSeparator()
 
         table_action = QAction(table_icon, "Table", self)
-        table_action.triggered.connect(lambda: self.editor.insert_markdown("\n| Header 1 | Header 2 |\n| --- | --- |\n| Row 1 Col 1 | Row 1 Col 2 |\n", ""))
+        table_action.triggered.connect(self.show_table_editor)
         self.toolbar.addAction(table_action)
 
         # HTML elements insertion
@@ -1539,6 +1652,10 @@ class MarkdownEditor(QMainWindow):
     def insert_emoji(self):
         self.emoji_picker = EmojiPicker(self)
         self.emoji_picker.exec_()
+
+    def show_table_editor(self):
+        table_editor = TableEditorDialog(self)
+        table_editor.exec_()
 
     def open_settings_window(self):
         settings_dialog = SettingsWindow(self.settings_file, self)
@@ -1796,7 +1913,7 @@ class MarkdownEditor(QMainWindow):
             with open(file_name, 'w') as file:
                 file.write(self.editor.toPlainText())
             self.current_file = file_name
-            self.setWindowTitle(f"{os.path.basename(self.current_file)} - Markdown Editor")
+            self.setWindowTitle(f"{os.path.basename(self.current_file)} - Markiva")
             self.editor.document().setModified(False)  # Reset modified status
         except Exception as e:
             QMessageBox.warning(self, "Error", f"Could not save file: {str(e)}")

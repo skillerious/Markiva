@@ -25,7 +25,7 @@ class AboutDialog(QDialog):
         layout.addWidget(logo_label)
 
         # App title
-        title_label = QLabel("Markdown Editor")
+        title_label = QLabel("Markiva")
         title_label.setFont(QFont("Arial", 24, QFont.Bold))
         title_label.setAlignment(Qt.AlignCenter)
         title_label.setStyleSheet("color: #FFD700;")
