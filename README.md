@@ -38,12 +38,12 @@ Manage your project files effortlessly with Markiva’s integrated file explorer
 
 ### Code Block
 
-\```markdown
+```markdown
 If my app is working
 then
   do this
 end if
-\```
+```
 
 ### Quote Block
 
