@@ -2,7 +2,7 @@
   <img src="https://i.postimg.cc/y6LSsGSh/Markiva-Logo.png" alt="drawing" style="width:200px;"/>
 </p>
 
-<img src="https://i.postimg.cc/rpkYdZzf/Screenshot-2024-08-17-000259.png"></img>
+![](https://i.postimg.cc/MHG275xR/Screenshot-2024-08-17-155409.png)
 
 # 🎉 Welcome to **Markiva!** 
 
