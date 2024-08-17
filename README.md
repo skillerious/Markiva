@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://i.postimg.cc/y6LSsGSh/Markiva-Logo.png" alt="drawing" style="width:200px;"/>
+</p>
+
 <img src="https://i.postimg.cc/rpkYdZzf/Screenshot-2024-08-17-000259.png"></img>
 
 # 🎉 Welcome to **Markiva!** 
