@@ -20,8 +20,8 @@ import subprocess  # For integrated terminal
 from spellchecker import SpellChecker
 import markdown2
 import difflib
+import chardet  # For detecting file encoding
 import re  # For regex support in Find and Replace
-from startup import StartupDialog  # Import the new startup dialog
 from Settings import SettingsWindow  # Import SettingsWindow
 from about import AboutDialog
 
@@ -829,8 +829,6 @@ class FindReplaceDialog(QDialog):
 
         # Buttons
         self.button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, self)
-        self.button_box.accepted.connect(self.accept)
-        self.button_box.rejected.connect(self.reject)
         layout.addWidget(self.button_box)
 
         self.setLayout(layout)
@@ -860,8 +858,6 @@ class MarkdownEditor(QMainWindow):
         self.settings_file = "user_settings.json"
         self.settings = self.load_settings()
 
-        self.check_startup_dialog()  # Check and possibly show the startup dialog
-
         self.current_file = None  # Track the currently open file
 
         # Set up the preview panel with QWebEngineView (initializing preview here)
@@ -888,14 +884,14 @@ class MarkdownEditor(QMainWindow):
         return {}
 
     def save_settings(self):
-        with open(self.settings_file, 'w') as f:
-            json.dump(self.settings, f)
+        try:
+            print(f"Saving settings to: {os.path.abspath(self.settings_file)}")
+            with open(self.settings_file, 'w') as f:
+                json.dump(self.settings, f, indent=4)
+            print(f"Settings saved to {self.settings_file}")
+        except Exception as e:
+            print(f"Failed to save settings: {e}")
 
-    def check_startup_dialog(self):
-        if self.settings.get("show_startup", True):
-            dialog = StartupDialog(self.settings_file)
-            if dialog.exec_() != QDialog.Accepted:
-                sys.exit()
 
     def initUI(self):
         # Set up the editor panel first
@@ -1351,8 +1347,19 @@ class MarkdownEditor(QMainWindow):
 
     def open_file_by_path(self, file_path):
         try:
-            with open(file_path, 'r', encoding='utf-8') as file:
-                self.editor.setPlainText(file.read())
+            with open(file_path, 'rb') as file:
+                raw_data = file.read()
+                if len(raw_data) == 0:  # Handle empty files
+                    self.editor.setPlainText("")  # Set empty content for the editor
+                    self.current_file = file_path
+                    self.setWindowTitle(f"{os.path.basename(self.current_file)} - Markiva")
+                    self.editor.document().setModified(False)  # Reset modified status
+                    self.update_status_bar()  # Ensure status bar is updated after file is opened
+                    return
+
+                # Always use UTF-8 to decode
+                decoded_text = raw_data.decode('utf-8')
+                self.editor.setPlainText(decoded_text)
                 self.current_file = file_path
                 self.setWindowTitle(f"{os.path.basename(self.current_file)} - Markiva")
                 self.editor.document().setModified(False)  # Reset modified status
@@ -1364,6 +1371,9 @@ class MarkdownEditor(QMainWindow):
                 self.tree.scrollTo(index)  # Ensure the file is visible
         except Exception as e:
             QMessageBox.warning(self, "Error", f"Could not open file: {str(e)}")
+
+
+
 
 
 
@@ -2110,13 +2120,15 @@ class MarkdownEditor(QMainWindow):
                 return
 
         try:
-            with open(file_name, 'w') as file:
+            with open(file_name, 'w', encoding='utf-8') as file:  # Ensure UTF-8 encoding here
                 file.write(self.editor.toPlainText())
             self.current_file = file_name
             self.setWindowTitle(f"{os.path.basename(self.current_file)} - Markiva")
             self.editor.document().setModified(False)  # Reset modified status
         except Exception as e:
             QMessageBox.warning(self, "Error", f"Could not save file: {str(e)}")
+
+
 
     def restore_window_state(self):
         """Restore the state of the window, including toolbar positions."""
