@@ -4,8 +4,6 @@
 
 Markiva is a powerful markdown editor designed to enhance the writing experience for users who work extensively with markdown files. It caters to both developers and content creators, offering a range of features including syntax highlighting, real-time live preview synchronization, version control, and a variety of customizable editor settings.
 
-The name Markiva is derived from the Swedish word for "brandy," symbolizing the application's strength and sophistication. Just as brandy is known for its rich and bold character, Markiva embodies these qualities through its robust features and refined user experience, making it a powerful tool for anyone working with markdown files.
-
 Markiva stands out with its live preview synchronization, allowing users to see their markdown content rendered in real-time as they type. This feature ensures that any changes made in the editor are immediately visible in the preview pane, streamlining the editing process and enhancing productivity.
 
 In addition to its core functionality, Markiva provides a host of markdown-specific tools accessible via a user-friendly toolbar. These include options for inserting bold, italic, and other text formatting, as well as advanced features like a table editor, an emoji picker, and template management capabilities. The application also supports customizable themes, with both light and dark modes, ensuring a comfortable editing environment for every user.
