@@ -18,7 +18,7 @@ class AboutDialog(QDialog):
 
         # Logo at the top with shadow effect
         logo_label = QLabel(self)
-        pixmap = QPixmap("images/logo.png")
+        pixmap = QPixmap("images/MarkivaLogo.png")  # Updated logo path
         pixmap = pixmap.scaled(100, 100, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         logo_label.setPixmap(pixmap)
         logo_label.setAlignment(Qt.AlignCenter)

@@ -11,6 +11,10 @@ from PyQt5.QtGui import QIcon, QPalette, QColor, QFont
 class StartupDialog(QDialog):
     def __init__(self, settings_file):
         super().__init__()
+        
+        # Set the window icon
+        self.setWindowIcon(QIcon("images/MarkivaLogo.png"))
+        
         self.settings_file = settings_file
         self.settings = self.load_settings()
         self.initUI()

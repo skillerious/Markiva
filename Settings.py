@@ -4,7 +4,7 @@ import qtawesome as qta
 from PyQt5.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QSpinBox, QColorDialog, QFileDialog, QFormLayout, QDialogButtonBox, QGroupBox, QSizePolicy, QAbstractButton
 )
-from PyQt5.QtGui import QColor, QPainter, QBrush, QPen
+from PyQt5.QtGui import QColor, QPainter, QBrush, QPen, QIcon
 from PyQt5.QtCore import Qt, QPropertyAnimation, QRect, pyqtProperty, QEasingCurve, QSize
 
 
@@ -96,6 +96,10 @@ class Toggle(QAbstractButton):
 class SettingsWindow(QDialog):
     def __init__(self, settings_file, parent=None):
         super().__init__(parent)
+        
+        # Set the window icon
+        self.setWindowIcon(QIcon("images/MarkivaLogo.png"))
+        
         self.setWindowTitle("Application Settings")
         self.setFixedSize(420, 460)
 
