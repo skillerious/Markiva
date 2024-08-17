@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QPlainTextEdit, QSplitter, QAction,
     QToolBar, QFileDialog, QMessageBox, QStatusBar, QTextEdit, QStyleFactory, QDialog,
     QGridLayout, QPushButton, QMenuBar, QMenu, QInputDialog, QLineEdit, QLabel, QPlainTextDocumentLayout,
-    QTreeView, QFileSystemModel, QHBoxLayout, QDesktopWidget, QDialogButtonBox, QListWidget, QSizePolicy, QAbstractItemView, QComboBox, QSpinBox, QColorDialog, QCheckBox, QToolButton, QTabWidget, QTableWidget, QTableWidgetItem, QHeaderView, QProgressBar
+    QTreeView, QFileSystemModel, QHBoxLayout, QDesktopWidget, QDialogButtonBox, QListWidget, QSizePolicy, QAbstractItemView, QComboBox, QSpinBox, QColorDialog, QCheckBox, QToolButton, QTabWidget, QTableWidget, QTableWidgetItem, QHeaderView, QProgressBar, QSpinBox
 )
 from PyQt5.QtCore import Qt, QRect, QSize, QTimer, QRegularExpression, QModelIndex, QDir, QFileInfo, QUrl, QItemSelectionModel, pyqtSlot
 from PyQt5.QtGui import QFont, QColor, QPainter, QTextFormat, QPalette, QTextCursor, QTextCharFormat, QSyntaxHighlighter, QIcon, QDesktopServices, QStandardItemModel, QStandardItem, QStandardItemModel
@@ -328,6 +328,33 @@ class CodeEditor(QPlainTextEdit):
             window.setWindowTitle(f"{os.path.basename(window.current_file)} - Markiva")
 
 
+class LinkDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Insert Link")
+        self.setFixedSize(400, 200)
+
+        layout = QVBoxLayout(self)
+
+        self.text_label = QLabel("Text to display:", self)
+        self.text_input = QLineEdit(self)
+        layout.addWidget(self.text_label)
+        layout.addWidget(self.text_input)
+
+        self.url_label = QLabel("URL:", self)
+        self.url_input = QLineEdit(self)
+        layout.addWidget(self.url_label)
+        layout.addWidget(self.url_input)
+
+        self.button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, self)
+        self.button_box.accepted.connect(self.accept)
+        self.button_box.rejected.connect(self.reject)
+        layout.addWidget(self.button_box)
+
+    def get_link_data(self):
+        return self.text_input.text(), self.url_input.text()
+
+
 class EmojiPicker(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -557,12 +584,6 @@ class TableEditorDialog(QDialog):
         super().accept()
 
 
-    def accept(self):
-        # Insert the table markdown into the editor
-        table_markdown = self.get_table_markdown()
-        self.parent().editor.insertPlainText(table_markdown)
-        super().accept()
-
 class TemplateDialog(QDialog):
     def __init__(self, templates_dir, parent=None):
         super().__init__(parent)
@@ -732,6 +753,31 @@ class TemplateDialog(QDialog):
                 QMessageBox.information(self, "Template Deleted", f"Template '{template_name}' has been deleted.")
 
 
+class ProgressDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Insert Progress")
+        self.setFixedSize(250, 120)
+
+        layout = QVBoxLayout(self)
+
+        self.label = QLabel("Select Progress Value:", self)
+        layout.addWidget(self.label)
+
+        self.spin_box = QSpinBox(self)
+        self.spin_box.setRange(1, 100)
+        self.spin_box.setValue(50)
+        layout.addWidget(self.spin_box)
+
+        self.button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, self)
+        self.button_box.accepted.connect(self.accept)
+        self.button_box.rejected.connect(self.reject)
+        layout.addWidget(self.button_box)
+
+    def get_progress_value(self):
+        return self.spin_box.value()
+
+
 class MarkdownEditor(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -898,7 +944,6 @@ class MarkdownEditor(QMainWindow):
         self.reading_time_label = QLabel("Reading Time: 0 min")
         self.cursor_position_label = QLabel("Line: 1, Col: 1")
         self.modified_label = QLabel("Modified: No")
-        self.current_word_label = QLabel("Word: ")
         self.syntax_label = QLabel("Syntax: Markdown")
         self.zoom_level_label = QLabel("Zoom: 100%")
         self.date_time_label = QLabel()
@@ -911,7 +956,6 @@ class MarkdownEditor(QMainWindow):
         self.status_bar.addPermanentWidget(self.reading_time_label)
         self.status_bar.addPermanentWidget(self.cursor_position_label)
         self.status_bar.addPermanentWidget(self.modified_label)
-        self.status_bar.addPermanentWidget(self.current_word_label)
         self.status_bar.addPermanentWidget(self.syntax_label)
         self.status_bar.addPermanentWidget(self.zoom_level_label)
         self.status_bar.addPermanentWidget(self.date_time_label)
@@ -949,12 +993,6 @@ class MarkdownEditor(QMainWindow):
         modified_status = "Yes" if self.editor.document().isModified() else "No"
         self.modified_label.setText(f"Modified: {modified_status}")
 
-        # Update current word under cursor
-        cursor = self.editor.textCursor()
-        cursor.select(QTextCursor.WordUnderCursor)
-        current_word = cursor.selectedText().strip()
-        self.current_word_label.setText(f"Word: {current_word}")
-
         # Update syntax label (assuming Markdown, but could be extended for other formats)
         syntax = "Markdown"  # You could detect other formats if necessary
         self.syntax_label.setText(f"Syntax: {syntax}")
@@ -964,10 +1002,11 @@ class MarkdownEditor(QMainWindow):
         self.zoom_level_label.setText(f"Zoom: {zoom_level}%")
 
     def update_cursor_position(self):
-        cursor = self.editor.textCursor()
+        cursor = self.editor.textCursor()  # Corrected this line to use self.editor
         line = cursor.blockNumber() + 1
         column = cursor.columnNumber() + 1
         self.cursor_position_label.setText(f"Line: {line}, Col: {column}")
+
 
     def update_date_time(self):
         current_date_time = time.strftime("%Y-%m-%d %H:%M:%S")
@@ -1451,6 +1490,7 @@ class MarkdownEditor(QMainWindow):
         indent_icon = qta.icon('fa.indent', color=icon_color)
         outdent_icon = qta.icon('fa.outdent', color=icon_color)
         settings_icon = qta.icon('fa.cog', color=icon_color)
+        misc_icon = qta.icon('fa.bars', color=icon_color)  # Icon for Misc dropdown
 
         # Icons for H1, H2, and Images
         h1_icon = qta.icon('fa.header', color=icon_color)
@@ -1536,7 +1576,7 @@ class MarkdownEditor(QMainWindow):
         self.toolbar.addSeparator()
 
         link_action = QAction(link_icon, "Link", self)
-        link_action.triggered.connect(lambda: self.editor.insert_markdown("[", "](url)"))
+        link_action.triggered.connect(self.insert_link)
         self.toolbar.addAction(link_action)
 
         image_action = QAction(image_icon, "Image", self)
@@ -1548,6 +1588,18 @@ class MarkdownEditor(QMainWindow):
         table_action = QAction(table_icon, "Table", self)
         table_action.triggered.connect(self.show_table_editor)
         self.toolbar.addAction(table_action)
+        
+        # Misc dropdown button
+        misc_menu = QMenu(self)
+        insert_progress_action = QAction("Insert Progress", self)
+        insert_progress_action.triggered.connect(self.insert_progress)
+        misc_menu.addAction(insert_progress_action)
+
+        misc_button = QToolButton(self)
+        misc_button.setIcon(misc_icon)
+        misc_button.setMenu(misc_menu)
+        misc_button.setPopupMode(QToolButton.InstantPopup)
+        self.toolbar.addWidget(misc_button)
 
         # HTML elements insertion
         self.toolbar.addSeparator()
@@ -1560,7 +1612,7 @@ class MarkdownEditor(QMainWindow):
         h2_action.triggered.connect(lambda: self.editor.insert_html("h2"))
         self.toolbar.addAction(h2_action)
 
-        img_action = QAction(img_icon, "Image", self)
+        img_action = QAction(img_icon, "HTML Image", self)
         img_action.triggered.connect(lambda: self.editor.insert_html("img", 'src="image_url"'))
         self.toolbar.addAction(img_action)
 
@@ -1587,6 +1639,7 @@ class MarkdownEditor(QMainWindow):
         settings_action = QAction(settings_icon, "Settings", self)
         settings_action.triggered.connect(self.open_settings_window)
         self.toolbar.addAction(settings_action)
+
 
     def createEditorSettingsToolbar(self):
         # Font Family
@@ -1680,6 +1733,13 @@ class MarkdownEditor(QMainWindow):
     def show_table_editor(self):
         table_editor = TableEditorDialog(self)
         table_editor.exec_()
+
+    def insert_progress(self):
+        dialog = ProgressDialog(self)
+        if dialog.exec_() == QDialog.Accepted:
+            progress_value = dialog.get_progress_value()
+            progress_markdown = f"![](https://geps.dev/progress/{progress_value})"
+            self.editor.insertPlainText(progress_markdown)
 
     def open_settings_window(self):
         settings_dialog = SettingsWindow(self.settings_file, self)
@@ -2001,6 +2061,39 @@ class MarkdownEditor(QMainWindow):
             QMessageBox.warning(self, "No Templates", "No templates found. Please save a template first.")
             return
         dialog = TemplateDialog(templates_dir, self)
+        dialog.exec_()
+
+    def insert_link(self):
+        dialog = QDialog(self)
+        dialog.setWindowTitle("Insert Link")
+
+        layout = QVBoxLayout(dialog)
+
+        # Input fields
+        text_label = QLabel("Text:", dialog)
+        layout.addWidget(text_label)
+        text_input = QLineEdit(dialog)
+        layout.addWidget(text_input)
+
+        url_label = QLabel("URL:", dialog)
+        layout.addWidget(url_label)
+        url_input = QLineEdit(dialog)
+        layout.addWidget(url_input)
+
+        # Dialog buttons
+        button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, dialog)
+        layout.addWidget(button_box)
+
+        def on_ok():
+            text = text_input.text()
+            url = url_input.text()
+            if text and url:
+                self.editor.insertPlainText(f"[{text}]({url})")
+            dialog.accept()
+
+        button_box.accepted.connect(on_ok)
+        button_box.rejected.connect(dialog.reject)
+
         dialog.exec_()
 
 
