@@ -103,6 +103,74 @@ class CodeEditor(QPlainTextEdit):
         self.setAcceptDrops(True)
         self.document().modificationChanged.connect(self.on_modification_changed)
 
+        self.predicted_text = ""
+        self.showing_prediction = False
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Tab and self.showing_prediction:
+            # Accept the predicted text
+            self.accept_prediction()
+            return
+        elif self.showing_prediction:
+            # If any key other than Tab is pressed, remove the prediction
+            self.clear_prediction()
+
+        super().keyPressEvent(event)
+
+        # Check for Markdown patterns after the user has typed
+        self.check_for_patterns()
+
+    def check_for_patterns(self):
+        cursor = self.textCursor()
+        cursor.select(QTextCursor.WordUnderCursor)
+        current_word = cursor.selectedText()
+
+        if current_word.endswith("![]"):
+            self.predicted_text = "(image_url)"
+            self.show_prediction()
+        elif current_word.endswith("[]"):
+            self.predicted_text = "(url)"
+            self.show_prediction()
+        elif current_word.endswith("**"):
+            self.predicted_text = "bold text**"
+            self.show_prediction()
+        elif current_word.endswith("_"):
+            self.predicted_text = "italic text_"
+            self.show_prediction()
+        elif current_word.endswith("```"):
+            self.predicted_text = "\n```language\n```\n"
+            self.show_prediction()
+        elif current_word.endswith(">"):
+            self.predicted_text = " blockquote"
+            self.show_prediction()
+
+    def show_prediction(self):
+        cursor = self.textCursor()
+        position = cursor.position()
+
+        # Insert the predicted text
+        cursor.insertText(self.predicted_text)
+
+        # Select the predicted text so it can be replaced or accepted
+        cursor.setPosition(position, QTextCursor.MoveAnchor)
+        cursor.setPosition(position + len(self.predicted_text), QTextCursor.KeepAnchor)
+        self.setTextCursor(cursor)
+
+        self.showing_prediction = True
+
+    def clear_prediction(self):
+        if self.showing_prediction:
+            cursor = self.textCursor()
+            cursor.removeSelectedText()
+            self.showing_prediction = False
+
+    def accept_prediction(self):
+        cursor = self.textCursor()
+        cursor.clearSelection()
+        self.setTextCursor(cursor)
+        self.showing_prediction = False
+
+
     def set_font_size(self, font_size):
         self.setFont(QFont(self.font().family(), font_size))
 
@@ -877,24 +945,57 @@ class MarkdownEditor(QMainWindow):
 
     def align_text(self, alignment):
         cursor = self.editor.textCursor()
+        
+        # Preserve the current cursor position and scroll position
+        initial_position = cursor.position()
+        initial_scroll_value = self.editor.verticalScrollBar().value()
+        
         cursor.select(QTextCursor.BlockUnderCursor)
         selected_text = cursor.selectedText().strip()
 
-        # Check if the selected text is already wrapped in a <p>, <div>, or heading tag with an existing style attribute
-        if selected_text.startswith("<p ") or selected_text.startswith("<div ") or re.match(r'<h[1-6] ', selected_text):
-            # Use regex to replace the existing text-align style within the tag
-            formatted_text = re.sub(r'text-align: \w+;', f'text-align: {alignment};', selected_text)
-        else:
-            # If no tags are detected, wrap the text in a <p> tag with the new alignment
-            formatted_text = f'<p style="text-align: {alignment};">{selected_text}</p>'
+        # Handle existing HTML headers (h1, h2, etc.)
+        html_header_match = re.match(r'<h([1-6])(\s[^>]*)?>(.*?)<\/h\1>', selected_text)
+        if html_header_match:
+            level = html_header_match.group(1)
+            attributes = html_header_match.group(2) or ""
+            title = html_header_match.group(3).strip()
+            
+            # Check if style attribute exists
+            style_match = re.search(r'style="[^"]*"', attributes)
+            if style_match:
+                # Update the existing style attribute
+                new_style = re.sub(r'text-align:\s*\w+;', f'text-align: {alignment};', style_match.group())
+                attributes = re.sub(r'style="[^"]*"', new_style, attributes)
+            else:
+                # Add the style attribute if it doesn't exist
+                attributes += f' style="text-align: {alignment};"'
 
-        # Prevent wrapping the text multiple times by avoiding re-inserting it if it's already formatted correctly
+            formatted_text = f'\n<h{level}{attributes}>{title}</h{level}>\n'
+
+        # Handle Markdown headers (e.g., # Title)
+        elif selected_text.startswith("#"):
+            level = selected_text.count('#')
+            title = selected_text.strip('# ').strip()
+            formatted_text = f'\n<h{level} style="text-align: {alignment};">{title}</h{level}>\n'
+        
+        else:
+            # Handle paragraphs or other blocks of text
+            if selected_text.startswith("<p ") or selected_text.startswith("<div ") or re.match(r'<h[1-6] ', selected_text):
+                # Use regex to replace the existing text-align style within the tag
+                formatted_text = re.sub(r'text-align: \w+;', f'text-align: {alignment};', selected_text)
+            else:
+                # If no tags are detected, wrap the text in a <p> tag with the new alignment
+                formatted_text = f'\n<p style="text-align: {alignment};">{selected_text}</p>\n'
+
+        # Replace the text in the editor
         if formatted_text != selected_text:
             cursor.insertText(formatted_text)
-        else:
-            cursor.insertText(selected_text)
-
+        
+        # Restore the cursor and scroll positions
+        cursor.setPosition(initial_position)
         self.editor.setTextCursor(cursor)
+        self.editor.verticalScrollBar().setValue(initial_scroll_value)
+
 
     def setup_web_channel(self):
         # Setup the channel for JavaScript to PyQt communication
@@ -1153,24 +1254,154 @@ class MarkdownEditor(QMainWindow):
             extras=["fenced-code-blocks", "tables", "strike"]
         )
 
-        # JavaScript to make checkboxes functional
-        js_code = """
+        # JavaScript for advanced tooltips with customization and error handling
+        js_tooltip = f"""
         <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('input[type="checkbox"]').forEach(function(checkbox) {
-                checkbox.addEventListener('change', function() {
-                    if (checkbox.checked) {
-                        checkbox.nextElementSibling.style.textDecoration = 'line-through';
-                    } else {
-                        checkbox.nextElementSibling.style.textDecoration = 'none';
-                    }
-                });
-            });
-        });
+        document.addEventListener('DOMContentLoaded', function() {{
+            const tooltipDelay = 500; // Tooltip delay in milliseconds
+            const showLinkTooltips = true;  // Customize to enable/disable link tooltips
+            const showImageTooltips = true; // Customize to enable/disable image tooltips
+
+            document.querySelectorAll('a, img, h1, h2, h3, h4, h5, h6, strong, em, code, blockquote, ul, ol, li, th, td').forEach(function(element) {{
+                let tooltipTimeout;
+
+                element.addEventListener('mouseenter', function(event) {{
+                    tooltipTimeout = setTimeout(function() {{
+                        let tooltipText = '';
+                        try {{
+                            switch(element.tagName.toLowerCase()) {{
+                                case 'a':
+                                    if (showLinkTooltips) {{
+                                        tooltipText = 'URL: ' + element.getAttribute('href');
+                                        fetch(element.getAttribute('href'), {{ method: 'HEAD' }})
+                                            .then(response => {{
+                                                if (response.ok) {{
+                                                    tooltipText += '<br>Title: ' + response.headers.get('Title');
+                                                }}
+                                            }})
+                                            .catch(() => {{
+                                                tooltipText += '<br>(Could not retrieve page title)';
+                                            }});
+                                    }}
+                                    break;
+                                case 'img':
+                                    if (showImageTooltips) {{
+                                        let img = new Image();
+                                        img.src = element.src;
+                                        img.onload = function() {{
+                                            tooltipText = 'Image: ' + (element.getAttribute('alt') || 'No alt text') +
+                                                        '<br>Dimensions: ' + img.width + 'x' + img.height;
+                                            showTooltip(tooltipText, element);
+                                        }}
+                                        img.onerror = function() {{
+                                            tooltipText = 'Image could not be loaded';
+                                            showTooltip(tooltipText, element);
+                                        }};
+                                        return; // Handle asynchronously
+                                    }}
+                                    break;
+                                case 'h1': case 'h2': case 'h3': case 'h4': case 'h5': case 'h6':
+                                    tooltipText = 'Header (' + element.tagName + '): ' + element.textContent;
+                                    break;
+                                case 'strong':
+                                    tooltipText = 'Bold text: ' + element.textContent;
+                                    break;
+                                case 'em':
+                                    tooltipText = 'Italic text: ' + element.textContent;
+                                    break;
+                                case 'u':
+                                    tooltipText = 'Underlined text: ' + element.textContent;
+                                    break;
+                                case 'code':
+                                    let lang = element.className.split('-')[1] || 'Unknown';
+                                    tooltipText = 'Code block (Language: ' + lang + ')';
+                                    break;
+                                case 'blockquote':
+                                    tooltipText = 'Blockquote: ' + element.textContent.substring(0, 50) + '...';
+                                    break;
+                                case 'ul':
+                                    tooltipText = 'Unordered List';
+                                    break;
+                                case 'ol':
+                                    tooltipText = 'Ordered List';
+                                    break;
+                                case 'li':
+                                    let parentTag = element.parentElement.tagName.toLowerCase();
+                                    tooltipText = (parentTag === 'ul' ? 'Bullet Point: ' : 'List Item: ') + element.textContent;
+                                    break;
+                                case 'th':
+                                    let thIndex = Array.from(element.parentNode.children).indexOf(element) + 1;
+                                    tooltipText = 'Table Header (Column ' + thIndex + ')';
+                                    break;
+                                case 'td':
+                                    let tdIndex = Array.from(element.parentNode.children).indexOf(element) + 1;
+                                    tooltipText = 'Table Cell (Row ' + (element.parentNode.rowIndex + 1) + ', Column ' + tdIndex + ')';
+                                    break;
+                            }}
+                        }} catch (error) {{
+                            tooltipText = 'Error generating tooltip';
+                        }}
+
+                        showTooltip(tooltipText, element);
+                    }}, tooltipDelay);
+                }});
+
+                element.addEventListener('mouseleave', function() {{
+                    clearTimeout(tooltipTimeout);
+                    hideTooltip(element);
+                }});
+            }});
+
+            function showTooltip(text, element) {{
+                if (text) {{
+                    let tooltip = document.createElement('div');
+                    tooltip.className = 'custom-tooltip';
+                    tooltip.innerHTML = text;
+                    document.body.appendChild(tooltip);
+
+                    let rect = element.getBoundingClientRect();
+                    tooltip.style.left = rect.left + window.pageXOffset + 'px';
+                    tooltip.style.top = rect.bottom + window.pageYOffset + 'px';
+
+                    element.tooltip = tooltip;  // Store reference to the tooltip
+                }}
+            }}
+
+            function hideTooltip(element) {{
+                if (element.tooltip) {{
+                    document.body.removeChild(element.tooltip);
+                    element.tooltip = null;
+                }}
+            }}
+        }});
         </script>
         """
 
-        # Add custom CSS for code blocks, blockquotes, and scrollbar
+        # CSS for tooltips with customization options
+        tooltip_background_color = "#333" if self.dark_mode else "#fff"
+        tooltip_text_color = "#fff" if self.dark_mode else "#000"
+        css_tooltip = f"""
+        <style>
+        .custom-tooltip {{
+            position: absolute;
+            background-color: {tooltip_background_color};
+            color: {tooltip_text_color};
+            padding: 5px;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 1000;
+            pointer-events: none;
+            white-space: nowrap;
+        }}
+        .custom-tooltip.light-mode {{
+            background-color: #fff;
+            color: #000;
+            border: 1px solid #333;
+        }}
+        </style>
+        """
+
+        # Add custom CSS for code blocks, blockquotes, scrollbar, and tooltips
         custom_css = """
         <style>
             body {
@@ -1180,23 +1411,29 @@ class MarkdownEditor(QMainWindow):
                 padding: 15px;
                 margin: 0;
             }
+            a {
+                color: #1e90ff;
+                font-weight: bold;
+                text-decoration: none;
+            }
+            a:hover {
+                text-decoration: underline;
+            }
             pre {
                 background-color: #2b2b2b;
                 color: #f8f8f2;
                 padding: 8px 12px;
-                border-left: 5px solid #00cc66;  /* Green accent for code blocks */
+                border-left: 5px solid #00cc66;
                 border-radius: 8px;
-                display: block;
-                overflow-x: auto;
                 margin-bottom: 20px;
                 font-size: 14px;
-                white-space: pre-wrap; /* Ensure code block retains formatting */
-                word-wrap: break-word; /* Ensure long lines wrap */
+                white-space: pre-wrap;
+                word-wrap: break-word;
             }
             blockquote {
                 background-color: #2e2e2e;
                 color: #dddddd;
-                border-left: 5px solid #ffcc00;  /* Yellow accent for blockquotes */
+                border-left: 5px solid #ffcc00;
                 padding: 10px 20px;
                 margin: 20px 0;
                 border-radius: 8px;
@@ -1222,7 +1459,6 @@ class MarkdownEditor(QMainWindow):
                 max-width: 100%;
                 height: auto;
             }
-            /* Custom scrollbar styling */
             ::-webkit-scrollbar {
                 width: 8px;
                 height: 8px;
@@ -1237,7 +1473,6 @@ class MarkdownEditor(QMainWindow):
             ::-webkit-scrollbar-thumb:hover {
                 background-color: #555;
             }
-            /* Checkbox styling */
             input[type="checkbox"] {
                 margin-right: 8px;
             }
@@ -1249,15 +1484,19 @@ class MarkdownEditor(QMainWindow):
 
         if not self.dark_mode:
             custom_css = custom_css.replace('#1e1e1e', '#ffffff').replace('#f8f8f2', '#000000').replace('#2b2b2b', '#f0f0f0').replace('#2e2e2e', '#e0e0e0')
+            css_tooltip = css_tooltip.replace('.custom-tooltip', '.custom-tooltip.light-mode')
 
         # Ensure newlines within code blocks are treated as literal
         html = html.replace('<pre><code>', '<pre style="white-space:pre-wrap;"><code style="white-space:pre-wrap;">')
 
-        # Insert the CSS and JS into the HTML
-        full_html = custom_css + html + js_code
+        # Combine everything into the full HTML
+        full_html = custom_css + css_tooltip + html + js_tooltip
 
         # Set the HTML content in the preview pane
         self.preview.page().setHtml(full_html)
+
+
+
 
     def update_preview_scroll_position(self):
         """
@@ -1268,10 +1507,17 @@ class MarkdownEditor(QMainWindow):
         editor_scroll_range = self.editor.verticalScrollBar().maximum()
         editor_scroll_percentage = editor_scroll_position / editor_scroll_range if editor_scroll_range else 0
 
-        # Apply the same percentage to the preview pane
-        preview_scroll_range = self.preview.page().contentsSize().height() - self.preview.height()
-        preview_scroll_position = preview_scroll_range * editor_scroll_percentage
-        self.preview.page().runJavaScript(f"window.scrollTo(0, {preview_scroll_position});")
+        # Function to adjust the preview's scroll position
+        def adjust_preview_scroll(preview_scroll_height):
+            preview_scroll_position = preview_scroll_height * editor_scroll_percentage
+            self.preview.page().runJavaScript(f"window.scrollTo(0, {preview_scroll_position});")
+
+        # Ensure the preview content is fully loaded before scrolling
+        def scroll_preview():
+            self.preview.page().runJavaScript("document.documentElement.scrollHeight", adjust_preview_scroll)
+
+        scroll_preview()
+
 
     def set_initial_preview_content(self):
         # This sets the initial content of the preview pane with the correct background style
@@ -1387,9 +1633,26 @@ class MarkdownEditor(QMainWindow):
             self.file_model.setRootPath(QDir.currentPath())  # Refresh the file model
 
     def open_selected_file(self, index):
+        # Check if there are unsaved changes in the current document
+        if self.editor.document().isModified():
+            reply = QMessageBox.question(
+                self,
+                "Unsaved Changes",
+                f"You have unsaved changes in {os.path.basename(self.current_file) if self.current_file else 'untitled'}. Do you want to save before opening another file?",
+                QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel,
+                QMessageBox.Cancel
+            )
+
+            if reply == QMessageBox.Yes:
+                self.save_file()  # Save the current file
+            elif reply == QMessageBox.Cancel:
+                return  # Do not proceed with opening the new file if the user cancels
+
+        # Open the selected file
         file_path = self.file_model.filePath(index)
         if file_path.endswith('.md'):
             self.open_file_by_path(file_path)
+
 
     def open_file_by_path(self, file_path):
         try:
@@ -1619,8 +1882,11 @@ class MarkdownEditor(QMainWindow):
         misc_icon = qta.icon('fa.bars', color=icon_color)  # Icon for Misc dropdown
 
         # Icons for H1, H2, and Images
-        h1_icon = qta.icon('fa.header', color=icon_color)
-        h2_icon = qta.icon('fa.header', color=icon_color)
+        
+        # Use the H1 and H2 icons from the project folder
+        h1_icon = QIcon("images/h1.png")
+        h2_icon = QIcon("images/h2.png")
+        
         img_icon = qta.icon('fa.image', color=icon_color)
 
         # Alignment icons
