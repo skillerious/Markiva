@@ -4,36 +4,8 @@
 
 ![](https://github.com/skillerious/RobinDoak/blob/main/images/Markiva.gif)
 
-<div class="toc-container">
-<h2>Table of Contents</h2>
-<ul class="toc-list">
-<li class="toc-item toc-level-1"><a href="#🎉-welcome-to-**markiva**">🎉 Welcome to **Markiva!**</a></li>
-<li class="toc-item toc-level-2"><a href="#🚀-key-features">🚀 Key Features</a></li>
-<li class="toc-item toc-level-3"><a href="#✨-live-preview-synchronization">✨ Live Preview Synchronization</a></li>
-<li class="toc-item toc-level-3"><a href="#🛠️-markdown-specific-tools">🛠️ Markdown-Specific Tools</a></li>
-<li class="toc-item toc-level-3"><a href="#🗂️-integrated-file-explorer">🗂️ Integrated File Explorer</a></li>
-<li class="toc-item toc-level-3"><a href="#🛡️-additional-features">🛡️ Additional Features</a></li>
-<li class="toc-item toc-level-3"><a href="#🌟-advanced-markdown-features">🌟 Advanced Markdown Features</a></li>
-<li class="toc-item toc-level-3"><a href="#🖼️-enhanced-image-and-link-handling">🖼️ Enhanced Image and Link Handling</a></li>
-<li class="toc-item toc-level-3"><a href="#🗂️-template-management">🗂️ Template Management</a></li>
-<li class="toc-item toc-level-3"><a href="#📝-version-control-and-snapshots">📝 Version Control and Snapshots</a></li>
-<li class="toc-item toc-level-3"><a href="#🎨-editor-customization">🎨 Editor Customization</a></li>
-<li class="toc-item toc-level-3"><a href="#💻-integrated-terminal">💻 Integrated Terminal</a></li>
-<li class="toc-item toc-level-3"><a href="#📊-table-editing">📊 Table Editing</a></li>
-<li class="toc-item toc-level-3"><a href="#🔎-find-and-replace">🔎 Find and Replace</a></li>
-<li class="toc-item toc-level-3"><a href="#🖥️-cross-platform-compatibility">🖥️ Cross-Platform Compatibility</a></li>
-<li class="toc-item toc-level-3"><a href="#📤-export-options">📤 Export Options</a></li>
-<li class="toc-item toc-level-3"><a href="#⌨️-keyboard-shortcuts">⌨️ Keyboard Shortcuts</a></li>
-<li class="toc-item toc-level-2"><a href="#📝-examples">📝 Examples</a></li>
-<li class="toc-item toc-level-2"><a href="#🔗-links">🔗 Links</a></li>
-<li class="toc-item toc-level-2"><a href="#📊-tables">📊 Tables</a></li>
-<li class="toc-item toc-level-2"><a href="#🌟-other-extras">🌟 Other Extras</a></li>
-<li class="toc-item toc-level-2"><a href="#🖼️-images">🖼️ Images</a></li>
-<li class="toc-item toc-level-2"><a href="#🎉-go-and-explore">🎉 Go and Explore!</a></li>
-</ul>
-</div>
 
-<h1 id="🎉-welcome-to-**markiva**">🎉 Welcome to **Markiva!**</h1>
+<h1 id="🎉-welcome-to-**markiva**">🎉 Welcome to Markiva!</h1>
 
 **Markiva** is your ultimate markdown editor, designed to elevate the writing experience for developers, content creators, and anyone who works with markdown files. Markiva is packed with powerful features, making it one of the most versatile and user-friendly markdown editors available.
 
