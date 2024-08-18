@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://i.postimg.cc/y6LSsGSh/Markiva-Logo.png" alt="Markiva Logo" style="width:200px;"/>
+  <img src="https://i.postimg.cc/j5LRngMP/Markiva-Logo.png" alt="Markiva Logo" style="width:200px;"/>
 </p>
 
 ![](https://github.com/skillerious/RobinDoak/blob/main/images/Markiva.gif)
