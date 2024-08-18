@@ -7,7 +7,7 @@
 <div class="toc-container">
 <h2>Table of Contents</h2>
 <ul class="toc-list">
-<li class="toc-item toc-level-1"><a href="#🎉-welcome-to-markiva">🎉 Welcome to Markiva!</a></li>
+<li class="toc-item toc-level-1"><a href="#🎉-welcome-to-**markiva**">🎉 Welcome to **Markiva!**</a></li>
 <li class="toc-item toc-level-2"><a href="#🚀-key-features">🚀 Key Features</a></li>
 <li class="toc-item toc-level-3"><a href="#✨-live-preview-synchronization">✨ Live Preview Synchronization</a></li>
 <li class="toc-item toc-level-3"><a href="#🛠️-markdown-specific-tools">🛠️ Markdown-Specific Tools</a></li>
@@ -136,9 +136,10 @@ For users who prefer keyboard navigation:
 <h3 id="code-block">Code Block</h3>
 
 ```markdown
-If my app is working
-then
-  do this
+If my app is working then
+   don't Panic
+else
+   Panic
 end if
 ```
 
