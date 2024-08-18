@@ -110,19 +110,23 @@ class CodeEditor(QPlainTextEdit):
         self.setFont(QFont(font_family, self.font().pointSize()))
 
     def set_background_color(self, color):
+        # Extract the current text color
+        text_color = self.styleSheet().split('color: ')[1].split(';')[0]
         self.setStyleSheet(f"""
             QPlainTextEdit {{
                 background-color: {color};
-                color: #ffffff;
+                color: {text_color};
                 padding: 10px;
                 border: 1px solid #3e3e3e;
             }}
         """)
 
     def set_text_color(self, color):
+        # Extract the current background color
+        background_color = self.styleSheet().split('background-color: ')[1].split(';')[0]
         self.setStyleSheet(f"""
             QPlainTextEdit {{
-                background-color: {self.styleSheet().split('background-color: ')[1].split(';')[0]};
+                background-color: {background_color};
                 color: {color};
                 padding: 10px;
                 border: 1px solid #3e3e3e;
@@ -871,6 +875,27 @@ class MarkdownEditor(QMainWindow):
 
         self.apply_settings()  # Apply settings after loading UI
 
+    def align_text(self, alignment):
+        cursor = self.editor.textCursor()
+        cursor.select(QTextCursor.BlockUnderCursor)
+        selected_text = cursor.selectedText().strip()
+
+        # Check if the selected text is already wrapped in a <p>, <div>, or heading tag with an existing style attribute
+        if selected_text.startswith("<p ") or selected_text.startswith("<div ") or re.match(r'<h[1-6] ', selected_text):
+            # Use regex to replace the existing text-align style within the tag
+            formatted_text = re.sub(r'text-align: \w+;', f'text-align: {alignment};', selected_text)
+        else:
+            # If no tags are detected, wrap the text in a <p> tag with the new alignment
+            formatted_text = f'<p style="text-align: {alignment};">{selected_text}</p>'
+
+        # Prevent wrapping the text multiple times by avoiding re-inserting it if it's already formatted correctly
+        if formatted_text != selected_text:
+            cursor.insertText(formatted_text)
+        else:
+            cursor.insertText(selected_text)
+
+        self.editor.setTextCursor(cursor)
+
     def setup_web_channel(self):
         # Setup the channel for JavaScript to PyQt communication
         self.channel = QWebChannel()
@@ -885,7 +910,17 @@ class MarkdownEditor(QMainWindow):
 
     def save_settings(self):
         try:
-            print(f"Saving settings to: {os.path.abspath(self.settings_file)}")
+            # Save editor settings
+            self.settings["font_size"] = self.editor.font().pointSize()
+            self.settings["font_family"] = self.editor.font().family()
+
+            # Save the current background and text colors directly
+            self.settings["background_color"] = self.current_background_color
+            self.settings["text_color"] = self.current_text_color
+
+            # Save other settings like window state
+            self.settings["window_state"] = self.saveState().toHex().data().decode()
+
             with open(self.settings_file, 'w') as f:
                 json.dump(self.settings, f, indent=4)
             print(f"Settings saved to {self.settings_file}")
@@ -970,16 +1005,27 @@ class MarkdownEditor(QMainWindow):
         self.restore_window_state()
 
     def apply_settings(self):
+        # Apply the saved settings
         self.editor.set_font_size(self.settings.get("font_size", 14))
         self.editor.set_font_family(self.settings.get("font_family", "Fira Code"))
-        self.editor.set_background_color(self.settings.get("background_color", "#1e1e1e"))
-        self.editor.set_text_color(self.settings.get("text_color", "#ffffff"))
+        
+        # Apply the saved colors
+        background_color = self.settings.get("background_color", "#1e1e1e")
+        text_color = self.settings.get("text_color", "#ffffff")
+
+        self.current_background_color = background_color
+        self.current_text_color = text_color
+
+        self.editor.set_background_color(background_color)
+        self.editor.set_text_color(text_color)
+
         if self.settings.get("dark_mode", True):
             self.set_dark_theme()
         else:
             self.set_light_theme()
-        self.update_toolbar_icons()  # Update toolbar icons when settings are applied
-        self.update_preview()  # Update preview pane when settings are applied
+
+        self.update_toolbar_icons()
+        self.update_preview()
 
     def create_status_bar(self):
         self.status_bar = QStatusBar()
@@ -1372,11 +1418,6 @@ class MarkdownEditor(QMainWindow):
         except Exception as e:
             QMessageBox.warning(self, "Error", f"Could not open file: {str(e)}")
 
-
-
-
-
-
     def open_context_menu(self, position):
         index = self.tree.indexAt(position)
 
@@ -1542,8 +1583,6 @@ class MarkdownEditor(QMainWindow):
         help_menu.addAction(about_action)
 
 
-
-
     def createToolbar(self):
         self.update_toolbar_icons()
 
@@ -1642,7 +1681,6 @@ class MarkdownEditor(QMainWindow):
         code_action.triggered.connect(lambda: self.editor.insert_markdown("```", "```", block=True))
         self.toolbar.addAction(code_action)
 
-
         hr_action = QAction(hr_icon, "Horizontal Rule", self)
         hr_action.triggered.connect(lambda: self.editor.insert_markdown("\n---\n", ""))
         self.toolbar.addAction(hr_action)
@@ -1712,15 +1750,15 @@ class MarkdownEditor(QMainWindow):
         self.toolbar.addSeparator()
 
         align_left_action = QAction(align_left_icon, "Align Left", self)
-        align_left_action.triggered.connect(lambda: self.editor.insert_html("p", 'align="left"'))
+        align_left_action.triggered.connect(lambda: self.align_text("left"))
         self.toolbar.addAction(align_left_action)
 
         align_center_action = QAction(align_center_icon, "Align Center", self)
-        align_center_action.triggered.connect(lambda: self.editor.insert_html("p", 'align="center"'))
+        align_center_action.triggered.connect(lambda: self.align_text("center"))
         self.toolbar.addAction(align_center_action)
 
         align_right_action = QAction(align_right_icon, "Align Right", self)
-        align_right_action.triggered.connect(lambda: self.editor.insert_html("p", 'align="right"'))
+        align_right_action.triggered.connect(lambda: self.align_text("right"))
         self.toolbar.addAction(align_right_action)
 
         self.toolbar.addSeparator()
@@ -1816,12 +1854,14 @@ class MarkdownEditor(QMainWindow):
     def choose_background_color(self):
         color = QColorDialog.getColor()
         if color.isValid():
-            self.editor.set_background_color(color.name())
+            self.current_background_color = color.name()
+            self.editor.set_background_color(self.current_background_color)
 
     def choose_text_color(self):
         color = QColorDialog.getColor()
         if color.isValid():
-            self.editor.set_text_color(color.name())
+            self.current_text_color = color.name()
+            self.editor.set_text_color(self.current_text_color)
 
     def toggle_line_numbers(self, checked):
         self.editor.lineNumberArea.setVisible(checked)
@@ -1879,20 +1919,38 @@ class MarkdownEditor(QMainWindow):
                 self.preview.page().toHtml(lambda content: file.write(content))
 
     def generate_toc(self):
-        # Generate a table of contents based on the headings in the Markdown document
         raw_markdown = self.editor.toPlainText()
         lines = raw_markdown.splitlines()
         toc = []
+        anchor_map = {}
+
+        # Add a container <div> for the TOC with a class for styling
+        toc.append('<div class="toc-container">')
+        toc.append('<h2>Table of Contents</h2>')
+        toc.append('<ul class="toc-list">')
 
         for line in lines:
             if line.startswith("#"):
                 level = line.count('#')
-                title = line.replace('#', '').strip()
-                anchor = title.lower().replace(' ', '-').replace('.', '')
-                toc.append(f'{" " * (level - 1) * 2}- [{title}](#{anchor})')
+                title = line.strip('# ').strip()
+                anchor = title.lower().replace(' ', '-').replace('.', '').replace('!', '').replace('?', '')
 
-        toc_markdown = "\n".join(toc)
-        self.editor.insertPlainText("\n\n" + toc_markdown + "\n\n")
+                if anchor in anchor_map:
+                    anchor_map[anchor] += 1
+                    anchor += f'-{anchor_map[anchor]}'
+                else:
+                    anchor_map[anchor] = 0
+
+                toc.append(f'<li class="toc-item toc-level-{level}"><a href="#{anchor}">{title}</a></li>')
+                raw_markdown = raw_markdown.replace(line, f'<h{level} id="{anchor}">{title}</h{level}>', 1)
+
+        toc.append('</ul>')
+        toc.append('</div>')
+
+        toc_html = "\n".join(toc)
+        self.editor.setPlainText(toc_html + "\n\n" + raw_markdown)
+
+
 
     def toggle_theme(self):
         if self.dark_mode:
@@ -2156,6 +2214,7 @@ class MarkdownEditor(QMainWindow):
                 event.ignore()
                 return
         self.save_window_state()
+        self.save_settings()  # Save settings on close
         event.accept()
 
     def open_file(self):
@@ -2192,82 +2251,11 @@ class MarkdownEditor(QMainWindow):
         dialog.exec_()
 
     def insert_link(self):
-        dialog = QDialog(self)
-        dialog.setWindowTitle("Insert Link")
-
-        layout = QVBoxLayout(dialog)
-
-        # Input fields
-        text_label = QLabel("Text:", dialog)
-        layout.addWidget(text_label)
-        text_input = QLineEdit(dialog)
-        layout.addWidget(text_input)
-
-        url_label = QLabel("URL:", dialog)
-        layout.addWidget(url_label)
-        url_input = QLineEdit(dialog)
-        layout.addWidget(url_input)
-
-        # Dialog buttons
-        button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, dialog)
-        layout.addWidget(button_box)
-
-        def on_ok():
-            text = text_input.text()
-            url = url_input.text()
+        link_dialog = LinkDialog(self)
+        if link_dialog.exec_() == QDialog.Accepted:
+            text, url = link_dialog.get_link_data()
             if text and url:
                 self.editor.insertPlainText(f"[{text}]({url})")
-            dialog.accept()
-
-        button_box.accepted.connect(on_ok)
-        button_box.rejected.connect(dialog.reject)
-
-        dialog.exec_()
-
-
-class FindReplaceDialog(QDialog):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setWindowTitle("Find and Replace")
-        self.setMinimumSize(400, 200)
-
-        layout = QVBoxLayout(self)
-
-        # Find text
-        find_layout = QHBoxLayout()
-        find_label = QLabel("Find:", self)
-        self.find_input = QLineEdit(self)
-        find_layout.addWidget(find_label)
-        find_layout.addWidget(self.find_input)
-        layout.addLayout(find_layout)
-
-        # Replace text
-        replace_layout = QHBoxLayout()
-        replace_label = QLabel("Replace:", self)
-        self.replace_input = QLineEdit(self)
-        replace_layout.addWidget(replace_label)
-        replace_layout.addWidget(self.replace_input)
-        layout.addLayout(replace_layout)
-
-        # Regex option
-        self.regex_checkbox = QCheckBox("Use Regular Expression", self)
-        layout.addWidget(self.regex_checkbox)
-
-        # Dialog buttons
-        button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, self)
-        layout.addWidget(button_box)
-
-        button_box.accepted.connect(self.accept)
-        button_box.rejected.connect(self.reject)
-
-    def get_find_text(self):
-        return self.find_input.text()
-
-    def get_replace_text(self):
-        return self.replace_input.text()
-
-    def is_regex_enabled(self):
-        return self.regex_checkbox.isChecked()
 
 
 if __name__ == "__main__":
