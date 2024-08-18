@@ -25,8 +25,6 @@
 <li class="toc-item toc-level-3"><a href="#📤-export-options">📤 Export Options</a></li>
 <li class="toc-item toc-level-3"><a href="#⌨️-keyboard-shortcuts">⌨️ Keyboard Shortcuts</a></li>
 <li class="toc-item toc-level-2"><a href="#📝-examples">📝 Examples</a></li>
-<li class="toc-item toc-level-3"><a href="#code-block">Code Block</a></li>
-<li class="toc-item toc-level-3"><a href="#quote-block">Quote Block</a></li>
 <li class="toc-item toc-level-2"><a href="#🔗-links">🔗 Links</a></li>
 <li class="toc-item toc-level-2"><a href="#📊-tables">📊 Tables</a></li>
 <li class="toc-item toc-level-2"><a href="#🌟-other-extras">🌟 Other Extras</a></li>
