@@ -59,9 +59,13 @@ Markiva’s integrated file explorer allows you to manage your project files eff
 - **Default Open Files**: Set your preferred files to open by default when you start Markiva.
 
 <h3 id="🛡️-additional-features">🛡️ Additional Features</h3>
+
 - **Spell-checking**: Ensure your content is free from spelling errors as you type.
+
 - **Auto-save**: Never lose your work again with automatic saving of your progress.
+
 - **Export Options**: Convert your markdown files to PDF or HTML with just a few clicks.
+
 - **Preview Tooltips**: Get detailed information by hovering over elements in the preview (e.g., image dimensions, link URLs).
 
 <h3 id="🌟-advanced-markdown-features">🌟 Advanced Markdown Features</h3>
@@ -72,8 +76,11 @@ Markiva’s integrated file explorer allows you to manage your project files eff
 - **Live HTML Conversion**: Convert your markdown into HTML with a single button click, including options for custom attributes.
 
 <h3 id="🖼️-enhanced-image-and-link-handling">🖼️ Enhanced Image and Link Handling</h3>
+
 - **Drag-and-Drop Images**: Simply drag and drop an image into the editor to embed it in your markdown file.
+  
 - **Link Management**: Easily insert and manage hyperlinks with the built-in link dialog.
+  
 - **Image Tooltips**: Hover over an image in the preview to see its dimensions and alt text.
 
 <h3 id="🗂️-template-management">🗂️ Template Management</h3>
