@@ -2,7 +2,7 @@
   <img src="https://i.postimg.cc/y6LSsGSh/Markiva-Logo.png" alt="drawing" style="width:200px;"/>
 </p>
 
-![]([https://github.com/Your_Repository_Name/Your_GIF_Name.gif](https://github.com/skillerious/RobinDoak/blob/main/images/Markiva.gif))
+![](https://github.com/skillerious/RobinDoak/blob/main/images/Markiva.gif)
 
 # 🎉 Welcome to **Markiva!** 
 
