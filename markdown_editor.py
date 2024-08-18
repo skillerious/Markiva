@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QPlainTextEdit, QSplitter, QAction,
     QToolBar, QFileDialog, QMessageBox, QStatusBar, QTextEdit, QStyleFactory, QDialog,
     QGridLayout, QPushButton, QMenuBar, QMenu, QInputDialog, QLineEdit, QLabel, QPlainTextDocumentLayout,
-    QTreeView, QFileSystemModel, QHBoxLayout, QDesktopWidget, QDialogButtonBox, QListWidget, QSizePolicy, QAbstractItemView, QComboBox, QSpinBox, QColorDialog, QCheckBox, QToolButton, QTabWidget, QTableWidget, QTableWidgetItem, QHeaderView, QProgressBar, QSpinBox
+    QTreeView, QFileSystemModel, QHBoxLayout, QDesktopWidget, QDialogButtonBox, QListWidget, QSizePolicy, QAbstractItemView, QComboBox, QSpinBox, QColorDialog, QCheckBox, QToolButton, QTabWidget, QTableWidget, QTableWidgetItem, QHeaderView, QProgressBar, QSpinBox, QScrollArea
 )
 from PyQt5.QtCore import Qt, QRect, QSize, QTimer, QRegularExpression, QModelIndex, QDir, QFileInfo, QUrl, QItemSelectionModel, pyqtSlot
 from PyQt5.QtGui import QFont, QColor, QPainter, QTextFormat, QPalette, QTextCursor, QTextCharFormat, QSyntaxHighlighter, QIcon, QDesktopServices, QStandardItemModel, QStandardItem, QStandardItemModel
@@ -399,6 +399,65 @@ class CodeEditor(QPlainTextEdit):
             window.setWindowTitle(f"{os.path.basename(window.current_file)}* - Markiva")
         elif window.current_file:
             window.setWindowTitle(f"{os.path.basename(window.current_file)} - Markiva")
+            
+class ImageDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        # Set the window icon
+        self.setWindowIcon(QIcon("images/MarkivaLogo.png"))
+
+        self.setWindowTitle("Insert Image")
+        self.setFixedSize(450, 250)
+
+        # Main layout
+        main_layout = QVBoxLayout(self)
+        main_layout.setContentsMargins(15, 15, 15, 15)
+
+        # Name input field (optional)
+        self.name_label = QLabel("Image Name (Optional):", self)
+        self.name_label.setStyleSheet("font-size: 14px;")
+        self.name_input = QLineEdit(self)
+        self.name_input.setPlaceholderText("Enter a name for the image")
+        self.name_input.setToolTip("This is the text that will appear if the image fails to load.")
+        self.name_input.setStyleSheet("padding: 5px; font-size: 14px;")
+        main_layout.addWidget(self.name_label)
+        main_layout.addWidget(self.name_input)
+
+        # URL input field (required)
+        self.url_label = QLabel("Image URL (Required):", self)
+        self.url_label.setStyleSheet("font-size: 14px; margin-top: 10px;")
+        self.url_input = QLineEdit(self)
+        self.url_input.setPlaceholderText("Enter the URL of the image")
+        self.url_input.setToolTip("Provide the full URL to the image you want to insert.")
+        self.url_input.setStyleSheet("padding: 5px; font-size: 14px;")
+        main_layout.addWidget(self.url_label)
+        main_layout.addWidget(self.url_input)
+
+        # Dialog buttons with some margin and padding
+        self.button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, self)
+        self.button_box.setStyleSheet("QPushButton { padding: 5px 10px; font-size: 14px; }")
+        self.button_box.accepted.connect(self.validate_input)
+        self.button_box.rejected.connect(self.reject)
+        main_layout.addWidget(self.button_box)
+
+    def validate_input(self):
+        """Validate URL field and proceed if valid."""
+        url = self.url_input.text().strip()
+        if not url:
+            QMessageBox.warning(self, "Validation Error", "The Image URL is required.", QMessageBox.Ok)
+        elif not re.match(r'^https?://', url):
+            QMessageBox.warning(self, "Validation Error", "Please enter a valid URL starting with http:// or https://", QMessageBox.Ok)
+        else:
+            self.accept()
+
+    def get_image_data(self):
+        return self.name_input.text().strip(), self.url_input.text().strip()
+
+
+    def get_image_data(self):
+        return self.name_input.text(), self.url_input.text()
+
 
 
 class LinkDialog(QDialog):
@@ -407,59 +466,211 @@ class LinkDialog(QDialog):
         
         # Set the window icon
         self.setWindowIcon(QIcon("images/MarkivaLogo.png"))
-        
+
         self.setWindowTitle("Insert Link")
-        self.setFixedSize(400, 200)
+        self.setFixedSize(450, 250)
 
-        layout = QVBoxLayout(self)
+        # Main layout
+        main_layout = QVBoxLayout(self)
+        main_layout.setContentsMargins(15, 15, 15, 15)
 
-        self.text_label = QLabel("Text to display:", self)
+        # Text to display input field (required)
+        self.text_label = QLabel("Text to Display (Required):", self)
+        self.text_label.setStyleSheet("font-size: 14px;")
         self.text_input = QLineEdit(self)
-        layout.addWidget(self.text_label)
-        layout.addWidget(self.text_input)
+        self.text_input.setPlaceholderText("Enter the text to display for the link")
+        self.text_input.setToolTip("This is the text that will be displayed as the clickable link.")
+        self.text_input.setStyleSheet("padding: 5px; font-size: 14px;")
+        main_layout.addWidget(self.text_label)
+        main_layout.addWidget(self.text_input)
 
-        self.url_label = QLabel("URL:", self)
+        # URL input field (required)
+        self.url_label = QLabel("Link URL (Required):", self)
+        self.url_label.setStyleSheet("font-size: 14px; margin-top: 10px;")
         self.url_input = QLineEdit(self)
-        layout.addWidget(self.url_label)
-        layout.addWidget(self.url_input)
+        self.url_input.setPlaceholderText("Enter the URL for the link")
+        self.url_input.setToolTip("Provide the full URL to the link.")
+        self.url_input.setStyleSheet("padding: 5px; font-size: 14px;")
+        main_layout.addWidget(self.url_label)
+        main_layout.addWidget(self.url_input)
 
+        # Dialog buttons with some margin and padding
         self.button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, self)
-        self.button_box.accepted.connect(self.accept)
+        self.button_box.setStyleSheet("QPushButton { padding: 5px 10px; font-size: 14px; }")
+        self.button_box.accepted.connect(self.validate_input)
         self.button_box.rejected.connect(self.reject)
-        layout.addWidget(self.button_box)
+        main_layout.addWidget(self.button_box)
+
+    def validate_input(self):
+        """Validate input fields and proceed if valid."""
+        text = self.text_input.text().strip()
+        url = self.url_input.text().strip()
+        if not text:
+            QMessageBox.warning(self, "Validation Error", "The Text to Display is required.", QMessageBox.Ok)
+        elif not url:
+            QMessageBox.warning(self, "Validation Error", "The Link URL is required.", QMessageBox.Ok)
+        elif not re.match(r'^https?://', url):
+            QMessageBox.warning(self, "Validation Error", "Please enter a valid URL starting with http:// or https://", QMessageBox.Ok)
+        else:
+            self.accept()
 
     def get_link_data(self):
-        return self.text_input.text(), self.url_input.text()
+        return self.text_input.text().strip(), self.url_input.text().strip()
 
 
 class EmojiPicker(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
-        
+
         # Set the window icon
         self.setWindowIcon(QIcon("images/MarkivaLogo.png"))
-        
+
         self.setWindowTitle("Emoji Picker")
-        self.setFixedSize(300, 200)
+        self.setFixedSize(400, 500)  # Adjusted size for a larger display
 
-        # Create a grid layout
-        layout = QGridLayout()
-        self.setLayout(layout)
+        # Create a scroll area with vertical scrollbar only
+        scroll_area = QScrollArea(self)
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
-        # List of sample emojis
-        emojis = ["😀", "😁", "😂", "😃", "😄", "😅", "😆", "😉", "😊", "😋"]
+        # Create a widget to hold the emojis
+        emoji_widget = QWidget()
+        layout = QVBoxLayout(emoji_widget)
+        layout.setSpacing(12)  # Adjust spacing for better layout
 
-        # Add buttons for each emoji
-        positions = [(i, j) for i in range(2) for j in range(5)]
-        for position, emoji in zip(positions, emojis):
+        # Special Section for the provided emojis
+        special_emojis_layout = QGridLayout()
+        special_emojis = [
+            "🍟", "🚀", "🎉", "👋", "⭐", "🌟", "✨", "📈", "📊", "🖥️",
+            "💻", "🔥", "📪", "📬", "📫", "☕", "📋", "🗂️", "📂", "🛡️",
+            "🖼️", "📰", "🎨", "📝", "🛒", "🔎", "📤", "📥", "🔗"
+        ]
+        columns = 4  # Number of columns in the grid
+        for i, emoji in enumerate(special_emojis):
             button = QPushButton(emoji)
+            button.setFixedSize(60, 60)  # Larger size for uniform buttons
+            button.setStyleSheet("""
+                QPushButton {
+                    font-size: 26px;
+                    padding: 8px;
+                    color: #ffffff;
+                    background-color: #444444;
+                    border-radius: 15px;
+                    margin: 8px;
+                }
+                QPushButton:hover {
+                    background-color: #2A82DA;
+                }
+                QPushButton:pressed {
+                    background-color: #333333;
+                }
+            """)
             button.clicked.connect(lambda _, e=emoji: self.select_emoji(e))
-            layout.addWidget(button, *position)
+            special_emojis_layout.addWidget(button, i // columns, i % columns)
+
+        # Add a label for the special section
+        special_label = QLabel("Special Emojis")
+        special_label.setAlignment(Qt.AlignCenter)
+        special_label.setStyleSheet("font-size: 16px; color: #ffffff; margin-top: 10px;")
+        layout.addWidget(special_label)
+        layout.addLayout(special_emojis_layout)
+
+        # Separator
+        separator = QLabel(" ")
+        layout.addWidget(separator)
+
+        # General Emoji Section
+        general_emojis_layout = QGridLayout()
+        general_emojis = [
+            "😀", "😁", "😂", "😃", "😄", "😅", "😆", "😉", "😊", "😋",
+            "😍", "😘", "😗", "😙", "😚", "😜", "😝", "😛", "🤑", "🤗",
+            "🤔", "🤐", "😐", "😑", "😶", "😏", "😒", "🙄", "😬", "🤥",
+            "😌", "😔", "😪", "🤤", "😴", "😷", "🤒", "🤕", "🤢", "🤧",
+            "😵", "🤠", "😎", "🤓", "🧐", "😕", "😟", "🙁", "😮", "😯",
+            "😲", "😳", "😦", "😧", "😨", "😰", "😥", "😢", "😭", "😱",
+            "😖", "😣", "😞", "😓", "😩", "😫", "😤", "😡", "😠", "🤬",
+            "😈", "👿", "💀", "☠️", "🤡", "👹", "👺", "👻", "👽", "👾",
+            "🤖", "🎃", "😺", "😸", "😹", "😻", "😼", "😽", "🙀", "😿",
+            "😾", "🙌", "👏", "👍", "👎", "👊", "✊", "✌️", "👌", "✋"
+        ]
+        for i, emoji in enumerate(general_emojis):
+            button = QPushButton(emoji)
+            button.setFixedSize(60, 60)  # Larger size for uniform buttons
+            button.setStyleSheet("""
+                QPushButton {
+                    font-size: 26px;
+                    padding: 8px;
+                    color: #ffffff;
+                    background-color: #444444;
+                    border-radius: 15px;
+                    margin: 8px;
+                }
+                QPushButton:hover {
+                    background-color: #2A82DA;
+                }
+                QPushButton:pressed {
+                    background-color: #333333;
+                }
+            """)
+            button.clicked.connect(lambda _, e=emoji: self.select_emoji(e))
+            general_emojis_layout.addWidget(button, i // columns, i % columns)
+
+        # Add a label for the general section
+        general_label = QLabel("General Emojis")
+        general_label.setAlignment(Qt.AlignCenter)
+        general_label.setStyleSheet("font-size: 16px; color: #ffffff; margin-top: 10px;")
+        layout.addWidget(general_label)
+        layout.addLayout(general_emojis_layout)
+
+        # Apply the layout to the scroll area
+        scroll_area.setWidget(emoji_widget)
+
+        # Set the main layout for the dialog
+        main_layout = QVBoxLayout(self)
+        main_layout.addWidget(scroll_area)
+
+        # Set dark theme with gradient background for the dialog
+        self.setStyleSheet("""
+            QDialog {
+                background: qlineargradient(
+                    x1: 0, y1: 0, x2: 1, y2: 1,
+                    stop: 0 #3a3a3a, stop: 1 #1f1f1f
+                );
+                border-radius: 12px;
+                padding: 15px;
+            }
+            QScrollArea {
+                background-color: transparent;
+                border: none;
+            }
+            QGridLayout {
+                margin: 10px;
+            }
+            QScrollBar:vertical {
+                background-color: #2e2e2e;
+                width: 12px;
+                margin: 0px 0px 0px 0px;
+                border-radius: 6px;
+            }
+            QScrollBar::handle:vertical {
+                background-color: #888;
+                min-height: 30px;
+                border-radius: 6px;
+            }
+            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+                height: 0px;
+                subcontrol-position: none;
+            }
+            QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+                background: none;
+            }
+        """)
 
     def select_emoji(self, emoji):
         # Emit a signal to insert the selected emoji
         self.parent().editor.insertPlainText(emoji)
         self.close()
+
 
 
 class CustomFileSystemModel(QFileSystemModel):
@@ -1496,8 +1707,6 @@ class MarkdownEditor(QMainWindow):
         self.preview.page().setHtml(full_html)
 
 
-
-
     def update_preview_scroll_position(self):
         """
         Synchronize the scroll position between the editor and the preview pane.
@@ -1976,8 +2185,9 @@ class MarkdownEditor(QMainWindow):
         self.toolbar.addAction(link_action)
 
         image_action = QAction(image_icon, "Image", self)
-        image_action.triggered.connect(lambda: self.editor.insert_markdown("![", "](image_url)"))
+        image_action.triggered.connect(self.insert_image)  # Use the new insert_image method
         self.toolbar.addAction(image_action)
+
 
         self.toolbar.addSeparator()
 
@@ -2522,6 +2732,15 @@ class MarkdownEditor(QMainWindow):
             text, url = link_dialog.get_link_data()
             if text and url:
                 self.editor.insertPlainText(f"[{text}]({url})")
+                
+    def insert_image(self):
+        image_dialog = ImageDialog(self)
+        if image_dialog.exec_() == QDialog.Accepted:
+            name, url = image_dialog.get_image_data()
+            if url:  # URL is required
+                markdown_code = f"![{name}]({url})"
+                self.editor.insertPlainText(markdown_code)
+
 
 
 if __name__ == "__main__":
