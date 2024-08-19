@@ -77,12 +77,20 @@ class MarkdownHighlighter(QSyntaxHighlighter):
                 
 
 class OutlinePane(QTreeView):
-    def __init__(self, editor, parent=None):
+    def __init__(self, editor, preview_pane, parent=None):
         super().__init__(parent)
         self.editor = editor
+        self.preview_pane = preview_pane
         self.setModel(QStandardItemModel())
         self.setHeaderHidden(True)
         self.editor.textChanged.connect(self.update_outline)
+
+        # Load icons
+        self.icons = {
+            1: QIcon("images/h1.png"),  # H1 headers
+            2: QIcon("images/h2.png"),  # H2 headers
+            'default': QIcon("images/header.png")  # Other headers
+        }
 
     def update_outline(self):
         self.model().clear()
@@ -100,6 +108,12 @@ class OutlinePane(QTreeView):
                     item = QStandardItem(title)
                     item.setEditable(False)  # Make the item non-editable
                     
+                    # Assign the correct icon based on the header level
+                    if level in self.icons:
+                        item.setIcon(self.icons[level])
+                    else:
+                        item.setIcon(self.icons['default'])
+
                     # Adjust the stack to find the correct parent for this level
                     while outline_stack and outline_stack[-1][0] >= level:
                         outline_stack.pop()
@@ -115,6 +129,7 @@ class OutlinePane(QTreeView):
 
         # Expand the outline tree view to show all levels
         self.expandAll()
+
 
     def navigate_to_heading(self, index):
         item = self.model().itemFromIndex(index)
@@ -159,6 +174,21 @@ class OutlinePane(QTreeView):
                 self.editor.setTextCursor(cursor)
                 break
             block = block.next()
+
+        # Calculate the scroll position in the editor
+        editor_scroll_value = self.editor.verticalScrollBar().value()
+        editor_scroll_max = self.editor.verticalScrollBar().maximum()
+
+        if editor_scroll_max > 0:
+            editor_scroll_ratio = editor_scroll_value / editor_scroll_max
+
+            # Scroll the preview pane to the corresponding position
+            def scroll_preview(preview_scroll_height):
+                preview_scroll_value = int(preview_scroll_height * editor_scroll_ratio)
+                self.preview_pane.page().runJavaScript(f"window.scrollTo(0, {preview_scroll_value});")
+
+            self.preview_pane.page().runJavaScript("document.documentElement.scrollHeight", scroll_preview)
+
 
 
 class CodeEditor(QPlainTextEdit):
@@ -1173,6 +1203,95 @@ class ProgressDialog(QDialog):
 
     def get_progress_value(self):
         return self.progress_spin_box.value()
+    
+class MarkdownReferenceDialog(QDialog):
+    def __init__(self, editor, parent=None):
+        super().__init__(parent)
+        self.editor = editor
+
+        # Set the window icon
+        self.setWindowIcon(QIcon("images/MarkivaLogo.png"))
+
+        self.setWindowTitle("Markdown Reference")
+        self.setFixedSize(600, 400)
+
+        # Main layout
+        main_layout = QVBoxLayout(self)
+        main_layout.setContentsMargins(15, 15, 15, 15)
+
+        # Scroll area to allow scrolling if the content is too long
+        scroll_area = QScrollArea(self)
+        scroll_area.setWidgetResizable(True)
+        main_layout.addWidget(scroll_area)
+
+        # Container widget
+        container_widget = QWidget()
+        scroll_area.setWidget(container_widget)
+
+        # Layout for the content (using a grid layout)
+        grid_layout = QGridLayout(container_widget)
+        grid_layout.setSpacing(10)
+        grid_layout.setAlignment(Qt.AlignTop)
+
+        # Markdown reference items
+        references = [
+            ("# Heading 1", "Creates a level 1 heading"),
+            ("## Heading 2", "Creates a level 2 heading"),
+            ("### Heading 3", "Creates a level 3 heading"),
+            ("**Bold**", "Makes text bold"),
+            ("*Italic*", "Makes text italic"),
+            ("~~Strikethrough~~", "Strikethrough text"),
+            ("`Inline Code`", "Displays inline code"),
+            ("```Code Block```", "Displays a block of code"),
+            ("> Blockquote", "Creates a blockquote"),
+            ("1. Numbered list", "Creates a numbered list"),
+            ("- Bullet list", "Creates a bullet list"),
+            ("[Link](url)", "Creates a hyperlink"),
+            ("![Image](url)", "Inserts an image"),
+            ("---", "Inserts a horizontal rule")
+        ]
+
+        # Add each reference to the grid layout with an insert button
+        for row, (syntax, description) in enumerate(references):
+            # Syntax label
+            syntax_label = QLabel(f"<b>{syntax}</b>")
+            grid_layout.addWidget(syntax_label, row, 0, Qt.AlignLeft)
+
+            # Description label
+            description_label = QLabel(description)
+            description_label.setStyleSheet("color: #cccccc;")
+            grid_layout.addWidget(description_label, row, 1, Qt.AlignLeft)
+
+            # Insert button
+            insert_button = QPushButton("Insert")
+            insert_button.setFixedSize(70, 25)
+            insert_button.setStyleSheet("""
+                QPushButton {
+                    background-color: #444444;
+                    color: #ffffff;
+                    border-radius: 5px;
+                }
+                QPushButton:hover {
+                    background-color: #2A82DA;
+                    color: #ffffff;
+                }
+                QPushButton:pressed {
+                    background-color: #333333;
+                }
+            """)
+            insert_button.clicked.connect(lambda checked, s=syntax: self.insert_into_editor(s))
+            grid_layout.addWidget(insert_button, row, 2, Qt.AlignRight)
+
+        # Add a button to close the dialog
+        button_box = QDialogButtonBox(QDialogButtonBox.Ok)
+        button_box.accepted.connect(self.accept)
+        main_layout.addWidget(button_box)
+
+    def insert_into_editor(self, text):
+        cursor = self.editor.textCursor()
+        cursor.insertText(text)
+        self.editor.setTextCursor(cursor)
+        self.editor.setFocus()
 
 
 
@@ -1299,8 +1418,19 @@ class MarkdownEditor(QMainWindow):
         self.apply_settings()  # Apply settings after loading UI
         
     def setup_outline_pane(self):
-        self.outline_pane = OutlinePane(self.editor)
+        self.outline_pane = OutlinePane(self.editor, self.preview)
         self.outline_pane.clicked.connect(self.outline_pane.navigate_to_heading)
+
+        # Create a QWidget to serve as a container for the outline pane with padding
+        outline_container = QWidget()
+        outline_layout = QVBoxLayout(outline_container)
+        
+        # Set the padding around the outline pane
+        outline_layout.setContentsMargins(10, 0, 10, 0)  # Adjust the padding as needed (left, top, right, bottom)
+        outline_layout.addWidget(self.outline_pane)
+        
+        self.outline_container = outline_container
+
 
     def align_text(self, alignment):
         cursor = self.editor.textCursor()
@@ -1422,8 +1552,15 @@ class MarkdownEditor(QMainWindow):
         # Set up file explorer
         self.setup_file_explorer()
 
-        # Set up the outline pane
+        # Set up the outline pane with padding
         self.setup_outline_pane()
+
+        # Set size policy and minimum size explicitly
+        self.file_tree_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.file_tree_view.setMinimumSize(200, 300)
+
+        self.outline_container.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.outline_container.setMinimumSize(200, 300)
 
         # Set up main layout and splitter
         main_layout = QVBoxLayout()
@@ -1433,17 +1570,24 @@ class MarkdownEditor(QMainWindow):
         # Vertical splitter for project treeview and outline pane
         left_splitter = QSplitter(Qt.Vertical)
         left_splitter.addWidget(self.file_tree_view)
-        left_splitter.addWidget(self.outline_pane)
+        left_splitter.addWidget(self.outline_container)  # Use the container instead of the outline_pane directly
 
-        # Adjust sizes to be equal
+        # Adjust sizes and set minimum size for both the tree view and outline pane
         left_splitter.setSizes([300, 300])  # Set equal sizes for both the project treeview and outline pane
+
+        # Set stretch factors to ensure the splitters respect the set sizes
+        left_splitter.setStretchFactor(0, 1)
+        left_splitter.setStretchFactor(1, 1)
 
         splitter.addWidget(left_splitter)
         splitter.addWidget(self.editor)
         splitter.addWidget(self.preview)
 
         # Set the widths for the horizontal splitter, giving more space to the editor and preview
-        splitter.setSizes([200, 500, 500])
+        splitter.setSizes([200, 500, 500])  # Adjust these numbers as needed
+        splitter.setStretchFactor(0, 1)
+        splitter.setStretchFactor(1, 3)
+        splitter.setStretchFactor(2, 3)
 
         # Set the layout
         main_widget = QWidget()
@@ -1462,6 +1606,9 @@ class MarkdownEditor(QMainWindow):
 
         # Restore window state (including toolbar positions)
         self.restore_window_state()
+
+
+
 
     def apply_settings(self):
         # Apply the saved settings
@@ -1601,257 +1748,268 @@ class MarkdownEditor(QMainWindow):
 
 
     def update_preview(self):
-        raw_markdown = self.editor.toPlainText()
+        # Store the current scroll position using JavaScript
+        def update_preview_with_scroll_position(current_scroll_position):
+            # Replace Markdown checkboxes with HTML checkboxes
+            raw_markdown = self.editor.toPlainText()
+            raw_markdown = raw_markdown.replace('- [ ]', '<input type="checkbox">').replace('- [x]', '<input type="checkbox" checked>')
 
-        # Replace Markdown checkboxes with HTML checkboxes
-        raw_markdown = raw_markdown.replace('- [ ]', '<input type="checkbox">').replace('- [x]', '<input type="checkbox" checked>')
+            # Use markdown2 with extras to support tables, fenced-code-blocks, and other features
+            html = markdown2.markdown(
+                raw_markdown,
+                extras=["fenced-code-blocks", "tables", "strike"]
+            )
 
-        # Use markdown2 with extras to support tables, fenced-code-blocks, and other features
-        html = markdown2.markdown(
-            raw_markdown,
-            extras=["fenced-code-blocks", "tables", "strike"]
-        )
+            # JavaScript for advanced tooltips with customization and error handling
+            js_tooltip = f"""
+            <script>
+            document.addEventListener('DOMContentLoaded', function() {{
+                const tooltipDelay = 500; // Tooltip delay in milliseconds
+                const showLinkTooltips = true;  // Customize to enable/disable link tooltips
+                const showImageTooltips = true; // Customize to enable/disable image tooltips
 
-        # JavaScript for advanced tooltips with customization and error handling
-        js_tooltip = f"""
-        <script>
-        document.addEventListener('DOMContentLoaded', function() {{
-            const tooltipDelay = 500; // Tooltip delay in milliseconds
-            const showLinkTooltips = true;  // Customize to enable/disable link tooltips
-            const showImageTooltips = true; // Customize to enable/disable image tooltips
+                document.querySelectorAll('a, img, h1, h2, h3, h4, h5, h6, strong, em, code, blockquote, ul, ol, li, th, td').forEach(function(element) {{
+                    let tooltipTimeout;
 
-            document.querySelectorAll('a, img, h1, h2, h3, h4, h5, h6, strong, em, code, blockquote, ul, ol, li, th, td').forEach(function(element) {{
-                let tooltipTimeout;
-
-                element.addEventListener('mouseenter', function(event) {{
-                    tooltipTimeout = setTimeout(function() {{
-                        let tooltipText = '';
-                        try {{
-                            switch(element.tagName.toLowerCase()) {{
-                                case 'a':
-                                    if (showLinkTooltips) {{
-                                        tooltipText = 'URL: ' + element.getAttribute('href');
-                                        fetch(element.getAttribute('href'), {{ method: 'HEAD' }})
-                                            .then(response => {{
-                                                if (response.ok) {{
-                                                    tooltipText += '<br>Title: ' + response.headers.get('Title');
-                                                }}
-                                            }})
-                                            .catch(() => {{
-                                                tooltipText += '<br>(Could not retrieve page title)';
-                                            }});
-                                    }}
-                                    break;
-                                case 'img':
-                                    if (showImageTooltips) {{
-                                        let img = new Image();
-                                        img.src = element.src;
-                                        img.onload = function() {{
-                                            tooltipText = 'Image: ' + (element.getAttribute('alt') || 'No alt text') +
-                                                        '<br>Dimensions: ' + img.width + 'x' + img.height;
-                                            showTooltip(tooltipText, element);
+                    element.addEventListener('mouseenter', function(event) {{
+                        tooltipTimeout = setTimeout(function() {{
+                            let tooltipText = '';
+                            try {{
+                                switch(element.tagName.toLowerCase()) {{
+                                    case 'a':
+                                        if (showLinkTooltips) {{
+                                            tooltipText = 'URL: ' + element.getAttribute('href');
+                                            fetch(element.getAttribute('href'), {{ method: 'HEAD' }})
+                                                .then(response => {{
+                                                    if (response.ok) {{
+                                                        tooltipText += '<br>Title: ' + response.headers.get('Title');
+                                                    }}
+                                                }})
+                                                .catch(() => {{
+                                                    tooltipText += '<br>(Could not retrieve page title)';
+                                                }});
                                         }}
-                                        img.onerror = function() {{
-                                            tooltipText = 'Image could not be loaded';
-                                            showTooltip(tooltipText, element);
-                                        }};
-                                        return; // Handle asynchronously
-                                    }}
-                                    break;
-                                case 'h1': case 'h2': case 'h3': case 'h4': case 'h5': case 'h6':
-                                    tooltipText = 'Header (' + element.tagName + '): ' + element.textContent;
-                                    break;
-                                case 'strong':
-                                    tooltipText = 'Bold text: ' + element.textContent;
-                                    break;
-                                case 'em':
-                                    tooltipText = 'Italic text: ' + element.textContent;
-                                    break;
-                                case 'u':
-                                    tooltipText = 'Underlined text: ' + element.textContent;
-                                    break;
-                                case 'code':
-                                    let lang = element.className.split('-')[1] || 'Unknown';
-                                    tooltipText = 'Code block (Language: ' + lang + ')';
-                                    break;
-                                case 'blockquote':
-                                    tooltipText = 'Blockquote: ' + element.textContent.substring(0, 50) + '...';
-                                    break;
-                                case 'ul':
-                                    tooltipText = 'Unordered List';
-                                    break;
-                                case 'ol':
-                                    tooltipText = 'Ordered List';
-                                    break;
-                                case 'li':
-                                    let parentTag = element.parentElement.tagName.toLowerCase();
-                                    tooltipText = (parentTag === 'ul' ? 'Bullet Point: ' : 'List Item: ') + element.textContent;
-                                    break;
-                                case 'th':
-                                    let thIndex = Array.from(element.parentNode.children).indexOf(element) + 1;
-                                    tooltipText = 'Table Header (Column ' + thIndex + ')';
-                                    break;
-                                case 'td':
-                                    let tdIndex = Array.from(element.parentNode.children).indexOf(element) + 1;
-                                    tooltipText = 'Table Cell (Row ' + (element.parentNode.rowIndex + 1) + ', Column ' + tdIndex + ')';
-                                    break;
+                                        break;
+                                    case 'img':
+                                        if (showImageTooltips) {{
+                                            let img = new Image();
+                                            img.src = element.src;
+                                            img.onload = function() {{
+                                                tooltipText = 'Image: ' + (element.getAttribute('alt') || 'No alt text') +
+                                                            '<br>Dimensions: ' + img.width + 'x' + img.height;
+                                                showTooltip(tooltipText, element);
+                                            }}
+                                            img.onerror = function() {{
+                                                tooltipText = 'Image could not be loaded';
+                                                showTooltip(tooltipText, element);
+                                            }};
+                                            return; // Handle asynchronously
+                                        }}
+                                        break;
+                                    case 'h1': case 'h2': case 'h3': case 'h4': case 'h5': case 'h6':
+                                        tooltipText = 'Header (' + element.tagName + '): ' + element.textContent;
+                                        break;
+                                    case 'strong':
+                                        tooltipText = 'Bold text: ' + element.textContent;
+                                        break;
+                                    case 'em':
+                                        tooltipText = 'Italic text: ' + element.textContent;
+                                        break;
+                                    case 'u':
+                                        tooltipText = 'Underlined text: ' + element.textContent;
+                                        break;
+                                    case 'code':
+                                        let lang = element.className.split('-')[1] || 'Unknown';
+                                        tooltipText = 'Code block (Language: ' + lang + ')';
+                                        break;
+                                    case 'blockquote':
+                                        tooltipText = 'Blockquote: ' + element.textContent.substring(0, 50) + '...';
+                                        break;
+                                    case 'ul':
+                                        tooltipText = 'Unordered List';
+                                        break;
+                                    case 'ol':
+                                        tooltipText = 'Ordered List';
+                                        break;
+                                    case 'li':
+                                        let parentTag = element.parentElement.tagName.toLowerCase();
+                                        tooltipText = (parentTag === 'ul' ? 'Bullet Point: ' : 'List Item: ') + element.textContent;
+                                        break;
+                                    case 'th':
+                                        let thIndex = Array.from(element.parentNode.children).indexOf(element) + 1;
+                                        tooltipText = 'Table Header (Column ' + thIndex + ')';
+                                        break;
+                                    case 'td':
+                                        let tdIndex = Array.from(element.parentNode.children).indexOf(element) + 1;
+                                        tooltipText = 'Table Cell (Row ' + (element.parentNode.rowIndex + 1) + ', Column ' + tdIndex + ')';
+                                        break;
+                                }}
+                            }} catch (error) {{
+                                tooltipText = 'Error generating tooltip';
                             }}
-                        }} catch (error) {{
-                            tooltipText = 'Error generating tooltip';
-                        }}
 
-                        showTooltip(tooltipText, element);
-                    }}, tooltipDelay);
+                            showTooltip(tooltipText, element);
+                        }}, tooltipDelay);
+                    }});
+
+                    element.addEventListener('mouseleave', function() {{
+                        clearTimeout(tooltipTimeout);
+                        hideTooltip(element);
+                    }});
                 }});
 
-                element.addEventListener('mouseleave', function() {{
-                    clearTimeout(tooltipTimeout);
-                    hideTooltip(element);
-                }});
+                function showTooltip(text, element) {{
+                    if (text) {{
+                        let tooltip = document.createElement('div');
+                        tooltip.className = 'custom-tooltip';
+                        tooltip.innerHTML = text;
+                        document.body.appendChild(tooltip);
+
+                        let rect = element.getBoundingClientRect();
+                        tooltip.style.left = rect.left + window.pageXOffset + 'px';
+                        tooltip.style.top = rect.bottom + window.pageYOffset + 'px';
+
+                        element.tooltip = tooltip;  // Store reference to the tooltip
+                    }}
+                }}
+
+                function hideTooltip(element) {{
+                    if (element.tooltip) {{
+                        document.body.removeChild(element.tooltip);
+                        element.tooltip = null;
+                    }}
+                }}
             }});
+            </script>
+            """
 
-            function showTooltip(text, element) {{
-                if (text) {{
-                    let tooltip = document.createElement('div');
-                    tooltip.className = 'custom-tooltip';
-                    tooltip.innerHTML = text;
-                    document.body.appendChild(tooltip);
-
-                    let rect = element.getBoundingClientRect();
-                    tooltip.style.left = rect.left + window.pageXOffset + 'px';
-                    tooltip.style.top = rect.bottom + window.pageYOffset + 'px';
-
-                    element.tooltip = tooltip;  // Store reference to the tooltip
-                }}
+            # CSS for tooltips with customization options
+            tooltip_background_color = "#333" if self.dark_mode else "#fff"
+            tooltip_text_color = "#fff" if self.dark_mode else "#000"
+            css_tooltip = f"""
+            <style>
+            .custom-tooltip {{
+                position: absolute;
+                background-color: {tooltip_background_color};
+                color: {tooltip_text_color};
+                padding: 5px;
+                border-radius: 5px;
+                font-size: 12px;
+                z-index: 1000;
+                pointer-events: none;
+                white-space: nowrap;
             }}
-
-            function hideTooltip(element) {{
-                if (element.tooltip) {{
-                    document.body.removeChild(element.tooltip);
-                    element.tooltip = null;
-                }}
+            .custom-tooltip.light-mode {{
+                background-color: #fff;
+                color: #000;
+                border: 1px solid #333;
             }}
-        }});
-        </script>
-        """
+            </style>
+            """
 
-        # CSS for tooltips with customization options
-        tooltip_background_color = "#333" if self.dark_mode else "#fff"
-        tooltip_text_color = "#fff" if self.dark_mode else "#000"
-        css_tooltip = f"""
-        <style>
-        .custom-tooltip {{
-            position: absolute;
-            background-color: {tooltip_background_color};
-            color: {tooltip_text_color};
-            padding: 5px;
-            border-radius: 5px;
-            font-size: 12px;
-            z-index: 1000;
-            pointer-events: none;
-            white-space: nowrap;
-        }}
-        .custom-tooltip.light-mode {{
-            background-color: #fff;
-            color: #000;
-            border: 1px solid #333;
-        }}
-        </style>
-        """
+            # Add custom CSS for code blocks, blockquotes, scrollbar, and tooltips
+            custom_css = """
+            <style>
+                body {
+                    font-family: Consolas, "Courier New", monospace;
+                    color: #f8f8f2;
+                    background-color: #1e1e1e;
+                    padding: 15px;
+                    margin: 0;
+                }
+                a {
+                    color: #1e90ff;
+                    font-weight: bold;
+                    text-decoration: none;
+                }
+                a:hover {
+                    text-decoration: underline;
+                }
+                pre {
+                    background-color: #2b2b2b;
+                    color: #f8f8f2;
+                    padding: 8px 12px;
+                    border-left: 5px solid #00cc66;
+                    border-radius: 8px;
+                    margin-bottom: 20px;
+                    font-size: 14px;
+                    white-space: pre-wrap;
+                    word-wrap: break-word;
+                }
+                blockquote {
+                    background-color: #2e2e2e;
+                    color: #dddddd;
+                    border-left: 5px solid #ffcc00;
+                    padding: 10px 20px;
+                    margin: 20px 0;
+                    border-radius: 8px;
+                    font-style: italic;
+                }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-bottom: 20px;
+                    background-color: #2b2b2b;
+                    color: #f8f8f2;
+                }
+                th, td {
+                    border: 1px solid #444;
+                    padding: 8px 12px;
+                    text-align: left;
+                }
+                th {
+                    background-color: #333;
+                    font-weight: bold;
+                }
+                img {
+                    max-width: 100%;
+                    height: auto;
+                }
+                ::-webkit-scrollbar {
+                    width: 8px;
+                    height: 8px;
+                }
+                ::-webkit-scrollbar-track {
+                    background: #1e1e1e;
+                }
+                ::-webkit-scrollbar-thumb {
+                    background-color: #444;
+                    border-radius: 4px;
+                }
+                ::-webkit-scrollbar-thumb:hover {
+                    background-color: #555;
+                }
+                input[type="checkbox"] {
+                    margin-right: 8px;
+                }
+                input[type="checkbox"]:checked + label {
+                    text-decoration: line-through;
+                }
+            </style>
+            """
 
-        # Add custom CSS for code blocks, blockquotes, scrollbar, and tooltips
-        custom_css = """
-        <style>
-            body {
-                font-family: Consolas, "Courier New", monospace;
-                color: #f8f8f2;
-                background-color: #1e1e1e;
-                padding: 15px;
-                margin: 0;
-            }
-            a {
-                color: #1e90ff;
-                font-weight: bold;
-                text-decoration: none;
-            }
-            a:hover {
-                text-decoration: underline;
-            }
-            pre {
-                background-color: #2b2b2b;
-                color: #f8f8f2;
-                padding: 8px 12px;
-                border-left: 5px solid #00cc66;
-                border-radius: 8px;
-                margin-bottom: 20px;
-                font-size: 14px;
-                white-space: pre-wrap;
-                word-wrap: break-word;
-            }
-            blockquote {
-                background-color: #2e2e2e;
-                color: #dddddd;
-                border-left: 5px solid #ffcc00;
-                padding: 10px 20px;
-                margin: 20px 0;
-                border-radius: 8px;
-                font-style: italic;
-            }
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-bottom: 20px;
-                background-color: #2b2b2b;
-                color: #f8f8f2;
-            }
-            th, td {
-                border: 1px solid #444;
-                padding: 8px 12px;
-                text-align: left;
-            }
-            th {
-                background-color: #333;
-                font-weight: bold;
-            }
-            img {
-                max-width: 100%;
-                height: auto;
-            }
-            ::-webkit-scrollbar {
-                width: 8px;
-                height: 8px;
-            }
-            ::-webkit-scrollbar-track {
-                background: #1e1e1e;
-            }
-            ::-webkit-scrollbar-thumb {
-                background-color: #444;
-                border-radius: 4px;
-            }
-            ::-webkit-scrollbar-thumb:hover {
-                background-color: #555;
-            }
-            input[type="checkbox"] {
-                margin-right: 8px;
-            }
-            input[type="checkbox"]:checked + label {
-                text-decoration: line-through;
-            }
-        </style>
-        """
+            if not self.dark_mode:
+                custom_css = custom_css.replace('#1e1e1e', '#ffffff').replace('#f8f8f2', '#000000').replace('#2b2b2b', '#f0f0f0').replace('#2e2e2e', '#e0e0e0')
+                css_tooltip = css_tooltip.replace('.custom-tooltip', '.custom-tooltip.light-mode')
 
-        if not self.dark_mode:
-            custom_css = custom_css.replace('#1e1e1e', '#ffffff').replace('#f8f8f2', '#000000').replace('#2b2b2b', '#f0f0f0').replace('#2e2e2e', '#e0e0e0')
-            css_tooltip = css_tooltip.replace('.custom-tooltip', '.custom-tooltip.light-mode')
+            # Ensure newlines within code blocks are treated as literal
+            html = html.replace('<pre><code>', '<pre style="white-space:pre-wrap;"><code style="white-space:pre-wrap;">')
 
-        # Ensure newlines within code blocks are treated as literal
-        html = html.replace('<pre><code>', '<pre style="white-space:pre-wrap;"><code style="white-space:pre-wrap;">')
+            # Combine everything into the full HTML
+            full_html = custom_css + css_tooltip + html + js_tooltip
 
-        # Combine everything into the full HTML
-        full_html = custom_css + css_tooltip + html + js_tooltip
+            # Set the HTML content in the preview pane
+            self.preview.page().setHtml(full_html)
 
-        # Set the HTML content in the preview pane
-        self.preview.page().setHtml(full_html)
+            # Restore the scroll position after the content has been updated
+            def restore_scroll_position():
+                self.preview.page().runJavaScript(f"window.scrollTo(0, {current_scroll_position});")
+
+            # Use a slight delay to ensure the HTML content is fully loaded before restoring the scroll
+            QTimer.singleShot(50, restore_scroll_position)
+
+        # Get the current scroll position
+        self.preview.page().runJavaScript("window.scrollY", update_preview_with_scroll_position)
 
 
     def update_preview_scroll_position(self):
@@ -1873,6 +2031,7 @@ class MarkdownEditor(QMainWindow):
             self.preview.page().runJavaScript("document.documentElement.scrollHeight", adjust_preview_scroll)
 
         scroll_preview()
+
 
 
     def set_initial_preview_content(self):
@@ -2200,6 +2359,11 @@ class MarkdownEditor(QMainWindow):
         about_action = QAction(qta.icon('fa.question-circle', color='red'), "About", self)
         about_action.triggered.connect(self.show_about_dialog)
         help_menu.addAction(about_action)
+        
+        # Add Markdown Reference action
+        markdown_reference_action = QAction(qta.icon('fa.book', color='blue'), "Markdown Reference", self)
+        markdown_reference_action.triggered.connect(self.show_markdown_reference)
+        help_menu.addAction(markdown_reference_action)
 
 
     def createToolbar(self):
@@ -2243,12 +2407,32 @@ class MarkdownEditor(QMainWindow):
         h1_icon = QIcon("images/h1.png")
         h2_icon = QIcon("images/h2.png")
         
-        img_icon = qta.icon('fa.image', color=icon_color)
+        img_icon = QIcon("images/image.png")
+        
 
         # Alignment icons
         align_left_icon = qta.icon('fa.align-left', color=icon_color)
         align_center_icon = qta.icon('fa.align-center', color=icon_color)
         align_right_icon = qta.icon('fa.align-right', color=icon_color)
+        
+        self.toolbar.addSeparator()
+        
+        save_action = QAction(save_icon, "Save", self)
+        save_action.triggered.connect(self.save_file)
+        self.toolbar.addAction(save_action)
+
+        open_action = QAction(open_icon, "Open", self)
+        open_action.triggered.connect(self.open_file)
+        self.toolbar.addAction(open_action)
+               
+        # Add Markdown Reference button to the toolbar
+        markdown_reference_icon = qta.icon('fa.book', color=icon_color)
+        markdown_reference_action = QAction(markdown_reference_icon, "Markdown Reference", self)
+        markdown_reference_action.triggered.connect(self.show_markdown_reference)
+        self.toolbar.addAction(markdown_reference_action)
+        
+        self.toolbar.addSeparator()
+        
 
         # Add actions to toolbar with separators for better organization
         bold_action = QAction(bold_icon, "Bold", self)
@@ -2272,6 +2456,17 @@ class MarkdownEditor(QMainWindow):
         heading_action = QAction(heading_icon, "Heading", self)
         heading_action.triggered.connect(lambda: self.editor.insert_markdown("# ", ""))
         self.toolbar.addAction(heading_action)
+        
+        self.toolbar.addSeparator()
+        h1_action = QAction(h1_icon, "H1", self)
+        h1_action.triggered.connect(lambda: self.editor.insert_html("h1"))
+        self.toolbar.addAction(h1_action)
+
+        h2_action = QAction(h2_icon, "H2", self)
+        h2_action.triggered.connect(lambda: self.editor.insert_html("h2"))
+        self.toolbar.addAction(h2_action)
+        
+        self.toolbar.addSeparator()
 
         superscript_action = QAction(superscript_icon, "Superscript", self)
         superscript_action.triggered.connect(lambda: self.editor.insert_markdown("<sup>", "</sup>"))
@@ -2357,14 +2552,6 @@ class MarkdownEditor(QMainWindow):
         # HTML elements insertion
         self.toolbar.addSeparator()
 
-        h1_action = QAction(h1_icon, "H1", self)
-        h1_action.triggered.connect(lambda: self.editor.insert_html("h1"))
-        self.toolbar.addAction(h1_action)
-
-        h2_action = QAction(h2_icon, "H2", self)
-        h2_action.triggered.connect(lambda: self.editor.insert_html("h2"))
-        self.toolbar.addAction(h2_action)
-
         img_action = QAction(img_icon, "HTML Image", self)
         img_action.triggered.connect(lambda: self.editor.insert_html("img", 'src="image_url"'))
         self.toolbar.addAction(img_action)
@@ -2396,22 +2583,15 @@ class MarkdownEditor(QMainWindow):
 
         self.toolbar.addSeparator()
 
-        save_action = QAction(save_icon, "Save", self)
-        save_action.triggered.connect(self.save_file)
-        self.toolbar.addAction(save_action)
-
-        open_action = QAction(open_icon, "Open", self)
-        open_action.triggered.connect(self.open_file)
-        self.toolbar.addAction(open_action)
-
-        self.toolbar.addSeparator()
-
         settings_action = QAction(settings_icon, "Settings", self)
         settings_action.triggered.connect(self.open_settings_window)
         self.toolbar.addAction(settings_action)
 
 
     def createEditorSettingsToolbar(self):
+        
+        self.settings_toolbar.addSeparator()
+        
         # Font Family
         font_family_combo = QComboBox(self)
         font_family_combo.addItems(["Fira Code", "Consolas", "Courier New", "Arial", "Times New Roman"])
@@ -2641,6 +2821,10 @@ class MarkdownEditor(QMainWindow):
     def show_about_dialog(self):
         about_dialog = AboutDialog(self)
         about_dialog.exec_()
+        
+    def show_markdown_reference(self):
+        reference_dialog = MarkdownReferenceDialog(self.editor, self)
+        reference_dialog.exec_()
 
     def show_version_control(self):
         if not self.current_file:
