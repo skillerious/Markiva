@@ -161,3 +161,8 @@ Embedding images is as easy as this:
 Markiva is more than just an editor; it's a powerful tool to help you create, edit, and manage your markdown projects. Download and start exploring today, and unlock the full potential of markdown with Markiva! ✨
 
 Robin Doak
+
+
+# Please note!
+
+This application still has a long way to go. There will be a ton of bugs that need fixed and i will continue to iron these out.
