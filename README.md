@@ -2,7 +2,7 @@
   <img src="https://i.postimg.cc/j5LRngMP/Markiva-Logo.png" alt="Markiva Logo" style="width:200px;"/>
 </p>
 
-![](https://i.postimg.cc/rsyrZQvh/Screenshot-2024-08-19-190937.png)
+![](https://i.postimg.cc/Vk8MTq3P/Screenshot-2024-08-19-200924.png)
 
 
 <h1 id="🎉-welcome-to-**markiva**">🎉 Welcome to Markiva!</h1>
