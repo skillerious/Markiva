@@ -74,6 +74,91 @@ class MarkdownHighlighter(QSyntaxHighlighter):
             while iterator.hasNext():
                 match = iterator.next()
                 self.setFormat(match.capturedStart(), match.capturedLength(), fmt)
+                
+
+class OutlinePane(QTreeView):
+    def __init__(self, editor, parent=None):
+        super().__init__(parent)
+        self.editor = editor
+        self.setModel(QStandardItemModel())
+        self.setHeaderHidden(True)
+        self.editor.textChanged.connect(self.update_outline)
+
+    def update_outline(self):
+        self.model().clear()
+        document = self.editor.document()
+        block = document.firstBlock()
+
+        outline_stack = [(0, self.model())]  # Stack to manage outline hierarchy
+
+        while block.isValid():
+            text = block.text().strip()
+            if text.startswith("#"):
+                level = text.count('#')
+                title = text.strip('#').strip()
+                if title:
+                    item = QStandardItem(title)
+                    item.setEditable(False)  # Make the item non-editable
+                    
+                    # Adjust the stack to find the correct parent for this level
+                    while outline_stack and outline_stack[-1][0] >= level:
+                        outline_stack.pop()
+
+                    # Add the new item as a child of the current parent
+                    parent_item = outline_stack[-1][1]
+                    parent_item.appendRow(item)
+
+                    # Push the new item onto the stack
+                    outline_stack.append((level, item))
+
+            block = block.next()
+
+        # Expand the outline tree view to show all levels
+        self.expandAll()
+
+    def navigate_to_heading(self, index):
+        item = self.model().itemFromIndex(index)
+        heading_text = item.text()
+
+        # Search for the heading in the editor and move the cursor to it
+        cursor = self.editor.textCursor()
+        document = self.editor.document()
+        block = document.findBlockByLineNumber(0)  # Start from the beginning
+
+        while block.isValid():
+            text = block.text().strip()
+            if heading_text in text:
+                cursor.setPosition(block.position())
+                self.editor.setTextCursor(cursor)
+                break
+            block = block.next()
+
+
+    def find_parent_item(self, level, outline_map):
+        # This method finds the correct parent item for a given level
+        for pos, item in reversed(outline_map.items()):
+            item_level = item.text().count('#')
+            if item_level == level:
+                return item
+        return None
+
+
+    def navigate_to_heading(self, index):
+        item = self.model().itemFromIndex(index)
+        heading_text = item.text()
+
+        # Search for the heading in the editor and move the cursor to it
+        cursor = self.editor.textCursor()
+        document = self.editor.document()
+        block = document.findBlockByLineNumber(0)  # Start from the beginning
+
+        while block.isValid():
+            text = block.text().strip()
+            if heading_text in text:
+                cursor.setPosition(block.position())
+                self.editor.setTextCursor(cursor)
+                break
+            block = block.next()
 
 
 class CodeEditor(QPlainTextEdit):
@@ -1056,65 +1141,125 @@ class TemplateDialog(QDialog):
 class ProgressDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
-        
+
         # Set the window icon
         self.setWindowIcon(QIcon("images/MarkivaLogo.png"))
-        
+
         self.setWindowTitle("Insert Progress")
-        self.setFixedSize(250, 120)
+        self.setFixedSize(450, 200)
 
-        layout = QVBoxLayout(self)
+        # Main layout
+        main_layout = QVBoxLayout(self)
+        main_layout.setContentsMargins(15, 15, 15, 15)
 
-        self.label = QLabel("Select Progress Value:", self)
-        layout.addWidget(self.label)
+        # Progress input label
+        self.progress_label = QLabel("Progress Value (1-100):", self)
+        self.progress_label.setStyleSheet("font-size: 14px;")
+        main_layout.addWidget(self.progress_label)
 
-        self.spin_box = QSpinBox(self)
-        self.spin_box.setRange(1, 100)
-        self.spin_box.setValue(50)
-        layout.addWidget(self.spin_box)
+        # Progress spin box
+        self.progress_spin_box = QSpinBox(self)
+        self.progress_spin_box.setRange(1, 100)
+        self.progress_spin_box.setValue(50)
+        self.progress_spin_box.setStyleSheet("padding: 5px; font-size: 14px;")
+        main_layout.addWidget(self.progress_spin_box)
 
+        # Dialog buttons with margin and padding
         self.button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, self)
+        self.button_box.setStyleSheet("QPushButton { padding: 5px 10px; font-size: 14px; }")
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
-        layout.addWidget(self.button_box)
+        main_layout.addWidget(self.button_box)
 
     def get_progress_value(self):
-        return self.spin_box.value()
+        return self.progress_spin_box.value()
+
 
 
 class FindReplaceDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
-        
+
         # Set the window icon
         self.setWindowIcon(QIcon("images/MarkivaLogo.png"))
-        
+
         self.setWindowTitle("Find and Replace")
-        self.setFixedSize(400, 300)
+        self.setFixedSize(450, 300)
 
-        layout = QVBoxLayout(self)
+        # Main layout with a sleek, modern design
+        main_layout = QVBoxLayout(self)
+        main_layout.setContentsMargins(20, 20, 20, 20)
+        self.setStyleSheet("""
+            QDialog {
+                background-color: #2e2e2e;
+                border-radius: 8px;
+            }
+        """)
 
-        # Find text field
+        # Find text input
         self.find_label = QLabel("Find:", self)
-        self.find_input = QLineEdit(self)
-        layout.addWidget(self.find_label)
-        layout.addWidget(self.find_input)
+        self.find_label.setStyleSheet("font-size: 14px; color: #ffffff;")
+        main_layout.addWidget(self.find_label)
 
-        # Replace text field
+        self.find_input = QLineEdit(self)
+        self.find_input.setPlaceholderText("Enter text to find...")
+        self.find_input.setStyleSheet("""
+            QLineEdit {
+                padding: 6px;
+                font-size: 14px;
+                background-color: #444444;
+                color: #ffffff;
+                border-radius: 4px;
+                border: 1px solid #2A82DA;
+            }
+        """)
+        main_layout.addWidget(self.find_input)
+
+        # Replace text input
         self.replace_label = QLabel("Replace with:", self)
+        self.replace_label.setStyleSheet("font-size: 14px; color: #ffffff; margin-top: 10px;")
+        main_layout.addWidget(self.replace_label)
+
         self.replace_input = QLineEdit(self)
-        layout.addWidget(self.replace_label)
-        layout.addWidget(self.replace_input)
+        self.replace_input.setPlaceholderText("Enter replacement text...")
+        self.replace_input.setStyleSheet("""
+            QLineEdit {
+                padding: 6px;
+                font-size: 14px;
+                background-color: #444444;
+                color: #ffffff;
+                border-radius: 4px;
+                border: 1px solid #2A82DA;
+            }
+        """)
+        main_layout.addWidget(self.replace_input)
 
         # Regex option
         self.regex_checkbox = QCheckBox("Use Regular Expressions", self)
-        layout.addWidget(self.regex_checkbox)
+        self.regex_checkbox.setStyleSheet("font-size: 14px; color: #ffffff; margin-top: 10px;")
+        main_layout.addWidget(self.regex_checkbox)
 
-        # Buttons
+        # Dialog buttons with a flat, modern design
         self.button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, self)
-        layout.addWidget(self.button_box)
-
-        self.setLayout(layout)
+        self.button_box.setStyleSheet("""
+            QPushButton {
+                font-size: 14px;
+                padding: 6px 15px;
+                color: #ffffff;
+                background-color: #2A82DA;
+                border-radius: 4px;
+                margin: 10px;
+            }
+            QPushButton:hover {
+                background-color: #1f65a6;
+            }
+            QPushButton:pressed {
+                background-color: #144276;
+            }
+        """)
+        self.button_box.accepted.connect(self.accept)
+        self.button_box.rejected.connect(self.reject)
+        main_layout.addWidget(self.button_box)
 
     def get_find_text(self):
         return self.find_input.text()
@@ -1124,7 +1269,6 @@ class FindReplaceDialog(QDialog):
 
     def is_regex_enabled(self):
         return self.regex_checkbox.isChecked()
-
 
 class MarkdownEditor(QMainWindow):
     def __init__(self):
@@ -1153,6 +1297,10 @@ class MarkdownEditor(QMainWindow):
         self.initUI()
 
         self.apply_settings()  # Apply settings after loading UI
+        
+    def setup_outline_pane(self):
+        self.outline_pane = OutlinePane(self.editor)
+        self.outline_pane.clicked.connect(self.outline_pane.navigate_to_heading)
 
     def align_text(self, alignment):
         cursor = self.editor.textCursor()
@@ -1274,29 +1422,28 @@ class MarkdownEditor(QMainWindow):
         # Set up file explorer
         self.setup_file_explorer()
 
+        # Set up the outline pane
+        self.setup_outline_pane()
+
         # Set up main layout and splitter
         main_layout = QVBoxLayout()
         splitter = QSplitter(Qt.Horizontal)
         splitter.setHandleWidth(8)
 
-        # Set up the preview panel with QWebEngineView
-        self.preview = QWebEngineView()
+        # Vertical splitter for project treeview and outline pane
+        left_splitter = QSplitter(Qt.Vertical)
+        left_splitter.addWidget(self.file_tree_view)
+        left_splitter.addWidget(self.outline_pane)
 
-        # Enable access to remote content
-        self.preview.settings().setAttribute(QWebEngineSettings.LocalContentCanAccessRemoteUrls, True)
-        self.preview.settings().setAttribute(QWebEngineSettings.LocalContentCanAccessFileUrls, True)
-        self.preview.settings().setAttribute(QWebEngineSettings.AutoLoadImages, True)
+        # Adjust sizes to be equal
+        left_splitter.setSizes([300, 300])  # Set equal sizes for both the project treeview and outline pane
 
-        self.preview.setStyleSheet("background-color: #1e1e1e; border-left: 2px solid #3e3e3e;")
-
-        # Set an initial empty content with the correct background
-        self.set_initial_preview_content()
-
-        # Add widgets to the splitter
-        splitter.addWidget(self.file_tree_view)
+        splitter.addWidget(left_splitter)
         splitter.addWidget(self.editor)
         splitter.addWidget(self.preview)
-        splitter.setSizes([200, 500, 500])  # Adjust sizes of the file explorer, editor, and preview
+
+        # Set the widths for the horizontal splitter, giving more space to the editor and preview
+        splitter.setSizes([200, 500, 500])
 
         # Set the layout
         main_widget = QWidget()
