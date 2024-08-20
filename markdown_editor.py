@@ -1396,6 +1396,9 @@ class MarkdownEditor(QMainWindow):
         # Set the window icon
         self.setWindowIcon(QIcon("images/MarkivaLogo.png"))
 
+        # Define the splitter as an instance attribute here
+        self.splitter = None
+        
         self.setWindowTitle("Markiva")
         self.setGeometry(100, 100, 1200, 800)
         self.dark_mode = True  # Start with dark mode by default
@@ -1516,6 +1519,48 @@ class MarkdownEditor(QMainWindow):
             print(f"Settings saved to {self.settings_file}")
         except Exception as e:
             print(f"Failed to save settings: {e}")
+            
+    def apply_settings(self):
+        # Apply the saved settings
+        self.editor.set_font_size(self.settings.get("font_size", 14))
+        self.editor.set_font_family(self.settings.get("font_family", "Fira Code"))
+        
+        # Apply the saved colors
+        background_color = self.settings.get("background_color", "#1e1e1e")
+        text_color = self.settings.get("text_color", "#ffffff")
+
+        self.current_background_color = background_color
+        self.current_text_color = text_color
+
+        self.editor.set_background_color(background_color)
+        self.editor.set_text_color(text_color)
+
+        if self.settings.get("dark_mode", True):
+            self.set_dark_theme()
+        else:
+            self.set_light_theme()
+
+        self.update_toolbar_icons()
+        self.update_preview()
+        
+    def open_settings(self):
+        """Open the settings window and apply changes if necessary."""
+        settings_window = SettingsWindow(self.settings_file)
+        if settings_window.exec_() == QDialog.Accepted:
+            self.settings = self.load_settings()
+            self.apply_settings()
+            
+    def createMenuBar(self):
+        # Create the main menu bar
+        menubar = self.menuBar()
+        fileMenu = menubar.addMenu('File')
+
+        # Add other menus as needed
+        # Settings action
+        settingsAction = QAction("Settings", self)
+        settingsAction.setShortcut("Ctrl+S")
+        settingsAction.triggered.connect(self.open_settings)
+        fileMenu.addAction(settingsAction)
 
 
     def initUI(self):
@@ -1564,8 +1609,8 @@ class MarkdownEditor(QMainWindow):
 
         # Set up main layout and splitter
         main_layout = QVBoxLayout()
-        splitter = QSplitter(Qt.Horizontal)
-        splitter.setHandleWidth(8)
+        self.splitter = QSplitter(Qt.Horizontal)  # Define splitter as an instance attribute
+        self.splitter.setHandleWidth(8)
 
         # Vertical splitter for project treeview and outline pane
         left_splitter = QSplitter(Qt.Vertical)
@@ -1579,19 +1624,19 @@ class MarkdownEditor(QMainWindow):
         left_splitter.setStretchFactor(0, 1)
         left_splitter.setStretchFactor(1, 1)
 
-        splitter.addWidget(left_splitter)
-        splitter.addWidget(self.editor)
-        splitter.addWidget(self.preview)
+        self.splitter.addWidget(left_splitter)
+        self.splitter.addWidget(self.editor)
+        self.splitter.addWidget(self.preview)
 
         # Set the widths for the horizontal splitter, giving more space to the editor and preview
-        splitter.setSizes([200, 500, 500])  # Adjust these numbers as needed
-        splitter.setStretchFactor(0, 1)
-        splitter.setStretchFactor(1, 3)
-        splitter.setStretchFactor(2, 3)
+        self.splitter.setSizes([200, 500, 500])  # Adjust these numbers as needed
+        self.splitter.setStretchFactor(0, 1)
+        self.splitter.setStretchFactor(1, 3)
+        self.splitter.setStretchFactor(2, 3)
 
         # Set the layout
         main_widget = QWidget()
-        main_layout.addWidget(splitter)
+        main_layout.addWidget(self.splitter)
         main_widget.setLayout(main_layout)
         self.setCentralWidget(main_widget)
 
@@ -2589,9 +2634,11 @@ class MarkdownEditor(QMainWindow):
 
 
     def createEditorSettingsToolbar(self):
-        
+        self.settings_toolbar.clear()
+
+        # Separator
         self.settings_toolbar.addSeparator()
-        
+
         # Font Family
         font_family_combo = QComboBox(self)
         font_family_combo.addItems(["Fira Code", "Consolas", "Courier New", "Arial", "Times New Roman"])
@@ -2600,7 +2647,7 @@ class MarkdownEditor(QMainWindow):
         self.settings_toolbar.addWidget(QLabel("Font:"))
         self.settings_toolbar.addWidget(font_family_combo)
 
-        # Add a spacer
+        # Separator
         self.settings_toolbar.addSeparator()
 
         # Font Size
@@ -2611,7 +2658,7 @@ class MarkdownEditor(QMainWindow):
         self.settings_toolbar.addWidget(QLabel("Size:"))
         self.settings_toolbar.addWidget(font_size_spinbox)
 
-        # Add a spacer
+        # Separator
         self.settings_toolbar.addSeparator()
 
         # Background Color
@@ -2619,7 +2666,7 @@ class MarkdownEditor(QMainWindow):
         background_color_button.clicked.connect(self.choose_background_color)
         self.settings_toolbar.addWidget(background_color_button)
 
-        # Add a spacer
+        # Separator
         self.settings_toolbar.addSeparator()
 
         # Text Color
@@ -2627,7 +2674,7 @@ class MarkdownEditor(QMainWindow):
         text_color_button.clicked.connect(self.choose_text_color)
         self.settings_toolbar.addWidget(text_color_button)
 
-        # Add a spacer
+        # Separator
         self.settings_toolbar.addSeparator()
 
         # Line Numbers
@@ -2636,7 +2683,7 @@ class MarkdownEditor(QMainWindow):
         line_numbers_checkbox.toggled.connect(self.toggle_line_numbers)
         self.settings_toolbar.addWidget(line_numbers_checkbox)
 
-        # Add a spacer
+        # Separator
         self.settings_toolbar.addSeparator()
 
         # Spell Check
@@ -2645,7 +2692,7 @@ class MarkdownEditor(QMainWindow):
         spell_check_checkbox.toggled.connect(self.toggle_spell_check)
         self.settings_toolbar.addWidget(spell_check_checkbox)
 
-        # Add a spacer
+        # Separator
         self.settings_toolbar.addSeparator()
 
         # Word Wrap
@@ -2653,6 +2700,52 @@ class MarkdownEditor(QMainWindow):
         word_wrap_checkbox.setChecked(True)
         word_wrap_checkbox.toggled.connect(self.toggle_word_wrap)
         self.settings_toolbar.addWidget(word_wrap_checkbox)
+
+        # Separator
+        self.settings_toolbar.addSeparator()
+
+        # Editor, Split, and Preview Buttons
+        
+        editor_icon = qta.icon('fa.file-text-o', color='white')
+        split_icon = qta.icon('fa.columns', color='white')
+        preview_icon = qta.icon('fa.eye', color='white')
+
+        editor_button = QPushButton(editor_icon, "Editor", self)
+        editor_button.clicked.connect(self.show_editor_only)
+        self.settings_toolbar.addWidget(editor_button)
+
+        split_button = QPushButton(split_icon, "Split", self)
+        split_button.clicked.connect(self.show_split_view)
+        self.settings_toolbar.addWidget(split_button)
+
+        preview_button = QPushButton(preview_icon, "Preview", self)
+        preview_button.clicked.connect(self.show_preview_only)
+        self.settings_toolbar.addWidget(preview_button)
+
+    def show_editor_only(self):
+        left_pane_width = self.splitter.sizes()[0]  # Preserve the width of the left pane
+        total_width = sum(self.splitter.sizes())  # Get the total width of the splitter
+        remaining_width = total_width - left_pane_width
+
+        self.splitter.setSizes([left_pane_width, remaining_width, 0])  # Maximize editor, hide preview
+
+    def show_split_view(self):
+        left_pane_width = self.splitter.sizes()[0]  # Preserve the width of the left pane
+        total_width = sum(self.splitter.sizes())  # Get the total width of the splitter
+        remaining_width = total_width - left_pane_width
+        
+        # Split the remaining space equally between the editor and preview panes
+        editor_and_preview_width = remaining_width // 2
+        
+        self.splitter.setSizes([left_pane_width, editor_and_preview_width, editor_and_preview_width])
+
+
+    def show_preview_only(self):
+        left_pane_width = self.splitter.sizes()[0]  # Preserve the width of the left pane
+        total_width = sum(self.splitter.sizes())  # Get the total width of the splitter
+        remaining_width = total_width - left_pane_width
+
+        self.splitter.setSizes([left_pane_width, 0, remaining_width])  # Hide editor, maximize preview
 
     def choose_background_color(self):
         color = QColorDialog.getColor()
