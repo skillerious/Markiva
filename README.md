@@ -179,8 +179,3 @@ This application still has a long way to go. There will be a ton of bugs that ne
 
 
 ![](https://i.postimg.cc/sXvLkPSc/Screenshot-2024-08-21-183439.png)
-
----
-
-
-![](https://i.postimg.cc/sXvLkPSc/Screenshot-2024-08-21-183439.png)
