@@ -24,6 +24,7 @@ import chardet  # For detecting file encoding
 import re  # For regex support in Find and Replace
 from Settings import SettingsWindow  # Import SettingsWindow
 from about import AboutDialog
+from find import FindWindow
 
 
 class LineNumberArea(QWidget):
@@ -1295,100 +1296,6 @@ class MarkdownReferenceDialog(QDialog):
 
 
 
-class FindReplaceDialog(QDialog):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-
-        # Set the window icon
-        self.setWindowIcon(QIcon("images/MarkivaLogo.png"))
-
-        self.setWindowTitle("Find and Replace")
-        self.setFixedSize(450, 300)
-
-        # Main layout with a sleek, modern design
-        main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(20, 20, 20, 20)
-        self.setStyleSheet("""
-            QDialog {
-                background-color: #2e2e2e;
-                border-radius: 8px;
-            }
-        """)
-
-        # Find text input
-        self.find_label = QLabel("Find:", self)
-        self.find_label.setStyleSheet("font-size: 14px; color: #ffffff;")
-        main_layout.addWidget(self.find_label)
-
-        self.find_input = QLineEdit(self)
-        self.find_input.setPlaceholderText("Enter text to find...")
-        self.find_input.setStyleSheet("""
-            QLineEdit {
-                padding: 6px;
-                font-size: 14px;
-                background-color: #444444;
-                color: #ffffff;
-                border-radius: 4px;
-                border: 1px solid #2A82DA;
-            }
-        """)
-        main_layout.addWidget(self.find_input)
-
-        # Replace text input
-        self.replace_label = QLabel("Replace with:", self)
-        self.replace_label.setStyleSheet("font-size: 14px; color: #ffffff; margin-top: 10px;")
-        main_layout.addWidget(self.replace_label)
-
-        self.replace_input = QLineEdit(self)
-        self.replace_input.setPlaceholderText("Enter replacement text...")
-        self.replace_input.setStyleSheet("""
-            QLineEdit {
-                padding: 6px;
-                font-size: 14px;
-                background-color: #444444;
-                color: #ffffff;
-                border-radius: 4px;
-                border: 1px solid #2A82DA;
-            }
-        """)
-        main_layout.addWidget(self.replace_input)
-
-        # Regex option
-        self.regex_checkbox = QCheckBox("Use Regular Expressions", self)
-        self.regex_checkbox.setStyleSheet("font-size: 14px; color: #ffffff; margin-top: 10px;")
-        main_layout.addWidget(self.regex_checkbox)
-
-        # Dialog buttons with a flat, modern design
-        self.button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, self)
-        self.button_box.setStyleSheet("""
-            QPushButton {
-                font-size: 14px;
-                padding: 6px 15px;
-                color: #ffffff;
-                background-color: #2A82DA;
-                border-radius: 4px;
-                margin: 10px;
-            }
-            QPushButton:hover {
-                background-color: #1f65a6;
-            }
-            QPushButton:pressed {
-                background-color: #144276;
-            }
-        """)
-        self.button_box.accepted.connect(self.accept)
-        self.button_box.rejected.connect(self.reject)
-        main_layout.addWidget(self.button_box)
-
-    def get_find_text(self):
-        return self.find_input.text()
-
-    def get_replace_text(self):
-        return self.replace_input.text()
-
-    def is_regex_enabled(self):
-        return self.regex_checkbox.isChecked()
-
 class MarkdownEditor(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -2332,40 +2239,48 @@ class MarkdownEditor(QMainWindow):
         menubar.addMenu(file_menu)
 
         save_file_action = QAction(qta.icon('fa.save', color='green'), "Save", self)
+        save_file_action.setShortcut("Ctrl+S")
         save_file_action.triggered.connect(self.save_file)
         file_menu.addAction(save_file_action)
 
         export_pdf_action = QAction(qta.icon('fa.file-pdf-o', color='red'), "Export as PDF", self)
+        export_pdf_action.setShortcut("Ctrl+Shift+P")
         export_pdf_action.triggered.connect(self.export_to_pdf)
         file_menu.addAction(export_pdf_action)
 
         export_html_action = QAction(qta.icon('fa.html5', color='orange'), "Export as HTML", self)
+        export_html_action.setShortcut("Ctrl+Shift+H")
         export_html_action.triggered.connect(self.export_to_html)
         file_menu.addAction(export_html_action)
 
         file_menu.addSeparator()
 
         auto_save_action = QAction(qta.icon('fa.refresh', color='blue'), "Auto-save", self)
+        auto_save_action.setShortcut("Ctrl+Alt+S")
         auto_save_action.triggered.connect(self.auto_save)
         file_menu.addAction(auto_save_action)
 
         version_control_action = QAction(qta.icon('fa.code-fork', color='purple'), "Version Control", self)
+        version_control_action.setShortcut("Ctrl+Shift+V")
         version_control_action.triggered.connect(self.show_version_control)
         file_menu.addAction(version_control_action)
-        
+
         # View menu
         view_menu = QMenu("View", self)
         menubar.addMenu(view_menu)
 
         toggle_theme_action = QAction(qta.icon('fa.sun-o', color='purple'), "Toggle Dark/Light Mode", self)
+        toggle_theme_action.setShortcut("Ctrl+T")
         toggle_theme_action.triggered.connect(self.toggle_theme)
         view_menu.addAction(toggle_theme_action)
 
         generate_toc_action = QAction(qta.icon('fa.list', color='green'), "Generate Table of Contents", self)
+        generate_toc_action.setShortcut("Ctrl+Shift+T")
         generate_toc_action.triggered.connect(self.generate_toc)
         view_menu.addAction(generate_toc_action)
 
         show_terminal_action = QAction(qta.icon('fa.terminal', color='gray'), "Show Terminal", self)
+        show_terminal_action.setShortcut("Ctrl+Alt+T")
         show_terminal_action.triggered.connect(self.show_terminal)
         view_menu.addAction(show_terminal_action)
 
@@ -2373,15 +2288,27 @@ class MarkdownEditor(QMainWindow):
         edit_menu = QMenu("Edit", self)
         menubar.addMenu(edit_menu)
 
-        find_replace_action = QAction(qta.icon('fa.search', color='cyan'), "Find and Replace", self)
+        find_replace_action = QAction(qta.icon('fa.search', color='cyan'), "Find", self)  # Renamed to "Find"
+        find_replace_action.setShortcut("Ctrl+F")
         find_replace_action.triggered.connect(self.find_replace)
         edit_menu.addAction(find_replace_action)
+
+        undo_action = QAction(qta.icon('fa.undo', color='black'), "Undo", self)
+        undo_action.setShortcut("Ctrl+Z")
+        undo_action.triggered.connect(self.editor.undo)
+        edit_menu.addAction(undo_action)
+
+        redo_action = QAction(qta.icon('fa.repeat', color='black'), "Redo", self)
+        redo_action.setShortcut("Ctrl+Y")
+        redo_action.triggered.connect(self.editor.redo)
+        edit_menu.addAction(redo_action)
 
         # Settings menu
         settings_menu = QMenu("Settings", self)
         menubar.addMenu(settings_menu)
 
         application_settings_action = QAction(qta.icon('fa.wrench', color='orange'), "Application Settings", self)
+        application_settings_action.setShortcut("Ctrl+Alt+P")
         application_settings_action.triggered.connect(self.open_settings_window)
         settings_menu.addAction(application_settings_action)
 
@@ -2390,10 +2317,12 @@ class MarkdownEditor(QMainWindow):
         menubar.addMenu(template_menu)
 
         load_template_action = QAction(qta.icon('fa.download', color='blue'), "Load Template", self)
+        load_template_action.setShortcut("Ctrl+Shift+L")
         load_template_action.triggered.connect(self.load_template)
         template_menu.addAction(load_template_action)
 
         save_template_action = QAction(qta.icon('fa.upload', color='green'), "Save as Template", self)
+        save_template_action.setShortcut("Ctrl+Shift+S")
         save_template_action.triggered.connect(self.save_as_template)
         template_menu.addAction(save_template_action)
 
@@ -2402,11 +2331,13 @@ class MarkdownEditor(QMainWindow):
         menubar.addMenu(help_menu)
 
         about_action = QAction(qta.icon('fa.question-circle', color='red'), "About", self)
+        about_action.setShortcut("F1")
         about_action.triggered.connect(self.show_about_dialog)
         help_menu.addAction(about_action)
-        
+
         # Add Markdown Reference action
         markdown_reference_action = QAction(qta.icon('fa.book', color='blue'), "Markdown Reference", self)
+        markdown_reference_action.setShortcut("Ctrl+M")
         markdown_reference_action.triggered.connect(self.show_markdown_reference)
         help_menu.addAction(markdown_reference_action)
 
@@ -2498,16 +2429,35 @@ class MarkdownEditor(QMainWindow):
 
         self.toolbar.addSeparator()
 
-        heading_action = QAction(heading_icon, "Heading", self)
-        heading_action.triggered.connect(lambda: self.editor.insert_markdown("# ", ""))
-        self.toolbar.addAction(heading_action)
+        # Dropdown for Markdown headings (#, ##, ###)
+        heading_dropdown_button = QToolButton(self)
+        heading_dropdown_button.setIcon(heading_icon)
+        heading_dropdown_button.setText("Heading")
+        heading_dropdown_button.setPopupMode(QToolButton.InstantPopup)
+
+        heading_menu = QMenu(self)
+
+        h1_markdown_action = QAction("H1 (#)", self)
+        h1_markdown_action.triggered.connect(lambda: self.editor.insert_markdown("# ", ""))
+        heading_menu.addAction(h1_markdown_action)
+
+        h2_markdown_action = QAction("H2 (##)", self)
+        h2_markdown_action.triggered.connect(lambda: self.editor.insert_markdown("## ", ""))
+        heading_menu.addAction(h2_markdown_action)
+
+        h3_markdown_action = QAction("H3 (###)", self)
+        h3_markdown_action.triggered.connect(lambda: self.editor.insert_markdown("### ", ""))
+        heading_menu.addAction(h3_markdown_action)
+
+        heading_dropdown_button.setMenu(heading_menu)
+        self.toolbar.addWidget(heading_dropdown_button)
         
         self.toolbar.addSeparator()
-        h1_action = QAction(h1_icon, "H1", self)
+        h1_action = QAction(h1_icon, "H1 - HTML", self)
         h1_action.triggered.connect(lambda: self.editor.insert_html("h1"))
         self.toolbar.addAction(h1_action)
 
-        h2_action = QAction(h2_icon, "H2", self)
+        h2_action = QAction(h2_icon, "H2 - HTML", self)
         h2_action.triggered.connect(lambda: self.editor.insert_html("h2"))
         self.toolbar.addAction(h2_action)
         
@@ -3006,31 +2956,9 @@ class MarkdownEditor(QMainWindow):
         dialog.exec_()
 
     def find_replace(self):
-        find_replace_dialog = FindReplaceDialog(self)
-        if find_replace_dialog.exec_() == QDialog.Accepted:
-            find_text = find_replace_dialog.get_find_text()
-            replace_text = find_replace_dialog.get_replace_text()
-            use_regex = find_replace_dialog.is_regex_enabled()
-
-            try:
-                if use_regex:
-                    pattern = QRegularExpression(find_text)
-                    cursor = self.editor.textCursor()
-                    cursor.beginEditBlock()
-                    pos = 0
-                    while True:
-                        cursor = self.editor.document().find(pattern, pos)
-                        if cursor.isNull():
-                            break
-                        cursor.insertText(replace_text)
-                        pos = cursor.position()
-                    cursor.endEditBlock()
-                else:
-                    text = self.editor.toPlainText()
-                    updated_text = text.replace(find_text, replace_text)
-                    self.editor.setPlainText(updated_text)
-            except Exception as e:
-                QMessageBox.warning(self, "Error", f"An error occurred: {str(e)}")
+        # Open the FindWindow instead of the previous FindReplaceDialog
+        find_window = FindWindow(self.editor, self)
+        find_window.exec_()
 
     def show_terminal(self):
         self.terminal = QDialog(self)
