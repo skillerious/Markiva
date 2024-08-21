@@ -115,7 +115,7 @@ For users who prefer keyboard navigation:
 ### Code Block
 
 ```
-If my app is working then
+If Markiva is working then
    don't Panic
 else
    Panic
