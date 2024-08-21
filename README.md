@@ -5,7 +5,6 @@
 
 ![](https://github.com/skillerious/RobinDoak/blob/main/images/Screenshot%202024-08-20%20181952.png)
 
-
 # 🎉 Welcome to **Markiva**
 
 **Markiva** is your ultimate markdown editor, designed to elevate the writing experience for developers, content creators, and anyone who works with markdown files. Markiva is packed with powerful features, making it one of the most versatile and user-friendly markdown editors available.
@@ -168,3 +167,20 @@ Robin Doak
 # Please note!
 
 This application still has a long way to go. There will be a ton of bugs that need fixed and I will continue to iron these out.
+
+![](https://i.postimg.cc/dVjgrVw8/Screenshot-2024-08-21-183332.png)
+
+---
+
+
+![](https://i.postimg.cc/nLVgkfhN/Screenshot-2024-08-21-183348.png)
+
+---
+
+
+![](https://i.postimg.cc/sXvLkPSc/Screenshot-2024-08-21-183439.png)
+
+---
+
+
+![](https://i.postimg.cc/sXvLkPSc/Screenshot-2024-08-21-183439.png)
