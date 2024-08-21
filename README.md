@@ -115,13 +115,13 @@ For users who prefer keyboard navigation:
 
 ### Code Block
 
-\`\`\`markdown
+```
 If my app is working then
    don't Panic
 else
    Panic
 end if
-\`\`\`
+```
 
 ### Quote Block
 
