@@ -22,21 +22,56 @@ import markdown2
 import difflib
 import chardet  # For detecting file encoding
 import re  # For regex support in Find and Replace
-from Settings import SettingsWindow  # Import SettingsWindow
 from about import AboutDialog
 from find import FindWindow
-
+import pdfkit
 
 class LineNumberArea(QWidget):
     def __init__(self, editor):
         super().__init__(editor)
         self.editor = editor
+        self.highlights = set()  # Store the lines that are highlighted
 
     def sizeHint(self) -> QSize:
         return QSize(self.editor.line_number_area_width(), 0)
 
     def paintEvent(self, event):
         self.editor.line_number_area_paint_event(event)
+
+    def mousePressEvent(self, event):
+        block = self.editor.firstVisibleBlock()
+        block_number = block.blockNumber()
+        top = int(self.editor.blockBoundingGeometry(block).translated(self.editor.contentOffset()).top())
+        bottom = top + int(self.editor.blockBoundingRect(block).height())
+
+        while block.isValid() and top <= event.pos().y():
+            if block.isVisible() and bottom >= event.pos().y():
+                self.toggle_highlight(block_number)
+                break
+
+            block = block.next()
+            top = bottom
+            bottom = top + int(self.editor.blockBoundingRect(block).height())
+            block_number += 1
+
+        self.update()
+
+    def toggle_highlight(self, line_number):
+        if line_number in self.highlights:
+            self.highlights.remove(line_number)
+        else:
+            self.highlights.add(line_number)
+        self.update()
+
+    def draw_highlight_icons(self, painter, block_number, top):
+        if block_number in self.highlights:
+            icon_size = 10  # Size of the red dot
+            x_pos = 2  # Position from the left edge of the gutter
+            y_pos = top + (self.editor.fontMetrics().height() - icon_size) // 2
+
+            painter.setBrush(QColor(255, 0, 0))  # Red color
+            painter.setPen(Qt.NoPen)
+            painter.drawEllipse(x_pos, y_pos, icon_size, icon_size)
 
 
 class MarkdownHighlighter(QSyntaxHighlighter):
@@ -46,7 +81,7 @@ class MarkdownHighlighter(QSyntaxHighlighter):
 
         # Define formats for different parts of Markdown syntax
         header_format = QTextCharFormat()
-        header_format.setForeground(Qt.blue)
+        header_format.setForeground(QColor("#1E88FF"))  # Set the heading color to #1E88FF
         self._highlighting_rules.append((r'(^|\s)#{1,6}(?=\s)', header_format))  # Headers
 
         bold_format = QTextCharFormat()
@@ -60,7 +95,7 @@ class MarkdownHighlighter(QSyntaxHighlighter):
         code_format = QTextCharFormat()
         code_format.setFontFamily('Courier')
         code_format.setForeground(Qt.darkCyan)
-        self._highlighting_rules.append((r'[^]+', code_format))  # Inline code
+        self._highlighting_rules.append((r'`[^`]+`', code_format))  # Inline code
 
         blockquote_format = QTextCharFormat()
         blockquote_format.setForeground(Qt.darkGray)
@@ -75,6 +110,7 @@ class MarkdownHighlighter(QSyntaxHighlighter):
             while iterator.hasNext():
                 match = iterator.next()
                 self.setFormat(match.capturedStart(), match.capturedLength(), fmt)
+
                 
 
 class OutlinePane(QTreeView):
@@ -221,6 +257,38 @@ class CodeEditor(QPlainTextEdit):
 
         self.predicted_text = ""
         self.showing_prediction = False
+        
+    def line_number_area_paint_event(self, event):
+        painter = QPainter(self.lineNumberArea)
+
+        # Gutter background
+        painter.fillRect(event.rect(), QColor(30, 30, 30))
+
+        block = self.firstVisibleBlock()
+        block_number = block.blockNumber()
+        top = int(self.blockBoundingGeometry(block).translated(self.contentOffset()).top())
+        bottom = top + int(self.blockBoundingRect(block).height())
+
+        # Line number text color and font
+        painter.setPen(QColor(180, 180, 180))
+        painter.setFont(QFont("Fira Code", 10, QFont.Bold))
+
+        while block.isValid() and top <= event.rect().bottom():
+            if block.isVisible() and bottom >= event.rect().top():
+                number = str(block_number + 1)
+                painter.drawText(0, top, self.lineNumberArea.width() - 5, self.fontMetrics().height(), Qt.AlignRight, number)
+                
+                # Draw the highlight icon (red dot)
+                self.lineNumberArea.draw_highlight_icons(painter, block_number, top)
+
+            block = block.next()
+            top = bottom
+            bottom = top + int(self.blockBoundingRect(block).height())
+            block_number += 1
+
+        # Optional enhancement: Draw a border between the gutter and the editor
+        painter.setPen(QColor(60, 60, 60))  # Border color
+        painter.drawLine(self.lineNumberArea.width() - 1, event.rect().top(), self.lineNumberArea.width() - 1, event.rect().bottom())
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Tab and self.showing_prediction:
@@ -371,6 +439,37 @@ class CodeEditor(QPlainTextEdit):
         # Optional enhancement: Draw a border between the gutter and the editor
         painter.setPen(QColor(60, 60, 60))  # Border color
         painter.drawLine(self.lineNumberArea.width() - 1, event.rect().top(), self.lineNumberArea.width() - 1, event.rect().bottom())
+        
+    def draw_margin_indicators(self, painter, top, bottom, block):
+        text = block.text()
+        indent_level = self.get_indent_level(text)
+        
+        if indent_level > 0:
+            # Customize indicators based on content type
+            if text.strip().startswith("-"):
+                indicator_color = QColor(150, 150, 255)  # Blue for bullet lists
+            elif text.strip().startswith(">"):
+                indicator_color = QColor(255, 150, 150)  # Red for blockquotes
+            elif text.strip().startswith("```"):
+                indicator_color = QColor(150, 255, 150)  # Green for code blocks
+            else:
+                indicator_color = QColor(100, 100, 100)  # Default color
+            
+            painter.setPen(indicator_color)
+
+            x_pos = 4  # Start position for the first indicator
+            line_height = self.fontMetrics().height()
+
+            for _ in range(indent_level):
+                painter.drawLine(x_pos, top, x_pos, bottom)
+                x_pos += 10  # Space between indicators
+
+    def get_indent_level(self, text):
+        # Calculate indentation level based on leading spaces or tabs
+        spaces_per_indent = 4
+        leading_spaces = len(text) - len(text.lstrip(' '))
+        indent_level = leading_spaces // spaces_per_indent
+        return indent_level
 
     def highlight_current_line(self):
         extra_selections = []
@@ -1299,13 +1398,8 @@ class MarkdownReferenceDialog(QDialog):
 class MarkdownEditor(QMainWindow):
     def __init__(self):
         super().__init__()
-        
-        # Set the window icon
-        self.setWindowIcon(QIcon("images/MarkivaLogo.png"))
+        self.main_settings_file = "main_settings.json"
 
-        # Define the splitter as an instance attribute here
-        self.splitter = None
-        
         self.setWindowTitle("Markiva")
         self.setGeometry(100, 100, 1200, 800)
         self.dark_mode = True  # Start with dark mode by default
@@ -1326,6 +1420,13 @@ class MarkdownEditor(QMainWindow):
         self.initUI()
 
         self.apply_settings()  # Apply settings after loading UI
+       
+
+    def start_auto_save(self, interval):
+        """Start the auto-save timer with the specified interval (in minutes)."""
+        self.auto_save_timer = QTimer(self)
+        self.auto_save_timer.timeout.connect(self.save_snapshot)  # Assuming save_snapshot handles saving
+        self.auto_save_timer.start(interval * 60 * 1000)  # Convert minutes to milliseconds
         
     def setup_outline_pane(self):
         self.outline_pane = OutlinePane(self.editor, self.preview)
@@ -1450,12 +1551,6 @@ class MarkdownEditor(QMainWindow):
         self.update_toolbar_icons()
         self.update_preview()
         
-    def open_settings(self):
-        """Open the settings window and apply changes if necessary."""
-        settings_window = SettingsWindow(self.settings_file)
-        if settings_window.exec_() == QDialog.Accepted:
-            self.settings = self.load_settings()
-            self.apply_settings()
             
     def createMenuBar(self):
         # Create the main menu bar
@@ -2233,34 +2328,34 @@ class MarkdownEditor(QMainWindow):
         menubar = QMenuBar(self)
         self.setMenuBar(menubar)
 
-        
         # File menu
         file_menu = QMenu("File", self)
         menubar.addMenu(file_menu)
 
-        save_file_action = QAction(qta.icon('fa.save', color='green'), "Save", self)
+        # Replace FontAwesome icons with custom PNG icons
+        save_file_action = QAction(QIcon("images/save_icon.png"), "Save", self)
         save_file_action.setShortcut("Ctrl+S")
         save_file_action.triggered.connect(self.save_file)
         file_menu.addAction(save_file_action)
 
-        export_pdf_action = QAction(qta.icon('fa.file-pdf-o', color='red'), "Export as PDF", self)
+        export_pdf_action = QAction(QIcon("images/export_pdf_icon.png"), "Export as PDF", self)
         export_pdf_action.setShortcut("Ctrl+Shift+P")
         export_pdf_action.triggered.connect(self.export_to_pdf)
         file_menu.addAction(export_pdf_action)
 
-        export_html_action = QAction(qta.icon('fa.html5', color='orange'), "Export as HTML", self)
+        export_html_action = QAction(QIcon("images/export_html_icon.png"), "Export as HTML", self)
         export_html_action.setShortcut("Ctrl+Shift+H")
         export_html_action.triggered.connect(self.export_to_html)
         file_menu.addAction(export_html_action)
 
         file_menu.addSeparator()
 
-        auto_save_action = QAction(qta.icon('fa.refresh', color='blue'), "Auto-save", self)
+        auto_save_action = QAction(QIcon("images/auto_save_icon.png"), "Auto-save", self)
         auto_save_action.setShortcut("Ctrl+Alt+S")
         auto_save_action.triggered.connect(self.auto_save)
         file_menu.addAction(auto_save_action)
 
-        version_control_action = QAction(qta.icon('fa.code-fork', color='purple'), "Version Control", self)
+        version_control_action = QAction(QIcon("images/version_control_icon.png"), "Version Control", self)
         version_control_action.setShortcut("Ctrl+Shift+V")
         version_control_action.triggered.connect(self.show_version_control)
         file_menu.addAction(version_control_action)
@@ -2269,17 +2364,17 @@ class MarkdownEditor(QMainWindow):
         view_menu = QMenu("View", self)
         menubar.addMenu(view_menu)
 
-        toggle_theme_action = QAction(qta.icon('fa.sun-o', color='purple'), "Toggle Dark/Light Mode", self)
+        toggle_theme_action = QAction(QIcon("images/toggle_theme_icon.png"), "Toggle Dark/Light Mode", self)
         toggle_theme_action.setShortcut("Ctrl+T")
         toggle_theme_action.triggered.connect(self.toggle_theme)
         view_menu.addAction(toggle_theme_action)
 
-        generate_toc_action = QAction(qta.icon('fa.list', color='green'), "Generate Table of Contents", self)
+        generate_toc_action = QAction(QIcon("images/generate_toc_icon.png"), "Generate Table of Contents", self)
         generate_toc_action.setShortcut("Ctrl+Shift+T")
         generate_toc_action.triggered.connect(self.generate_toc)
         view_menu.addAction(generate_toc_action)
 
-        show_terminal_action = QAction(qta.icon('fa.terminal', color='gray'), "Show Terminal", self)
+        show_terminal_action = QAction(QIcon("images/show_terminal_icon.png"), "Show Terminal", self)
         show_terminal_action.setShortcut("Ctrl+Alt+T")
         show_terminal_action.triggered.connect(self.show_terminal)
         view_menu.addAction(show_terminal_action)
@@ -2288,40 +2383,31 @@ class MarkdownEditor(QMainWindow):
         edit_menu = QMenu("Edit", self)
         menubar.addMenu(edit_menu)
 
-        find_replace_action = QAction(qta.icon('fa.search', color='cyan'), "Find", self)  # Renamed to "Find"
+        find_replace_action = QAction(QIcon("images/find_icon.png"), "Find", self)  # Renamed to "Find"
         find_replace_action.setShortcut("Ctrl+F")
         find_replace_action.triggered.connect(self.find_replace)
         edit_menu.addAction(find_replace_action)
 
-        undo_action = QAction(qta.icon('fa.undo', color='black'), "Undo", self)
+        undo_action = QAction(QIcon("images/undo_icon.png"), "Undo", self)
         undo_action.setShortcut("Ctrl+Z")
         undo_action.triggered.connect(self.editor.undo)
         edit_menu.addAction(undo_action)
 
-        redo_action = QAction(qta.icon('fa.repeat', color='black'), "Redo", self)
+        redo_action = QAction(QIcon("images/redo_icon.png"), "Redo", self)
         redo_action.setShortcut("Ctrl+Y")
         redo_action.triggered.connect(self.editor.redo)
         edit_menu.addAction(redo_action)
-
-        # Settings menu
-        settings_menu = QMenu("Settings", self)
-        menubar.addMenu(settings_menu)
-
-        application_settings_action = QAction(qta.icon('fa.wrench', color='orange'), "Application Settings", self)
-        application_settings_action.setShortcut("Ctrl+Alt+P")
-        application_settings_action.triggered.connect(self.open_settings_window)
-        settings_menu.addAction(application_settings_action)
 
         # Templates menu
         template_menu = QMenu("Templates", self)
         menubar.addMenu(template_menu)
 
-        load_template_action = QAction(qta.icon('fa.download', color='blue'), "Load Template", self)
+        load_template_action = QAction(QIcon("images/load_template_icon.png"), "Load Template", self)
         load_template_action.setShortcut("Ctrl+Shift+L")
         load_template_action.triggered.connect(self.load_template)
         template_menu.addAction(load_template_action)
 
-        save_template_action = QAction(qta.icon('fa.upload', color='green'), "Save as Template", self)
+        save_template_action = QAction(QIcon("images/save_template_icon.png"), "Save as Template", self)
         save_template_action.setShortcut("Ctrl+Shift+S")
         save_template_action.triggered.connect(self.save_as_template)
         template_menu.addAction(save_template_action)
@@ -2330,16 +2416,17 @@ class MarkdownEditor(QMainWindow):
         help_menu = QMenu("Help", self)
         menubar.addMenu(help_menu)
 
-        about_action = QAction(qta.icon('fa.question-circle', color='red'), "About", self)
+        about_action = QAction(QIcon("images/about_icon.png"), "About", self)
         about_action.setShortcut("F1")
         about_action.triggered.connect(self.show_about_dialog)
         help_menu.addAction(about_action)
 
         # Add Markdown Reference action
-        markdown_reference_action = QAction(qta.icon('fa.book', color='blue'), "Markdown Reference", self)
+        markdown_reference_action = QAction(QIcon("images/markdown_reference_icon.png"), "Markdown Reference", self)
         markdown_reference_action.setShortcut("Ctrl+M")
         markdown_reference_action.triggered.connect(self.show_markdown_reference)
         help_menu.addAction(markdown_reference_action)
+
 
 
     def createToolbar(self):
@@ -2533,16 +2620,10 @@ class MarkdownEditor(QMainWindow):
         self.toolbar.addAction(table_action)
         
         # Misc dropdown button
-        misc_menu = QMenu(self)
-        insert_progress_action = QAction("Insert Progress", self)
+        insert_progress_icon = qta.icon('fa.tasks', color=icon_color)
+        insert_progress_action = QAction(insert_progress_icon, "Insert Progress", self)
         insert_progress_action.triggered.connect(self.insert_progress)
-        misc_menu.addAction(insert_progress_action)
-
-        misc_button = QToolButton(self)
-        misc_button.setIcon(misc_icon)
-        misc_button.setMenu(misc_menu)
-        misc_button.setPopupMode(QToolButton.InstantPopup)
-        self.toolbar.addWidget(misc_button)
+        self.toolbar.addAction(insert_progress_action)
 
         # HTML elements insertion
         self.toolbar.addSeparator()
@@ -2575,12 +2656,6 @@ class MarkdownEditor(QMainWindow):
         redo_action = QAction(redo_icon, "Redo", self)
         redo_action.triggered.connect(self.editor.redo)
         self.toolbar.addAction(redo_action)
-
-        self.toolbar.addSeparator()
-
-        settings_action = QAction(settings_icon, "Settings", self)
-        settings_action.triggered.connect(self.open_settings_window)
-        self.toolbar.addAction(settings_action)
 
 
     def createEditorSettingsToolbar(self):
@@ -2736,10 +2811,7 @@ class MarkdownEditor(QMainWindow):
             progress_markdown = f"![](https://geps.dev/progress/{progress_value})"
             self.editor.insertPlainText(progress_markdown)
 
-    def open_settings_window(self):
-        settings_dialog = SettingsWindow(self.settings_file, self)
-        if settings_dialog.exec_() == QDialog.Accepted:
-            self.apply_settings()
+    
 
     def acceptNavigationRequest(self, url, _, __):
         # Open hyperlinks in the default web browser
@@ -2748,21 +2820,42 @@ class MarkdownEditor(QMainWindow):
             return False
         return True
 
+
     def export_to_pdf(self):
         options = QFileDialog.Options()
         file_name, _ = QFileDialog.getSaveFileName(self, "Export as PDF", "", "PDF Files (*.pdf);;All Files (*)", options=options)
+        
         if file_name:
-            printer = QPrinter(QPrinter.HighResolution)
-            printer.setOutputFormat(QPrinter.PdfFormat)
-            printer.setOutputFileName(file_name)
-            self.preview.page().print(printer)
+            if not file_name.endswith(".pdf"):
+                file_name += ".pdf"
+
+            # Asynchronously get the HTML content and then convert it to PDF
+            self.preview.page().toHtml(lambda html_content: self.convert_html_to_pdf(html_content, file_name))
+
+    def convert_html_to_pdf(self, html_content, file_name):
+        try:
+            # Convert the HTML to PDF using pdfkit and save it
+            pdfkit.from_string(html_content, file_name)
+            QMessageBox.information(self, "Export Successful", f"PDF was successfully exported to {file_name}")
+        except Exception as e:
+            QMessageBox.warning(self, "Export Error", f"Failed to export PDF: {str(e)}")
+
 
     def export_to_html(self):
         options = QFileDialog.Options()
         file_name, _ = QFileDialog.getSaveFileName(self, "Export as HTML", "", "HTML Files (*.html);;All Files (*)", options=options)
         if file_name:
-            with open(file_name, 'w') as file:
-                self.preview.page().toHtml(lambda content: file.write(content))
+            # Use a lambda function that opens the file within the callback
+            self.preview.page().toHtml(lambda content: self.save_html_to_file(file_name, content))
+
+    def save_html_to_file(self, file_name, content):
+        try:
+            with open(file_name, 'w', encoding='utf-8') as file:
+                file.write(content)
+            QMessageBox.information(self, "Export Successful", f"HTML was successfully exported to {file_name}")
+        except Exception as e:
+            QMessageBox.warning(self, "Export Error", f"Failed to export HTML: {str(e)}")
+
 
     def generate_toc(self):
         raw_markdown = self.editor.toPlainText()
@@ -3097,6 +3190,7 @@ class MarkdownEditor(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    settings_file = "main_settings.json"
     app.setStyle(QStyleFactory.create('Fusion'))
 
     # Apply a dark palette to the entire app for a consistent look
