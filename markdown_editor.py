@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import Qt, QRect, QSize, QTimer, QRegularExpression, QModelIndex, QDir, QFileInfo, QUrl, QItemSelectionModel, pyqtSlot
 from PyQt5.QtGui import QFont, QColor, QPainter, QTextFormat, QPalette, QTextCursor, QTextCharFormat, QSyntaxHighlighter, QIcon, QDesktopServices, QStandardItemModel, QStandardItem, QStandardItemModel
-from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEngineSettings
+from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEngineSettings, QWebEnginePage
 from PyQt5.QtWebChannel import QWebChannel
 from PyQt5.QtPrintSupport import QPrinter
 import subprocess  # For integrated terminal
@@ -25,6 +25,11 @@ import re  # For regex support in Find and Replace
 from about import AboutDialog
 from find import FindWindow
 import pdfkit
+import ctypes
+
+class CustomWebEnginePage(QWebEnginePage):
+    def javaScriptConsoleMessage(self, level, message, lineNumber, sourceId):
+        print(f"JavaScript console: {message} (line {lineNumber})")
 
 class LineNumberArea(QWidget):
     def __init__(self, editor):
@@ -1398,28 +1403,93 @@ class MarkdownReferenceDialog(QDialog):
 class MarkdownEditor(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.main_settings_file = "main_settings.json"
 
+        # Determine the directory where the application is running from
+        application_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
+        
+        # Set the path for the settings file
+        self.settings_file = os.path.join(application_dir, "user_settings.json")
+        self.main_settings_file = os.path.join(application_dir, "main_settings.json")
+
+        self.setWindowIcon(QIcon("images/MarkivaLogo.png"))
         self.setWindowTitle("Markiva")
         self.setGeometry(100, 100, 1200, 800)
         self.dark_mode = True  # Start with dark mode by default
 
         # Load settings
-        self.settings_file = "user_settings.json"
         self.settings = self.load_settings()
 
         self.current_file = None  # Track the currently open file
 
-        # Set up the preview panel with QWebEngineView (initializing preview here)
+        # Initialize the editor
+        font_size = self.settings.get("font_size", 14)
+        self.editor = CodeEditor(font_size=font_size)
+
+        # Initialize the preview panel
         self.preview = QWebEngineView()
 
-        # Now set up the web channel
+        # Set up the web channel
         self.setup_web_channel()
+
+        # Load the preview template
+        self.load_preview_template()
+
+        # Initialize timers and connect signals
+        self.update_timer = QTimer()
+        self.update_timer.setSingleShot(True)
+        self.update_timer.timeout.connect(self.update_preview)
+        self.editor.textChanged.connect(self.schedule_preview_update)
 
         # Initialize the rest of the UI
         self.initUI()
 
-        self.apply_settings()  # Apply settings after loading UI
+        # Apply settings after loading UI
+        self.apply_settings()
+
+            
+    def schedule_preview_update(self):
+        self.update_timer.start(300)  # Update after 300ms of inactivity
+            
+    def load_preview_template(self):
+        template_path = os.path.join(os.path.dirname(__file__), 'markdown_template.html')
+        with open(template_path, 'r', encoding='utf-8') as f:
+            html_content = f.read()
+
+        # Set the HTML content in the preview pane and ensure it loads before calling JavaScript
+        self.preview.setHtml(html_content, QUrl('file:///' + template_path))
+
+        # Connect to the loadFinished signal to call the JavaScript after loading
+        self.preview.loadFinished.connect(self.on_preview_loaded)
+
+    def on_preview_loaded(self):
+        # This method is called after the HTML content is fully loaded
+        self.update_preview()
+
+
+
+        
+    def update_preview(self):
+        """Convert the markdown content to HTML and update the preview."""
+        markdown_text = self.editor.toPlainText()
+
+        # Escape special characters to prevent JavaScript errors
+        escaped_text = markdown_text.translate(str.maketrans({
+            "\\": r"\\",
+            "'": r"\'",
+            "\n": r"\n",
+            "\r": r"\r",
+            "\b": r"\b",
+            "\f": r"\f",
+            "\t": r"\t",
+            "\v": r"\v",
+        }))
+
+        js_code = f"updateContent('{escaped_text}');"
+
+        # Call JavaScript function only after the content is fully loaded
+        self.preview.page().runJavaScript(js_code)
+
+
        
 
     def start_auto_save(self, interval):
@@ -1794,271 +1864,6 @@ class MarkdownEditor(QMainWindow):
         QMessageBox.information(self, "Status Bar Information", info_text)
 
 
-    def update_preview(self):
-        # Store the current scroll position using JavaScript
-        def update_preview_with_scroll_position(current_scroll_position):
-            # Replace Markdown checkboxes with HTML checkboxes
-            raw_markdown = self.editor.toPlainText()
-            raw_markdown = raw_markdown.replace('- [ ]', '<input type="checkbox">').replace('- [x]', '<input type="checkbox" checked>')
-
-            # Use markdown2 with extras to support tables, fenced-code-blocks, and other features
-            html = markdown2.markdown(
-                raw_markdown,
-                extras=["fenced-code-blocks", "tables", "strike"]
-            )
-
-            # JavaScript for advanced tooltips with customization and error handling
-            js_tooltip = f"""
-            <script>
-            document.addEventListener('DOMContentLoaded', function() {{
-                const tooltipDelay = 500; // Tooltip delay in milliseconds
-                const showLinkTooltips = true;  // Customize to enable/disable link tooltips
-                const showImageTooltips = true; // Customize to enable/disable image tooltips
-
-                document.querySelectorAll('a, img, h1, h2, h3, h4, h5, h6, strong, em, code, blockquote, ul, ol, li, th, td').forEach(function(element) {{
-                    let tooltipTimeout;
-
-                    element.addEventListener('mouseenter', function(event) {{
-                        tooltipTimeout = setTimeout(function() {{
-                            let tooltipText = '';
-                            try {{
-                                switch(element.tagName.toLowerCase()) {{
-                                    case 'a':
-                                        if (showLinkTooltips) {{
-                                            tooltipText = 'URL: ' + element.getAttribute('href');
-                                            fetch(element.getAttribute('href'), {{ method: 'HEAD' }})
-                                                .then(response => {{
-                                                    if (response.ok) {{
-                                                        tooltipText += '<br>Title: ' + response.headers.get('Title');
-                                                    }}
-                                                }})
-                                                .catch(() => {{
-                                                    tooltipText += '<br>(Could not retrieve page title)';
-                                                }});
-                                        }}
-                                        break;
-                                    case 'img':
-                                        if (showImageTooltips) {{
-                                            let img = new Image();
-                                            img.src = element.src;
-                                            img.onload = function() {{
-                                                tooltipText = 'Image: ' + (element.getAttribute('alt') || 'No alt text') +
-                                                            '<br>Dimensions: ' + img.width + 'x' + img.height;
-                                                showTooltip(tooltipText, element);
-                                            }}
-                                            img.onerror = function() {{
-                                                tooltipText = 'Image could not be loaded';
-                                                showTooltip(tooltipText, element);
-                                            }};
-                                            return; // Handle asynchronously
-                                        }}
-                                        break;
-                                    case 'h1': case 'h2': case 'h3': case 'h4': case 'h5': case 'h6':
-                                        tooltipText = 'Header (' + element.tagName + '): ' + element.textContent;
-                                        break;
-                                    case 'strong':
-                                        tooltipText = 'Bold text: ' + element.textContent;
-                                        break;
-                                    case 'em':
-                                        tooltipText = 'Italic text: ' + element.textContent;
-                                        break;
-                                    case 'u':
-                                        tooltipText = 'Underlined text: ' + element.textContent;
-                                        break;
-                                    case 'code':
-                                        let lang = element.className.split('-')[1] || 'Unknown';
-                                        tooltipText = 'Code block (Language: ' + lang + ')';
-                                        break;
-                                    case 'blockquote':
-                                        tooltipText = 'Blockquote: ' + element.textContent.substring(0, 50) + '...';
-                                        break;
-                                    case 'ul':
-                                        tooltipText = 'Unordered List';
-                                        break;
-                                    case 'ol':
-                                        tooltipText = 'Ordered List';
-                                        break;
-                                    case 'li':
-                                        let parentTag = element.parentElement.tagName.toLowerCase();
-                                        tooltipText = (parentTag === 'ul' ? 'Bullet Point: ' : 'List Item: ') + element.textContent;
-                                        break;
-                                    case 'th':
-                                        let thIndex = Array.from(element.parentNode.children).indexOf(element) + 1;
-                                        tooltipText = 'Table Header (Column ' + thIndex + ')';
-                                        break;
-                                    case 'td':
-                                        let tdIndex = Array.from(element.parentNode.children).indexOf(element) + 1;
-                                        tooltipText = 'Table Cell (Row ' + (element.parentNode.rowIndex + 1) + ', Column ' + tdIndex + ')';
-                                        break;
-                                }}
-                            }} catch (error) {{
-                                tooltipText = 'Error generating tooltip';
-                            }}
-
-                            showTooltip(tooltipText, element);
-                        }}, tooltipDelay);
-                    }});
-
-                    element.addEventListener('mouseleave', function() {{
-                        clearTimeout(tooltipTimeout);
-                        hideTooltip(element);
-                    }});
-                }});
-
-                function showTooltip(text, element) {{
-                    if (text) {{
-                        let tooltip = document.createElement('div');
-                        tooltip.className = 'custom-tooltip';
-                        tooltip.innerHTML = text;
-                        document.body.appendChild(tooltip);
-
-                        let rect = element.getBoundingClientRect();
-                        tooltip.style.left = rect.left + window.pageXOffset + 'px';
-                        tooltip.style.top = rect.bottom + window.pageYOffset + 'px';
-
-                        element.tooltip = tooltip;  // Store reference to the tooltip
-                    }}
-                }}
-
-                function hideTooltip(element) {{
-                    if (element.tooltip) {{
-                        document.body.removeChild(element.tooltip);
-                        element.tooltip = null;
-                    }}
-                }}
-            }});
-            </script>
-            """
-
-            # CSS for tooltips with customization options
-            tooltip_background_color = "#333" if self.dark_mode else "#fff"
-            tooltip_text_color = "#fff" if self.dark_mode else "#000"
-            css_tooltip = f"""
-            <style>
-            .custom-tooltip {{
-                position: absolute;
-                background-color: {tooltip_background_color};
-                color: {tooltip_text_color};
-                padding: 5px;
-                border-radius: 5px;
-                font-size: 12px;
-                z-index: 1000;
-                pointer-events: none;
-                white-space: nowrap;
-            }}
-            .custom-tooltip.light-mode {{
-                background-color: #fff;
-                color: #000;
-                border: 1px solid #333;
-            }}
-            </style>
-            """
-
-            # Add custom CSS for code blocks, blockquotes, scrollbar, and tooltips
-            custom_css = """
-            <style>
-                body {
-                    font-family: Consolas, "Courier New", monospace;
-                    color: #f8f8f2;
-                    background-color: #1e1e1e;
-                    padding: 15px;
-                    margin: 0;
-                }
-                a {
-                    color: #1e90ff;
-                    font-weight: bold;
-                    text-decoration: none;
-                }
-                a:hover {
-                    text-decoration: underline;
-                }
-                pre {
-                    background-color: #2b2b2b;
-                    color: #f8f8f2;
-                    padding: 8px 12px;
-                    border-left: 5px solid #00cc66;
-                    border-radius: 8px;
-                    margin-bottom: 20px;
-                    font-size: 14px;
-                    white-space: pre-wrap;
-                    word-wrap: break-word;
-                }
-                blockquote {
-                    background-color: #2e2e2e;
-                    color: #dddddd;
-                    border-left: 5px solid #ffcc00;
-                    padding: 10px 20px;
-                    margin: 20px 0;
-                    border-radius: 8px;
-                    font-style: italic;
-                }
-                table {
-                    width: 100%;
-                    border-collapse: collapse;
-                    margin-bottom: 20px;
-                    background-color: #2b2b2b;
-                    color: #f8f8f2;
-                }
-                th, td {
-                    border: 1px solid #444;
-                    padding: 8px 12px;
-                    text-align: left;
-                }
-                th {
-                    background-color: #333;
-                    font-weight: bold;
-                }
-                img {
-                    max-width: 100%;
-                    height: auto;
-                }
-                ::-webkit-scrollbar {
-                    width: 8px;
-                    height: 8px;
-                }
-                ::-webkit-scrollbar-track {
-                    background: #1e1e1e;
-                }
-                ::-webkit-scrollbar-thumb {
-                    background-color: #444;
-                    border-radius: 4px;
-                }
-                ::-webkit-scrollbar-thumb:hover {
-                    background-color: #555;
-                }
-                input[type="checkbox"] {
-                    margin-right: 8px;
-                }
-                input[type="checkbox"]:checked + label {
-                    text-decoration: line-through;
-                }
-            </style>
-            """
-
-            if not self.dark_mode:
-                custom_css = custom_css.replace('#1e1e1e', '#ffffff').replace('#f8f8f2', '#000000').replace('#2b2b2b', '#f0f0f0').replace('#2e2e2e', '#e0e0e0')
-                css_tooltip = css_tooltip.replace('.custom-tooltip', '.custom-tooltip.light-mode')
-
-            # Ensure newlines within code blocks are treated as literal
-            html = html.replace('<pre><code>', '<pre style="white-space:pre-wrap;"><code style="white-space:pre-wrap;">')
-
-            # Combine everything into the full HTML
-            full_html = custom_css + css_tooltip + html + js_tooltip
-
-            # Set the HTML content in the preview pane
-            self.preview.page().setHtml(full_html)
-
-            # Restore the scroll position after the content has been updated
-            def restore_scroll_position():
-                self.preview.page().runJavaScript(f"window.scrollTo(0, {current_scroll_position});")
-
-            # Use a slight delay to ensure the HTML content is fully loaded before restoring the scroll
-            QTimer.singleShot(50, restore_scroll_position)
-
-        # Get the current scroll position
-        self.preview.page().runJavaScript("window.scrollY", update_preview_with_scroll_position)
-
-
     def update_preview_scroll_position(self):
         """
         Synchronize the scroll position between the editor and the preview pane.
@@ -2163,9 +1968,12 @@ class MarkdownEditor(QMainWindow):
         self.file_tree_view = explorer_widget
 
     def open_default_file(self):
+        """Open the default file specified in settings."""
         default_file = self.settings.get("default_open_file")
         if default_file and os.path.exists(default_file):
             self.open_file_by_path(default_file)
+        else:
+            print("No default file specified or file does not exist.")
 
     def add_file(self):
         file_name, _ = QFileDialog.getSaveFileName(self, "Create Markdown File", self.settings.get("default_project_folder", "projectfolder/mymd/"), "Markdown Files (*.md);;All Files (*)")
@@ -2217,6 +2025,7 @@ class MarkdownEditor(QMainWindow):
 
 
     def open_file_by_path(self, file_path):
+        """Open a file given its path and update the editor and preview."""
         try:
             with open(file_path, 'rb') as file:
                 raw_data = file.read()
@@ -2226,6 +2035,7 @@ class MarkdownEditor(QMainWindow):
                     self.setWindowTitle(f"{os.path.basename(self.current_file)} - Markiva")
                     self.editor.document().setModified(False)  # Reset modified status
                     self.update_status_bar()  # Ensure status bar is updated after file is opened
+                    self.update_preview()  # Update preview for empty file
                     return
 
                 # Always use UTF-8 to decode
@@ -2240,6 +2050,9 @@ class MarkdownEditor(QMainWindow):
                 index = self.file_model.index(file_path)
                 self.tree.setCurrentIndex(index)
                 self.tree.scrollTo(index)  # Ensure the file is visible
+
+                # Update the preview with the loaded content
+                self.update_preview()
         except Exception as e:
             QMessageBox.warning(self, "Error", f"Could not open file: {str(e)}")
 
@@ -3192,6 +3005,7 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     settings_file = "main_settings.json"
     app.setStyle(QStyleFactory.create('Fusion'))
+    app.setWindowIcon(QIcon("images/MarkivaLogo.ico"))
 
     # Apply a dark palette to the entire app for a consistent look
     dark_palette = QPalette()

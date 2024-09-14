@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Live Preview</title>
+    <!-- Load the JavaScript Markdown library -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        /* Base styles */
+        body {
+            font-family: Consolas, "Courier New", monospace;
+            color: #f8f8f2;
+            background-color: #1e1e1e;
+            padding: 15px;
+            margin: 0;
+        }
+        a {
+            color: #1e90ff;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        pre, code {
+            background-color: #2b2b2b;
+            color: #f8f8f2;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        blockquote {
+            background-color: #2e2e2e;
+            color: #dddddd;
+            border-left: 5px solid #ffcc00;
+            padding: 10px 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-style: italic;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background-color: #2b2b2b;
+            color: #f8f8f2;
+        }
+        th, td {
+            border: 1px solid #444;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #333;
+            font-weight: bold;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e1e1e;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #444;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: #555;
+        }
+        /* Tooltip styling */
+        .custom-tooltip {
+            position: absolute;
+            background-color: #333;
+            color: #fff;
+            padding: 5px;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 1000;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+    <div id="content"></div>
+
+    <!-- JavaScript code -->
+    <script>
+        // Function to update the content with rendered Markdown
+        function updateContent(markdownText) {
+            console.log("updateContent called with:", markdownText);
+            // Use marked.js to parse Markdown to HTML
+            var htmlContent = marked.parse(markdownText);
+
+            // Set the rendered HTML to the content div
+            document.getElementById('content').innerHTML = htmlContent;
+
+            // Call the function to enable tooltips if needed
+            enableTooltips();
+        }
+
+        // Function to enable tooltips (optional)
+        function enableTooltips() {
+            // Implement any tooltip functionality if required
+        }
+
+        // Example of how to use the updateContent function on page load
+        // You can remove this if not needed
+        document.addEventListener("DOMContentLoaded", function() {
+            updateContent('# Welcome to Markiva!\n\nStart typing your Markdown content!');
+        });
+    </script>
+</body>
+</html>
