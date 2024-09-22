@@ -3,9 +3,6 @@
   <img src="https://i.postimg.cc/j5LRngMP/Markiva-Logo.png" alt="Markiva Logo" style="width:200px;"/>
 </p>
 
-
-![](https://github.com/skillerious/RobinDoak/blob/main/images/Screenshot%202024-08-20%20181952.png)
-
 # 🎉 Welcome to **Markiva**
 
 **Markiva** is your ultimate markdown editor, designed to elevate the writing experience for developers, content creators, and anyone who works with markdown files. Markiva is packed with powerful features, making it one of the most versatile and user-friendly markdown editors available.
@@ -13,9 +10,11 @@
 ## 🚀 Key Features
 
 ### ✨ Live Preview Synchronization
+
 With Markiva, you can experience seamless live preview synchronization, allowing you to see your markdown content rendered in real-time as you type. Changes made in the editor are instantly reflected in the preview pane, ensuring a smooth and efficient editing process.
 
 ### 🛠️ Markdown-Specific Tools
+
 Markiva comes loaded with a variety of markdown-specific tools accessible through an intuitive toolbar. Key features include:
 
 - **Text Formatting**: Easily insert **bold**, *italic*, underline, and other text formatting options with one click.
@@ -23,6 +22,7 @@ Markiva comes loaded with a variety of markdown-specific tools accessible throug
 - **Customizable Themes**: Choose between light and dark modes, or customize the editor's appearance to suit your preference.
 
 ### 🗂️ Integrated File Explorer
+
 Markiva’s integrated file explorer allows you to manage your project files effortlessly:
 
 - **Drag-and-Drop**: Quickly move files and folders around within the explorer.
@@ -30,6 +30,7 @@ Markiva’s integrated file explorer allows you to manage your project files eff
 - **Default Open Files**: Set your preferred files to open by default when you start Markiva.
 
 ### 🖥️ Split View Feature
+
 Markiva offers a flexible split view feature, allowing you to customize your workspace:
 
 - **Editor Only**: Focus entirely on writing by maximizing the editor view.
@@ -45,6 +46,8 @@ Markiva offers a flexible split view feature, allowing you to customize your wor
 
 ### 🌟 Advanced Markdown Features
 
+- **Syntax Highlighting**: Enjoy enhanced readability of your code blocks with integrated syntax highlighting powered by Prism.js.
+- **Mathematical Equations**: Write complex mathematical equations using LaTeX syntax, rendered beautifully with MathJax support.
 - **Bracket Matching**: Automatically insert matching brackets, braces, and quotes.
 - **Auto-Complete Markdown Patterns**: Predictive text completion for common markdown patterns like `![]`, `**`, `_`, and more.
 - **Block-Level Formatting**: Quickly insert blockquotes, code blocks, and horizontal rules.
@@ -57,6 +60,7 @@ Markiva offers a flexible split view feature, allowing you to customize your wor
 - **Image Tooltips**: Hover over an image in the preview to see its dimensions and alt text.
 
 ### 🗂️ Template Management
+
 Markiva allows you to save your frequently used markdown content as templates:
 
 - **Save as Template**: Save any markdown file or content as a reusable template.
@@ -64,6 +68,7 @@ Markiva allows you to save your frequently used markdown content as templates:
 - **Template Management**: Rename or delete templates with ease.
 
 ### 📝 Version Control and Snapshots
+
 Markiva includes built-in version control features:
 
 - **Automatic Snapshots**: Automatically save snapshots of your work at regular intervals.
@@ -71,6 +76,7 @@ Markiva includes built-in version control features:
 - **Restore from Snapshot**: Revert to a previous version of your document with just a few clicks.
 
 ### 🎨 Editor Customization
+
 Markiva offers extensive customization options:
 
 - **Font and Size Options**: Choose your preferred font family and size for a personalized editing experience.
@@ -78,6 +84,7 @@ Markiva offers extensive customization options:
 - **Toggle Line Numbers**: Show or hide line numbers in the editor for a cleaner or more informative view.
 
 ### 💻 Integrated Terminal
+
 Markiva includes an integrated terminal:
 
 - **Run Shell Commands**: Execute shell commands directly from within the editor.
@@ -85,75 +92,93 @@ Markiva includes an integrated terminal:
 - **Clear and Reset**: Clear the terminal output with a single click to keep your workspace clean.
 
 ### 📊 Table Editing
+
 The built-in table editor allows you to create and edit markdown tables visually:
 
 - **Dynamic Table Creation**: Easily add or remove rows and columns as needed.
 - **Markdown Conversion**: Automatically convert your table edits into markdown format.
 
 ### 🔎 Find and Replace
+
 Markiva includes a powerful find and replace tool:
 
 - **Regex Support**: Use regular expressions for advanced search and replace operations.
 - **Batch Replacement**: Replace all instances of a term or pattern in your document with ease.
 
 ### 🖥️ Cross-Platform Compatibility
+
 Markiva is designed to work on multiple platforms, ensuring that you can maintain the same productive environment regardless of your operating system.
 
 ### 📤 Export Options
+
 Markiva offers robust export options:
 
 - **PDF Export**: Convert your markdown documents into PDFs with custom formatting.
 - **HTML Export**: Generate HTML files from your markdown content, complete with all custom styles.
 
 ### ⌨️ Keyboard Shortcuts
+
 For users who prefer keyboard navigation:
 
 - **Custom Shortcuts**: Markiva allows you to assign custom keyboard shortcuts to frequently used actions.
 - **Quick Access**: Open files, run commands, and perform actions faster than ever.
 
+### 📚 Table of Contents Generation
+
+- **Automatic TOC**: Generate a table of contents based on your document headings, making navigation easier for long documents.
+
 ## 📝 Examples
 
-### Code Block
+### Code Block with Syntax Highlighting
 
+```python
+def greet():
+    print("Hello, World!")
 ```
-If Markiva is working then
-   don't Panic
-else
-   Panic
-end if
-```
+
+### Mathematical Equations with MathJax
+
+You can write complex mathematical expressions using LaTeX syntax:
+
+Inline equation: $E=mc^2$
+
+Displayed equation:
+
+$$
+\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}
+$$
 
 ### Quote Block
 
 > "You say potato, I say tomato."  
 > — Robin Doak
 
-## 🔗 Links
+### Links
 
 [Explore more projects by Robin Doak](https://github.com/skillerious)
 
-## 📊 Tables
+### Tables
 
 Creating tables is a breeze with Markiva. Here's an example:
 
-| **Column 1**    | **Column 2**    |
-|-----------------|-----------------|
-| This is a row   | This is another row|
-
-<br />
+| **Language** | **Creator**      |
+|--------------|------------------|
+| Python       | Guido van Rossum |
+| JavaScript   | Brendan Eich     |
 
 Need more? Use the Table Editor accessible via the toolbar.
 
 ![Table Editor Screenshot](https://i.postimg.cc/DzTGcvyr/Screenshot-2024-08-16-200147.png)
 
-## 🌟 Other Extras
+### Other Extras
 
 - ~~Strikethrough~~ text for corrections or stylistic choices.
 - To-do lists with checkboxes:
   - [ ] Item one
   - [x] Item two (done)
+- **Emoji Support**: Add emojis to your content for a personal touch. 😄🎉🚀
 
-## 🖼️ Images
+### Images
 
 Embedding images is as easy as this:
 
@@ -163,20 +188,21 @@ Embedding images is as easy as this:
 
 Markiva is more than just an editor; it's a powerful tool to help you create, edit, and manage your markdown projects. Download and start exploring today, and unlock the full potential of markdown with Markiva! ✨
 
-Robin Doak
+---
 
-# Please note!
+**Please note!**
 
-This application still has a long way to go. There will be a ton of bugs that need fixed and I will continue to iron these out.
+This application still has a long way to go. There may be bugs that need to be fixed, and I will continue to iron these out.
 
-![](https://i.postimg.cc/dVjgrVw8/Screenshot-2024-08-21-183332.png)
+![Screenshot](https://i.postimg.cc/dVjgrVw8/Screenshot-2024-08-21-183332.png)
 
 ---
 
-
-![](https://i.postimg.cc/nLVgkfhN/Screenshot-2024-08-21-183348.png)
+![Screenshot](https://i.postimg.cc/nLVgkfhN/Screenshot-2024-08-21-183348.png)
 
 ---
 
+![Screenshot](https://i.postimg.cc/sXvLkPSc/Screenshot-2024-08-21-183439.png)
 
-![](https://i.postimg.cc/sXvLkPSc/Screenshot-2024-08-21-183439.png)
+---
+
