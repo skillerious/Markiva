@@ -39,7 +39,7 @@ class AboutDialog(QDialog):
         layout.addWidget(title_label)
 
         # Version and author information
-        version_label = QLabel("Version 1.0.0")
+        version_label = QLabel("Version 2.0")
         version_label.setFont(QFont("Arial", 14))
         version_label.setAlignment(Qt.AlignCenter)
         version_label.setStyleSheet("color: #FFD700;")
