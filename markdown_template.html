@@ -3,12 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <title>Live Preview</title>
+
     <!-- Load the JavaScript Markdown library -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- Load Prism.js for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <!-- Load additional languages as needed -->
+    <!-- For example, to support Python syntax highlighting: -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <!-- Add more languages here -->
+
+    <!-- Load MathJax for rendering mathematical equations -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script"></script>
+
     <style>
         /* Base styles */
         body {
-            font-family: Consolas, "Courier New", monospace;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: #f8f8f2;
             background-color: #1e1e1e;
             padding: 15px;
@@ -22,16 +35,8 @@
         a:hover {
             text-decoration: underline;
         }
-        pre, code {
-            background-color: #2b2b2b;
-            color: #f8f8f2;
-            padding: 8px 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
+
+        /* Blockquote styling */
         blockquote {
             background-color: #2e2e2e;
             color: #dddddd;
@@ -41,6 +46,59 @@
             border-radius: 8px;
             font-style: italic;
         }
+
+        /* Code block styling */
+        pre {
+            position: relative; /* For positioning the copy button */
+            background-color: #2e2e2e;
+            color: #dddddd;
+            border-left: 5px solid #AAFF00;
+            padding: 10px 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            white-space: pre;               /* Preserve formatting */
+            overflow: auto;                 /* Enable scrolling for long code */
+        }
+
+        /* Remove additional styling from code inside pre */
+        pre code {
+            background-color: transparent;
+            padding: 0;
+            color: inherit;
+            font-size: inherit;
+        }
+
+        /* Inline code styling */
+        code {
+            background-color: #2b2b2b;
+            color: #f8f8f2;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        /* Copy button styling */
+        .copy-button {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            background-color: #444;
+            color: #fff;
+            border: none;
+            padding: 5px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        .copy-button:hover {
+            opacity: 1;
+        }
+
+        /* Table styling */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -57,10 +115,13 @@
             background-color: #333;
             font-weight: bold;
         }
+
+        /* Image styling */
         img {
             max-width: 100%;
             height: auto;
         }
+
         /* Scrollbar styling */
         ::-webkit-scrollbar {
             width: 8px;
@@ -76,6 +137,7 @@
         ::-webkit-scrollbar-thumb:hover {
             background-color: #555;
         }
+
         /* Tooltip styling */
         .custom-tooltip {
             position: absolute;
@@ -88,6 +150,11 @@
             pointer-events: none;
             white-space: nowrap;
         }
+
+        /* MathJax styling (if needed) */
+        .MathJax {
+            font-size: 100%;
+        }
     </style>
 </head>
 <body>
@@ -95,6 +162,14 @@
 
     <!-- JavaScript code -->
     <script>
+        // Configure Marked.js to support syntax highlighting with Prism.js
+        marked.setOptions({
+            highlight: function(code, lang) {
+                var validLang = Prism.languages[lang] ? lang : 'plaintext';
+                return Prism.highlight(code, Prism.languages[validLang], validLang);
+            }
+        });
+
         // Function to update the content with rendered Markdown
         function updateContent(markdownText) {
             console.log("updateContent called with:", markdownText);
@@ -104,8 +179,94 @@
             // Set the rendered HTML to the content div
             document.getElementById('content').innerHTML = htmlContent;
 
+            // Re-run Prism.js to highlight new content
+            Prism.highlightAllUnder(document.getElementById('content'));
+
+            // Typeset math equations using MathJax
+            if (typeof MathJax !== 'undefined') {
+                MathJax.typesetPromise();
+            }
+
+            // Add copy buttons to code blocks
+            addCopyButtons();
+
             // Call the function to enable tooltips if needed
             enableTooltips();
+        }
+
+        // Function to add copy buttons to code blocks
+        function addCopyButtons() {
+            var codeBlocks = document.querySelectorAll('pre');
+            codeBlocks.forEach(function(pre, index) {
+                // Create a unique ID
+                var codeBlockId = 'code-block-' + index;
+                pre.setAttribute('data-code-id', codeBlockId);
+
+                // Check if copy button already exists to avoid duplicates
+                if (!pre.querySelector('.copy-button')) {
+                    // Create the copy button
+                    var button = document.createElement('button');
+                    button.className = 'copy-button';
+                    button.setAttribute('data-copy-target', codeBlockId);
+                    button.textContent = 'Copy';
+
+                    // Position the button inside the pre element
+                    pre.insertBefore(button, pre.firstChild);
+                }
+            });
+
+            // Attach event listeners for copy buttons
+            addCopyButtonListeners();
+        }
+
+        // Function to add event listeners to copy buttons
+        function addCopyButtonListeners() {
+            var copyButtons = document.querySelectorAll('.copy-button');
+            copyButtons.forEach(function(button) {
+                button.addEventListener('click', function() {
+                    var targetId = this.getAttribute('data-copy-target');
+                    var codeBlock = document.querySelector('pre[data-code-id="' + targetId + '"] code');
+                    if (codeBlock) {
+                        var codeText = codeBlock.textContent;
+
+                        // Copy the code text to the clipboard
+                        copyToClipboard(codeText);
+
+                        // Optionally, provide feedback to the user
+                        this.textContent = 'Copied!';
+                        var that = this;
+                        setTimeout(function() {
+                            that.textContent = 'Copy';
+                        }, 2000);
+                    }
+                });
+            });
+        }
+
+        // Function to copy text to the clipboard with fallback
+        function copyToClipboard(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                // navigator.clipboard API method
+                navigator.clipboard.writeText(text).catch(function(err) {
+                    console.error('Failed to copy!', err);
+                });
+            } else {
+                // Fallback method
+                let textArea = document.createElement("textarea");
+                textArea.value = text;
+                // Make the textarea out of viewport
+                textArea.style.position = "absolute";
+                textArea.style.left = "-999999px";
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                } catch (err) {
+                    console.error('Fallback: Oops, unable to copy', err);
+                }
+                document.body.removeChild(textArea);
+            }
         }
 
         // Function to enable tooltips (optional)
