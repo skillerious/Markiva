@@ -3,6 +3,44 @@
   <img src="https://i.postimg.cc/j5LRngMP/Markiva-Logo.png" alt="Markiva Logo" style="width:200px;"/>
 </p>
 
+# Markiva v3.0 – Embracing Electron, Moving Away from Python!
+
+We are thrilled to announce a **major update** for Markiva, our newly re-engineered Markdown editor. In this release, we are moving away from our previous Python-based implementation and fully embracing **Electron** to deliver a robust, cross-platform desktop experience.
+
+## What's New?
+
+- **Multi-Tab Interface:**  
+  Easily manage and navigate multiple Markdown files with sleek, glass-style tabs. Click a tab to switch files!
+
+- **Persistent Notes:**  
+  Your notes now persist between sessions.
+
+- **Enhanced Preview:**  
+  Enjoy a refined preview with improved styling for code blocks, tables, horizontal rules, images, and more.
+
+- **Editor Gutter:**  
+  A new numbered gutter on the left side of the editor helps you keep track of your lines for a smoother editing experience.
+
+- **Improved UI Design:**  
+  Experience a completely overhauled interface featuring a modern, glass-like aesthetic, an intuitive layout, and enhanced user interactions for a truly delightful editing experience.
+
+- **Powered by Electron:**  
+  By moving away from Python and leveraging Electron, Markiva now offers enhanced performance, seamless integration, and a modern desktop experience across all platforms.
+
+## Preview
+
+![Markiva Preview](https://github.com/skillerious/Markiva/blob/main/images/Screenshot%202025-03-19%20231912.png)
+
+## Coming Soon
+
+Markiva v3.0 is **coming soon**! Stay tuned for the official release, and feel free to check out our [GitHub repository](https://github.com/skillerious/Markiva/tree/main) for more updates and details.
+
+*Thank you for your support and happy editing!*
+
+
+
+
+
 # 🎉 Welcome to **Markiva**
 
 **Markiva** is your ultimate markdown editor, designed to elevate the writing experience for developers, content creators, and anyone who works with markdown files. Markiva is packed with powerful features, making it one of the most versatile and user-friendly markdown editors available.
