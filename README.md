@@ -29,7 +29,7 @@ We are thrilled to announce a **major update** for Markiva, our newly re-enginee
 
 ## Preview
 
-![Markiva Preview](https://github.com/skillerious/Markiva/blob/main/images/Screenshot%202025-03-19%20231912.png)
+![Markiva Preview](https://github.com/skillerious/Markiva/blob/main/images/Screenshot%202025-03-21%20132439.png)
 
 ## Coming Soon
 
