@@ -1,246 +1,145 @@
-
 <p align="center">
   <img src="https://github.com/skillerious/Markiva/blob/main/assets/MarkivaLogo%20(1).png" alt="Markiva Logo" style="width:200px;"/>
 </p>
 
-# Markiva v3.0 – Embracing Electron, Moving Away from Python!
+<h1 align="center">Markiva v3.0 – Now Powered by Electron ⚡</h1>
 
-We are thrilled to announce a **major update** for Markiva, our newly re-engineered Markdown editor. In this release, we are moving away from our previous Python-based implementation and fully embracing **Electron** to deliver a robust, cross-platform desktop experience.
-
-## What's New?
-
-- **Multi-Tab Interface:**  
-  Easily manage and navigate multiple Markdown files with sleek, glass-style tabs. Click a tab to switch files!
-
-- **Persistent Notes:**  
-  Your notes now persist between sessions.
-
-- **Enhanced Preview:**  
-  Enjoy a refined preview with improved styling for code blocks, tables, horizontal rules, images, and more.
-
-- **Editor Gutter:**  
-  A new numbered gutter on the left side of the editor helps you keep track of your lines for a smoother editing experience.
-
-- **Improved UI Design:**  
-  Experience a completely overhauled interface featuring a modern, glass-like aesthetic, an intuitive layout, and enhanced user interactions for a truly delightful editing experience.
-
-- **Powered by Electron:**  
-  By moving away from Python and leveraging Electron, Markiva now offers enhanced performance, seamless integration, and a modern desktop experience across all platforms.
-
-## Preview
-
-![Markiva Preview](https://github.com/skillerious/Markiva/blob/main/images/Screenshot%202025-03-22%20184455.png)
-
-## Coming Soon
-
-Markiva v3.0 is **coming soon**! Stay tuned for the official release, and feel free to check out our [GitHub repository](https://github.com/skillerious/Markiva/tree/main) for more updates and details.
-
-*Thank you for your support and happy editing!*
-
-
-
-
-
-# 🎉 Welcome to **Markiva**
-
-**Markiva** is your ultimate markdown editor, designed to elevate the writing experience for developers, content creators, and anyone who works with markdown files. Markiva is packed with powerful features, making it one of the most versatile and user-friendly markdown editors available.
-
-## 🚀 Key Features
-
-### ✨ Live Preview Synchronization
-
-With Markiva, you can experience seamless live preview synchronization, allowing you to see your markdown content rendered in real-time as you type. Changes made in the editor are instantly reflected in the preview pane, ensuring a smooth and efficient editing process.
-
-### 🛠️ Markdown-Specific Tools
-
-Markiva comes loaded with a variety of markdown-specific tools accessible through an intuitive toolbar. Key features include:
-
-- **Text Formatting**: Easily insert **bold**, *italic*, underline, and other text formatting options with one click.
-- **Advanced Tools**: Create tables, insert code blocks, manage lists, add checkboxes, and even embed progress bars with a click.
-- **Customizable Themes**: Choose between light and dark modes, or customize the editor's appearance to suit your preference.
-
-### 🗂️ Integrated File Explorer
-
-Markiva’s integrated file explorer allows you to manage your project files effortlessly:
-
-- **Drag-and-Drop**: Quickly move files and folders around within the explorer.
-- **File Renaming**: Keep your files organized with the easy-to-use renaming feature.
-- **Default Open Files**: Set your preferred files to open by default when you start Markiva.
-
-### 🖥️ Split View Feature
-
-Markiva offers a flexible split view feature, allowing you to customize your workspace:
-
-- **Editor Only**: Focus entirely on writing by maximizing the editor view.
-- **Preview Only**: See your markdown fully rendered by maximizing the preview pane.
-- **Split View**: Work with both the editor and preview side by side for an efficient writing and reviewing experience.
-
-### 🛡️ Additional Features
-
-- **Spell-checking**: Ensure your content is free from spelling errors as you type.
-- **Auto-save**: Never lose your work again with automatic saving of your progress.
-- **Export Options**: Convert your markdown files to PDF or HTML with just a few clicks.
-- **Preview Tooltips**: Get detailed information by hovering over elements in the preview (e.g., image dimensions, link URLs).
-
-### 🌟 Advanced Markdown Features
-
-- **Syntax Highlighting**: Enjoy enhanced readability of your code blocks with integrated syntax highlighting powered by Prism.js.
-- **Mathematical Equations**: Write complex mathematical equations using LaTeX syntax, rendered beautifully with MathJax support.
-- **Bracket Matching**: Automatically insert matching brackets, braces, and quotes.
-- **Auto-Complete Markdown Patterns**: Predictive text completion for common markdown patterns like `![]`, `**`, `_`, and more.
-- **Block-Level Formatting**: Quickly insert blockquotes, code blocks, and horizontal rules.
-- **Live HTML Conversion**: Convert your markdown into HTML with a single button click, including options for custom attributes.
-
-### 🖼️ Enhanced Image and Link Handling
-
-- **Drag-and-Drop Images**: Simply drag and drop an image into the editor to embed it in your markdown file.
-- **Link Management**: Easily insert and manage hyperlinks with the built-in link dialog.
-- **Image Tooltips**: Hover over an image in the preview to see its dimensions and alt text.
-
-### 🗂️ Template Management
-
-Markiva allows you to save your frequently used markdown content as templates:
-
-- **Save as Template**: Save any markdown file or content as a reusable template.
-- **Load Template**: Load templates directly into your current project, with options to preview before loading.
-- **Template Management**: Rename or delete templates with ease.
-
-### 📝 Version Control and Snapshots
-
-Markiva includes built-in version control features:
-
-- **Automatic Snapshots**: Automatically save snapshots of your work at regular intervals.
-- **Version Comparison**: Compare different versions of your document side-by-side using a unified diff view.
-- **Restore from Snapshot**: Revert to a previous version of your document with just a few clicks.
-
-### 🎨 Editor Customization
-
-Markiva offers extensive customization options:
-
-- **Font and Size Options**: Choose your preferred font family and size for a personalized editing experience.
-- **Custom Colors**: Set your preferred background and text colors, ensuring the editor looks just the way you like it.
-- **Toggle Line Numbers**: Show or hide line numbers in the editor for a cleaner or more informative view.
-
-### 💻 Integrated Terminal
-
-Markiva includes an integrated terminal:
-
-- **Run Shell Commands**: Execute shell commands directly from within the editor.
-- **Output Window**: View command output in real-time in a dedicated window.
-- **Clear and Reset**: Clear the terminal output with a single click to keep your workspace clean.
-
-### 📊 Table Editing
-
-The built-in table editor allows you to create and edit markdown tables visually:
-
-- **Dynamic Table Creation**: Easily add or remove rows and columns as needed.
-- **Markdown Conversion**: Automatically convert your table edits into markdown format.
-
-### 🔎 Find and Replace
-
-Markiva includes a powerful find and replace tool:
-
-- **Regex Support**: Use regular expressions for advanced search and replace operations.
-- **Batch Replacement**: Replace all instances of a term or pattern in your document with ease.
-
-### 🖥️ Cross-Platform Compatibility
-
-Markiva is designed to work on multiple platforms, ensuring that you can maintain the same productive environment regardless of your operating system.
-
-### 📤 Export Options
-
-Markiva offers robust export options:
-
-- **PDF Export**: Convert your markdown documents into PDFs with custom formatting.
-- **HTML Export**: Generate HTML files from your markdown content, complete with all custom styles.
-
-### ⌨️ Keyboard Shortcuts
-
-For users who prefer keyboard navigation:
-
-- **Custom Shortcuts**: Markiva allows you to assign custom keyboard shortcuts to frequently used actions.
-- **Quick Access**: Open files, run commands, and perform actions faster than ever.
-
-### 📚 Table of Contents Generation
-
-- **Automatic TOC**: Generate a table of contents based on your document headings, making navigation easier for long documents.
-
-## 📝 Examples
-
-### Code Block with Syntax Highlighting
-
-```python
-def greet():
-    print("Hello, World!")
-```
-
-### Mathematical Equations with MathJax
-
-You can write complex mathematical expressions using LaTeX syntax:
-
-Inline equation: $E=mc^2$
-
-Displayed equation:
-
-$$
-\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}
-$$
-
-### Quote Block
-
-> "You say potato, I say tomato."  
-> — Robin Doak
-
-### Links
-
-[Explore more projects by Robin Doak](https://github.com/skillerious)
-
-### Tables
-
-Creating tables is a breeze with Markiva. Here's an example:
-
-| **Language** | **Creator**      |
-|--------------|------------------|
-| Python       | Guido van Rossum |
-| JavaScript   | Brendan Eich     |
-
-Need more? Use the Table Editor accessible via the toolbar.
-
-![Table Editor Screenshot](https://i.postimg.cc/DzTGcvyr/Screenshot-2024-08-16-200147.png)
-
-### Other Extras
-
-- ~~Strikethrough~~ text for corrections or stylistic choices.
-- To-do lists with checkboxes:
-  - [ ] Item one
-  - [x] Item two (done)
-- **Emoji Support**: Add emojis to your content for a personal touch. 😄🎉🚀
-
-### Images
-
-Embedding images is as easy as this:
-
-![Sample Image](https://lh3.googleusercontent.com/86arOE_jc_FYR6_mPbeXrzWB4LwvgCRWPGXbbftgG4_zAjY05ajbmq3xiG0Xc_uYCoTccikGvLdo5WIlofH5pmySn1VRejqngh2pwDLquiLJYayCOJKUrZKFnOwmSxKzQqqOM1y5o42TPk6LYR1vbPjrEPx3dQIUEwS4IPRjzt3JdPZT32TkqCECm-PoQtsBAPnyN6g46PbiyD9fblgzuBcT2xuO1AaZgOkR53bom8ATCBkDgcYT_mnsxWuxLGp6cNFUR4lWBFKyYkYJWJY--KmIVCWDDoJ3SxwjimGjwRG-X2Qu3AP4wa6tRazHuBo3a8IOofm6f5arSRdpVy4AaXoacTPz8TSkcofA0YaIttHpek1Gi5v1yMSbi5mHV6Mfv4lyczXPp8c5iNR7IFPvgMz1BiCETTxNwSvDjb2JCN94_256Fzejrs-Dk-kMYeCCYQh2Zd_lt9xiEQDgZ5gufdpxxM9xDiP447vrOqKbBMcAS_6hu43EwRi97ILAhBpS3QLP-4WhKf4GHauWqML_EcBvhszB-6T1iGeCWvpAT9jZVDVgekalBvLZiZNoy5Ow9QlnHA=w1827-h711-no-tmp.jpg)
-
-## 🎉 Go and Explore!
-
-Markiva is more than just an editor; it's a powerful tool to help you create, edit, and manage your markdown projects. Download and start exploring today, and unlock the full potential of markdown with Markiva! ✨
+Markiva has undergone a transformative update! We've officially moved away from our previous Python-based foundation and fully embraced **Electron**, delivering a sleek, fast, and modern markdown editing experience across platforms.
 
 ---
 
-**Please note!**
+## 🚀 Highlights of v3.0
 
-This application still has a long way to go. There may be bugs that need to be fixed, and I will continue to iron these out.
-
-![Screenshot](https://i.postimg.cc/dVjgrVw8/Screenshot-2024-08-21-183332.png)
-
----
-
-![Screenshot](https://i.postimg.cc/nLVgkfhN/Screenshot-2024-08-21-183348.png)
-
----
-
-![Screenshot](https://i.postimg.cc/sXvLkPSc/Screenshot-2024-08-21-183439.png)
+- ✅ **Electron-based**: Seamless cross-platform experience with modern performance.
+- ✅ **Multi-tab support**: Edit multiple markdown files with glass-style tab navigation.
+- ✅ **Split, Editor-Only, and Preview-Only Views**: Toggle between layouts like in VS Code.
+- ✅ **Live Preview Sync**: See changes reflected instantly as you type.
+- ✅ **Persistent Notes & Last Session Resume**: Never lose your place or notes.
+- ✅ **Drag-and-drop file loading** with support for `.md` files.
+- ✅ **Modern UI with Themes**: Refined interface with a professional, glass-like aesthetic.
+- ✅ **Powerful Find & Replace**: Includes Regex, Replace All, and inline highlights.
+- ✅ **File Operations**: Create, rename, and delete files directly from the integrated explorer.
 
 ---
 
+## 📥 Download
+
+Get the latest release from the [Releases Page](https://github.com/skillerious/Markiva/releases/tag/MarkivaV3)
+
+---
+
+## 📸 Screenshots
+
+| Feature | Screenshot |
+|--------|------------|
+| **Main App Interface** | ![Main](https://github.com/skillerious/Markiva/blob/main/screenshots/Screenshot%202025-03-22%20201331.png) |
+| **Settings Modal** | ![Settings](https://github.com/skillerious/Markiva/blob/main/screenshots/Screenshot%202025-03-22%20201343.png) |
+| **Find & Replace** | ![FindReplace](https://github.com/skillerious/Markiva/blob/main/screenshots/Screenshot%202025-03-22%20201355.png) |
+| **View Mode Toggle (Editor, Split, Preview)** | ![ViewToggle](https://github.com/skillerious/Markiva/blob/main/screenshots/Screenshot%202025-03-22%20201404.png) |
+| **Notes Sidebar** | ![Notes](https://github.com/skillerious/Markiva/blob/main/screenshots/Screenshot%202025-03-22%20201435.png) |
+
+---
+
+## 🔧 How to Run via VS Code
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/skillerious/Markiva.git
+   cd Markiva
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Start the app**:
+   ```bash
+   npm start
+   ```
+
+> 💡 Tip: Use VS Code’s built-in terminal and debugger for quick development cycles.
+
+---
+
+## ✨ Features in Detail
+
+### 🔄 View Modes (Like VS Code)
+Switch between:
+- 📝 **Editor only**
+- 🔍 **Preview only**
+- 🖥️ **Split view** (editor + preview side by side)
+
+### 🧠 Smart Markdown Editor
+- CodeMirror 5 powered
+- Line numbering and spell check
+- Live syncing with preview
+- Enhanced table editing toolbar
+
+### 🗂️ File Browser
+- Drag-and-drop markdown files
+- Right-click menu to rename/delete
+- Visual feedback for file interactions
+
+### 📝 Sticky Notes Pane
+- Add/remove/pin/complete notes
+- All notes persist via local JSON
+- Beautiful empty-state visuals
+
+### 🔍 Search & Replace
+- Highlighted results
+- Inline replace or replace all
+- Supports complex regex
+
+### 📥 File Save Prompts
+- On app close, you’ll be prompted to save unsaved files
+- Graceful dirty file handling
+
+### ⚙️ Custom Settings Dialog
+- Launch via the settings gear icon
+- Modify themes, font, and other preferences
+- Modal and non-dismissible for clarity
+
+---
+
+## 🔐 Auto-Save & Restore
+
+Markiva saves your **last opened tab** and restores it automatically on the next launch. Your notes and editor layout are also remembered for a seamless experience.
+
+---
+
+## 📌 Planned Features
+
+- GitHub markdown flavor toggle
+- Template manager
+- HTML and PDF export
+- Plugin support
+
+---
+
+## 🧪 Tech Stack
+
+- **Electron** – Cross-platform desktop app framework
+- **CodeMirror 5** – Markdown editor
+- **Marked.js** – Markdown parser
+- **Highlight.js** – Syntax highlighter
+- **Font Awesome** – Icons
+- **Node.js / FS** – File I/O
+- **Vanilla JS / HTML / CSS** – Clean and minimal front-end
+
+---
+
+## 💬 Contributing
+
+We welcome feedback, ideas, and PRs!  
+Open issues for bugs or feature requests. Let’s build Markiva together.
+
+---
+
+## 📄 License
+
+[MIT License](LICENSE)
+
+---
+
+<p align="center"><strong>🛠️ Built with love by Robin Doak</strong></p>
