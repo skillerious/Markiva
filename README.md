@@ -1,145 +1,153 @@
 <p align="center">
-  <img src="https://github.com/skillerious/Markiva/blob/main/assets/MarkivaLogo%20(1).png" alt="Markiva Logo" style="width:200px;"/>
+  <img src="https://github.com/skillerious/Markiva/blob/main/assets/MarkivaLogo%20(1).png" alt="Markiva Logo" width="200"/>
 </p>
 
-<h1 align="center">Markiva v3.0 – Now Powered by Electron ⚡</h1>
+<h1 align="center">🚀 Markiva v3.0 – From Python to Electron</h1>
+<p align="center"><i>A Beautifully Crafted Markdown Editor for Creators, Developers & Writers</i></p>
 
-Markiva has undergone a transformative update! We've officially moved away from our previous Python-based foundation and fully embraced **Electron**, delivering a sleek, fast, and modern markdown editing experience across platforms.
-
----
-
-## 🚀 Highlights of v3.0
-
-- ✅ **Electron-based**: Seamless cross-platform experience with modern performance.
-- ✅ **Multi-tab support**: Edit multiple markdown files with glass-style tab navigation.
-- ✅ **Split, Editor-Only, and Preview-Only Views**: Toggle between layouts like in VS Code.
-- ✅ **Live Preview Sync**: See changes reflected instantly as you type.
-- ✅ **Persistent Notes & Last Session Resume**: Never lose your place or notes.
-- ✅ **Drag-and-drop file loading** with support for `.md` files.
-- ✅ **Modern UI with Themes**: Refined interface with a professional, glass-like aesthetic.
-- ✅ **Powerful Find & Replace**: Includes Regex, Replace All, and inline highlights.
-- ✅ **File Operations**: Create, rename, and delete files directly from the integrated explorer.
+<p align="center">
+  <a href="https://github.com/skillerious/Markiva/releases/tag/MarkivaV3">
+    <img src="https://img.shields.io/github/v/release/skillerious/Markiva?label=Release&color=green&style=for-the-badge" />
+  </a>
+  <a href="https://github.com/skillerious/Markiva">
+    <img src="https://img.shields.io/github/stars/skillerious/Markiva?style=for-the-badge" />
+  </a>
+  <a href="https://github.com/skillerious/Markiva/issues">
+    <img src="https://img.shields.io/github/issues/skillerious/Markiva?style=for-the-badge" />
+  </a>
+</p>
 
 ---
 
-## 📥 Download
+## ✨ Why Markiva?
 
-Get the latest release from the [Releases Page](https://github.com/skillerious/Markiva/releases/tag/MarkivaV3)
+We are thrilled to announce a **major** transformation of Markiva. Formerly built in Python, Markiva now leverages **Electron** to deliver a polished, cross-platform Markdown editing experience. Below, you'll find everything you need to know about what's changed, what's new, and why Markiva might just become your go-to editor for Markdown.
 
----
-
-## 📸 Screenshots
-
-| Feature | Screenshot |
-|--------|------------|
-| **Main App Interface** | ![Main](https://github.com/skillerious/Markiva/blob/main/screenshots/Screenshot%202025-03-22%20201331.png) |
-| **Settings Modal** | ![Settings](https://github.com/skillerious/Markiva/blob/main/screenshots/Screenshot%202025-03-22%20201343.png) |
-| **Find & Replace** | ![FindReplace](https://github.com/skillerious/Markiva/blob/main/screenshots/Screenshot%202025-03-22%20201355.png) |
-| **View Mode Toggle (Editor, Split, Preview)** | ![ViewToggle](https://github.com/skillerious/Markiva/blob/main/screenshots/Screenshot%202025-03-22%20201404.png) |
-| **Notes Sidebar** | ![Notes](https://github.com/skillerious/Markiva/blob/main/screenshots/Screenshot%202025-03-22%20201435.png) |
+> “Markiva was always a tool for markdown lovers — now it’s faster, smarter, and more beautiful.”
 
 ---
 
-## 🔧 How to Run via VS Code
+## 🔥 Key Features at a Glance
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/skillerious/Markiva.git
-   cd Markiva
-   ```
-
-2. **Install dependencies**:
-   ```bash
-   npm install
-   ```
-
-3. **Start the app**:
-   ```bash
-   npm start
-   ```
-
-> 💡 Tip: Use VS Code’s built-in terminal and debugger for quick development cycles.
+- ⚡ **Multi-tab Interface**  
+- 📝 **Live Markdown Preview**  
+- 🧠 **Persistent Notes Sidebar**  
+- 📚 **Smart File Explorer**  
+- 💡 **Floating Find & Replace Toolbar**  
+- 🎛 **Settings Modal with Auto Save**  
+- 🪟 **Custom Layout Modes (Editor / Split / Preview)**  
+- 📷 **Dark Mode + Sleek UI + Iconic Controls**  
+- 🧩 **Drag & Drop Markdown File Support**  
+- 🧮 **Word Count & Read Time Tracking**  
+- ✅ **Unsaved Changes Detection + Save Prompt**  
+- 🗑️ **Contextual Menu for Files (Rename/Delete)**  
+- 💾 **Remembers Last Opened File on Launch**
 
 ---
 
-## ✨ Features in Detail
+## 🖼️ Screenshots
 
-### 🔄 View Modes (Like VS Code)
-Switch between:
-- 📝 **Editor only**
-- 🔍 **Preview only**
-- 🖥️ **Split view** (editor + preview side by side)
+| Main UI | Settings | Find & Replace |
+|--------|----------|----------------|
+| ![Main](https://github.com/skillerious/Markiva/blob/main/screenshots/Screenshot%202025-03-22%20201331.png) | ![Settings](https://github.com/skillerious/Markiva/blob/main/screenshots/Screenshot%202025-03-22%20201343.png) | ![Find](https://github.com/skillerious/Markiva/blob/main/screenshots/Screenshot%202025-03-22%20201355.png) |
 
-### 🧠 Smart Markdown Editor
-- CodeMirror 5 powered
-- Line numbering and spell check
-- Live syncing with preview
-- Enhanced table editing toolbar
-
-### 🗂️ File Browser
-- Drag-and-drop markdown files
-- Right-click menu to rename/delete
-- Visual feedback for file interactions
-
-### 📝 Sticky Notes Pane
-- Add/remove/pin/complete notes
-- All notes persist via local JSON
-- Beautiful empty-state visuals
-
-### 🔍 Search & Replace
-- Highlighted results
-- Inline replace or replace all
-- Supports complex regex
-
-### 📥 File Save Prompts
-- On app close, you’ll be prompted to save unsaved files
-- Graceful dirty file handling
-
-### ⚙️ Custom Settings Dialog
-- Launch via the settings gear icon
-- Modify themes, font, and other preferences
-- Modal and non-dismissible for clarity
+| Layout Switch | Notes Panel |
+|---------------|-------------|
+| ![Layout](https://github.com/skillerious/Markiva/blob/main/screenshots/Screenshot%202025-03-22%20201404.png) | ![Notes](https://github.com/skillerious/Markiva/blob/main/screenshots/Screenshot%202025-03-22%20201435.png) |
 
 ---
 
-## 🔐 Auto-Save & Restore
+## 💾 Download & Install
 
-Markiva saves your **last opened tab** and restores it automatically on the next launch. Your notes and editor layout are also remembered for a seamless experience.
+### 📦 From Releases
 
----
-
-## 📌 Planned Features
-
-- GitHub markdown flavor toggle
-- Template manager
-- HTML and PDF export
-- Plugin support
+Head over to [**Markiva Releases**](https://github.com/skillerious/Markiva/releases/tag/MarkivaV3) and download the prebuilt binary for your OS.
 
 ---
 
-## 🧪 Tech Stack
+## 🛠️ Running from Source
 
-- **Electron** – Cross-platform desktop app framework
-- **CodeMirror 5** – Markdown editor
-- **Marked.js** – Markdown parser
-- **Highlight.js** – Syntax highlighter
-- **Font Awesome** – Icons
-- **Node.js / FS** – File I/O
-- **Vanilla JS / HTML / CSS** – Clean and minimal front-end
+> Ensure Node.js is installed on your system.
 
----
+```bash
+# Clone the repository
+git clone https://github.com/skillerious/Markiva.git
+cd Markiva
 
-## 💬 Contributing
+# Install dependencies
+npm install
 
-We welcome feedback, ideas, and PRs!  
-Open issues for bugs or feature requests. Let’s build Markiva together.
+# Start the app
+npm start
+```
 
----
-
-## 📄 License
-
-[MIT License](LICENSE)
+> 💡 Tip: You can open the project in **VSCode** and run via the integrated terminal.
 
 ---
 
-<p align="center"><strong>🛠️ Built with love by Robin Doak</strong></p>
+## 📘 Features in Detail
+
+### 🧩 Markdown Goodness
+- Bold / Italic / Headings / Code / Link support
+- Table editor with visual add/remove columns/rows
+- Live synchronized HTML preview
+- Drag and drop `.md` files into the editor
+- Scroll sync between editor and preview
+
+### 🎨 Layout Modes
+- **Editor Only**
+- **Split Mode (Editor + Preview)**
+- **Preview Only**  
+Easily switch via title bar icons (à la VSCode style).
+
+### 🧠 Notes Panel
+- Persistent session-based notes
+- Add, delete, mark completed
+- Pin important items
+
+### 🔍 Find & Replace
+- Floating bar with regex support
+- Replace all or one-click navigation
+
+### 🧭 Project File Explorer
+- Live search
+- Rename, delete files
+- Remembers last opened file
+
+---
+
+## 🤖 Keyboard Shortcuts
+
+| Action           | Shortcut        |
+|------------------|-----------------|
+| Save File        | `Ctrl + S`      |
+| Find / Replace   | `Ctrl + F`      |
+| New File         | `Ctrl + N`      |
+| Toggle Layout    | `Ctrl + 1 / 2 / 3` |
+| Copy Markdown    | `Ctrl + Shift + C` |
+
+---
+
+## 🧠 Smart Prompts
+
+- Intelligent prompt on unsaved changes
+- Append `.md` extension automatically when needed
+- Contextual file prompts for rename/delete
+
+---
+
+## 🤝 Contributing
+
+Pull requests are welcome. For major changes, please open an issue first to discuss what you'd like to change.
+
+---
+
+## 📜 License
+
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+<p align="center">
+  <strong>Built with ❤️ by Robin Doak</strong>
+</p>
