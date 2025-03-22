@@ -1,6 +1,6 @@
 
 <p align="center">
-  <img src="https://github.com/skillerious/Markiva/blob/main/images/MarkivaLogo%20(1).png" alt="Markiva Logo" style="width:200px;"/>
+  <img src="https://github.com/skillerious/Markiva/blob/main/assets/MarkivaLogo%20(1).png" alt="Markiva Logo" style="width:200px;"/>
 </p>
 
 # Markiva v3.0 – Embracing Electron, Moving Away from Python!
