@@ -8,7 +8,57 @@ const path = require('path');
 const marked = require('marked');
 const hljs = require('highlight.js');
 
-// Marked Setup
+// Require CodeMirror hint addons from local node_modules
+require('codemirror/addon/hint/show-hint.js');
+require('codemirror/addon/hint/anyword-hint.js');
+
+// Dynamically import markdownlint since it is now an ES Module
+let markdownlintModule = null;
+(async () => {
+  try {
+    markdownlintModule = await import('markdownlint');
+    markdownlintModule = markdownlintModule.default || markdownlintModule;
+  } catch (err) {
+    console.error("Failed to load markdownlint module:", err);
+    markdownlintModule = null;
+  }
+})();
+
+// Define a set of snippet completions for Markdown
+const markdownSnippets = [
+  { text: '**Bold Text**', displayText: 'Bold Text' },
+  { text: '*Italic Text*', displayText: 'Italic Text' },
+  { text: '~~Strikethrough~~', displayText: 'Strikethrough' },
+  { text: '`Inline Code`', displayText: 'Inline Code' },
+  { text: '```language\nCode Block\n```', displayText: 'Code Block' },
+  { text: '> Blockquote', displayText: 'Blockquote' },
+  { text: '- List Item', displayText: 'List Item' },
+  { text: '1. Numbered List Item', displayText: 'Numbered List' },
+  { text: '[Link Text](https://)', displayText: 'Link' },
+  { text: '![Alt Text](image.jpg)', displayText: 'Image' },
+  { text: '| Header1 | Header2 |\n| --- | --- |\n| Data1 | Data2 |', displayText: 'Table' }
+];
+
+// Provide CodeMirror hints from our snippet list
+function provideHint(cm) {
+  const cur = cm.getCursor();
+  const token = cm.getTokenAt(cur);
+  const start = token.start;
+  const end = cur.ch;
+  const currentWord = token.string.slice(0, end - start).toLowerCase();
+
+  const list = markdownSnippets.filter(snippet =>
+    snippet.displayText.toLowerCase().startsWith(currentWord)
+  );
+
+  return {
+    list: list,
+    from: CodeMirror.Pos(cur.line, start),
+    to: CodeMirror.Pos(cur.line, end)
+  };
+}
+
+// Setup Marked
 marked.setOptions({
   highlight: (code, lang) => {
     if (lang && hljs.getLanguage(lang)) {
@@ -35,10 +85,82 @@ let currentSearchMatch = null;
 // We'll store user settings (including defaultFolder, lastFile) in this object
 let userSettings = {};
 
+// Markdownlint function
+function markdownLinter(text) {
+  if (!markdownlintModule) return [];
+  const options = {
+    strings: { content: text },
+    config: { "default": true }
+  };
+  const result = markdownlintModule.sync(options);
+  const errors = result.content || [];
+  const annotations = [];
+  errors.forEach(error => {
+    const line = error.lineNumber - 1;
+    const lineText = cmEditor ? cmEditor.getLine(line) : "";
+    annotations.push({
+      from: CodeMirror.Pos(line, 0),
+      to: CodeMirror.Pos(line, lineText.length),
+      message: `${error.ruleNames[0]}: ${error.ruleDescription}`,
+      severity: 'warning'
+    });
+  });
+  return annotations;
+}
+
+/**
+ * Revised alignment function:
+ * 1) Remove any existing <div style="text-align:..."> or <p align="..."> or <p style="text-align:...">
+ * 2) Strip leading/trailing newlines from the selection, then merge internal newlines into single spaces.
+ * 3) Wrap the entire snippet with:
+ * 
+ * <div style="text-align: alignment;">
+ * 
+ * snippet
+ * </div>
+ */
+function alignSelection(alignment) {
+  if (!cmEditor) return;
+
+  cmEditor.operation(() => {
+    const selections = cmEditor.listSelections();
+
+    selections.forEach(sel => {
+      let rawText = cmEditor.getRange(sel.anchor, sel.head);
+
+      // If nothing was selected, select the entire current line
+      if (!rawText.trim()) {
+        const curLine = cmEditor.getCursor().line;
+        rawText = cmEditor.getLine(curLine);
+        sel = {
+          anchor: { line: curLine, ch: 0 },
+          head:   { line: curLine, ch: rawText.length }
+        };
+      }
+
+      // 1) Remove any existing alignment wrappers:
+      const wrapperRegex = /<(?:div|p)\s+(?:style="text-align:\s*[^"]+"\s*|align="[^"]+"\s*)(?:[^>]*)>([\s\S]*?)<\/(?:div|p)>/gi;
+      let cleaned = rawText.replace(wrapperRegex, '$1');
+
+      // 2) Trim leading/trailing newlines, then merge any internal newlines
+      cleaned = cleaned.replace(/^\s+|\s+$/g, '');
+      cleaned = cleaned.replace(/\r?\n\s*/g, ' ');
+
+      // 3) Build final snippet with a blank line after the opening <div> and a closing </div>
+      const finalText = `<div style="text-align: ${alignment};">\n\n${cleaned}\n</div>`;
+
+      cmEditor.replaceRange(finalText, sel.anchor, sel.head);
+    });
+  });
+
+  cmEditor.focus();
+}
+
+
 window.addEventListener('DOMContentLoaded', () => {
   console.log("[DEBUG] DOM loaded, hooking up events...");
 
-  // ========== DOM REFERENCES ==========
+  // DOM references
   const glassTabs      = document.getElementById('glass-tabs');
   const previewContent = document.getElementById('preview-content');
   const fileSearch     = document.getElementById('file-search');
@@ -69,6 +191,14 @@ window.addEventListener('DOMContentLoaded', () => {
   const tableHeaderCheck = document.getElementById('table-header');
   const tableOkBtn       = document.getElementById('table-ok');
   const tableCancelBtn   = document.getElementById('table-cancel');
+
+  // Media insertion wizard
+  const mediaDialog = document.getElementById('media-dialog');
+  const mediaAlt = document.getElementById('media-alt');
+  const mediaUrl = document.getElementById('media-url');
+  const mediaOk = document.getElementById('media-ok');
+  const mediaCancel = document.getElementById('media-cancel');
+  const mediaBrowse = document.getElementById('media-browse');
 
   // Minimal table WYSIWYG
   const tableEditorPanel = document.getElementById('table-editor-panel');
@@ -104,6 +234,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const btnLink    = document.getElementById('btn-link');
   const btnHeading = document.getElementById('btn-heading');
   const btnTable   = document.getElementById('btn-table');
+  const btnMedia   = document.getElementById('btn-media');
 
   // Search & Replace
   const searchBar           = document.getElementById('search-replace-bar');
@@ -115,6 +246,14 @@ window.addEventListener('DOMContentLoaded', () => {
   const searchCloseBtn      = document.getElementById('search-close-btn');
   const btnSearch           = document.getElementById('btn-search');
 
+  // Alignment Buttons
+  const alignLeftBtn   = document.getElementById('align-left');
+  const alignCenterBtn = document.getElementById('align-center');
+  const alignRightBtn  = document.getElementById('align-right');
+
+  // GitHub menu button
+  const githubMenuBtn = document.getElementById('github-menu');
+
   // View mode references (titlebar icons)
   const editorContainer  = document.getElementById('editor-container');
   const previewContainer = document.getElementById('preview-container');
@@ -124,14 +263,14 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // Context Menu for Project Files
   const fileContextMenu = document.getElementById('file-context-menu');
-  let fileContextMenuTargetPath = null; // store which file was right-clicked
+  let fileContextMenuTargetPath = null;
 
   // Hide context menu on any left-click
   document.addEventListener('click', () => {
     fileContextMenu.style.display = 'none';
   });
 
-  // Right-click logic on file list
+  // Right-click on file list
   fileList.addEventListener('contextmenu', async (e) => {
     e.preventDefault();
     const li = e.target.closest('li');
@@ -139,19 +278,15 @@ window.addEventListener('DOMContentLoaded', () => {
     const anchor = li.querySelector('a');
     if (!anchor) return;
 
-    // figure out which file path
     const folder = userSettings.defaultFolder || process.cwd();
     const filename = anchor.textContent.trim();
     const filePath = path.join(folder, filename);
     fileContextMenuTargetPath = filePath;
-
-    // Show the context menu at mouse coords
     fileContextMenu.style.display = 'block';
     fileContextMenu.style.left = `${e.pageX}px`;
     fileContextMenu.style.top = `${e.pageY}px`;
   });
 
-  // Listen for clicks on the context menu items
   fileContextMenu.addEventListener('click', async (e) => {
     e.stopPropagation();
     fileContextMenu.style.display = 'none';
@@ -163,8 +298,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     if (action === 'open') {
       loadFile(fileContextMenuTargetPath);
-    }
-    else if (action === 'rename') {
+    } else if (action === 'rename') {
       const base = path.basename(fileContextMenuTargetPath);
       const newName = await customPrompt('Rename file:', base);
       if (!newName || newName === base) return;
@@ -176,9 +310,7 @@ window.addEventListener('DOMContentLoaded', () => {
       const newPath = path.join(dir, finalName);
       try {
         await fsp.rename(fileContextMenuTargetPath, newPath);
-        console.log('[DEBUG] file renamed:', fileContextMenuTargetPath, '->', newPath);
         refreshFileList();
-        // If that file is open in a tab, update the tab name
         const tabObj = tabs.find(t => t.filePath === fileContextMenuTargetPath);
         if (tabObj) {
           tabObj.filePath = newPath;
@@ -190,35 +322,37 @@ window.addEventListener('DOMContentLoaded', () => {
           }
         }
       } catch (err) {
-        console.error('Error renaming file from context menu:', err);
         customAlert(`Failed to rename file.\n${err.message}`);
       }
-    }
-    else if (action === 'delete') {
+    } else if (action === 'delete') {
       const base = path.basename(fileContextMenuTargetPath);
-      // show yes/cancel
       const confirmDel = await showYesCancelDialog(`Are you sure you want to delete "${base}"?`);
       if (confirmDel === 'yes') {
         try {
           await fsp.unlink(fileContextMenuTargetPath);
-          console.log('[DEBUG] file deleted:', fileContextMenuTargetPath);
           refreshFileList();
-          // If open in a tab, close that tab
           const tabObj = tabs.find(t => t.filePath === fileContextMenuTargetPath);
           if (tabObj) {
             closeTab(fileContextMenuTargetPath);
           }
         } catch (err) {
-          console.error('Error deleting file from context menu:', err);
           customAlert(`Failed to delete file.\n${err.message}`);
         }
       }
     }
   });
 
-  // ========== YES/CANCEL for file deletion ==========
+  // Insert GitHub Markdown (IPC from main)
+  ipcRenderer.on('insert-github-markdown', (event, markdown) => {
+    if (typeof window.insertGitHubMarkdown === 'function') {
+      window.insertGitHubMarkdown(markdown);
+    } else {
+      console.error("insertGitHubMarkdown is not defined.");
+    }
+  });
+
+  // Show yes/cancel for file deletion etc.
   async function showYesCancelDialog(message) {
-    // We'll reuse the same customPromptEl but override button text
     return new Promise((resolve) => {
       promptMessageEl.textContent = message;
       promptInputEl.style.display = 'none';
@@ -226,7 +360,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
       const oldOkText = promptOkBtn.textContent;
       const oldCancelText = promptCancelBtn.textContent;
-
       promptOkBtn.textContent = 'Yes';
       promptCancelBtn.textContent = 'Cancel';
 
@@ -250,30 +383,27 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ========== VIEW MODE BUTTONS ==========
+  // View mode
   btnEditorOnly?.addEventListener('click', () => {
-    editorContainer.style.display  = 'flex';
+    editorContainer.style.display = 'flex';
     previewContainer.style.display = 'none';
   });
   btnSplitView?.addEventListener('click', () => {
-    editorContainer.style.display  = 'flex';
+    editorContainer.style.display = 'flex';
     previewContainer.style.display = 'flex';
   });
   btnPreviewOnly?.addEventListener('click', () => {
-    editorContainer.style.display  = 'none';
+    editorContainer.style.display = 'none';
     previewContainer.style.display = 'flex';
   });
 
-  // ========== Dirty Save Logic: Exiting the App ==========
+  // Dirty Save Logic (app close)
   window.attemptAppCloseFromMain = async function() {
     const dirtyTab = tabs.find(t => t.isDirty);
-    if (!dirtyTab) {
-      return 'proceed';
-    }
+    if (!dirtyTab) return 'proceed';
     const active = tabs.find(t => t.filePath === activeTab);
-    if (!active) {
-      return 'proceed';
-    }
+    if (!active) return 'proceed';
+
     const fileName = active.fileName || 'Untitled';
     const choice = await showSaveChangesDialog(fileName);
     if (choice === 'save') {
@@ -289,8 +419,6 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // ========== PROMPT UTILS ==========
-
   function showSaveChangesDialog(filename) {
     return new Promise((resolve) => {
       saveChangesFilename.textContent = filename || 'Untitled';
@@ -303,15 +431,9 @@ window.addEventListener('DOMContentLoaded', () => {
         saveChangesCancelBtn.removeEventListener('click', onCancel);
         resolve(result);
       }
-      function onSave() {
-        cleanup('save');
-      }
-      function onDont() {
-        cleanup('dontsave');
-      }
-      function onCancel() {
-        cleanup('cancel');
-      }
+      function onSave()  { cleanup('save');     }
+      function onDont()  { cleanup('dontsave'); }
+      function onCancel() { cleanup('cancel');  }
 
       saveChangesSaveBtn.addEventListener('click', onSave);
       saveChangesDontBtn.addEventListener('click', onDont);
@@ -365,7 +487,7 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ========== NOTES ==========
+  // NOTES
   let notes = [];
   function loadNotes() {
     if (!userDataPath) {
@@ -447,6 +569,7 @@ window.addEventListener('DOMContentLoaded', () => {
         saveNotes();
         renderNotes();
       });
+
       const textSpan = document.createElement('span');
       textSpan.textContent = note.text;
 
@@ -475,7 +598,22 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ========== LOAD LAST FILE LOGIC ==========
+  // Add note
+  const addNoteButton = document.getElementById('add-note-button');
+  if (addNoteButton) {
+    addNoteButton.addEventListener('click', () => {
+      const noteText = newNoteInput.value.trim();
+      if (noteText) {
+        const newNote = { id: Date.now(), text: noteText, pinned: false, completed: false };
+        notes.push(newNote);
+        saveNotes();
+        renderNotes();
+        newNoteInput.value = '';
+      }
+    });
+  }
+
+  // Load last file logic
   async function rememberLastFile(filePath) {
     userSettings.lastFile = filePath;
     try {
@@ -486,8 +624,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // ========== FILE BROWSER & LOADING ==========
-
+  // File browser
   async function refreshFileList() {
     fileList.innerHTML = '';
     const folder = userSettings.defaultFolder || process.cwd();
@@ -538,8 +675,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // ========== TABS + Dirty Save ==========
-
+  // TABS + Dirty Save
   function createOrActivateTab(filePath, fileName, content) {
     const existing = tabs.find(t => t.filePath === filePath);
     if (existing) {
@@ -595,7 +731,6 @@ window.addEventListener('DOMContentLoaded', () => {
       cmEditor.clearHistory();
       updatePreview();
     }
-    // Remember last file
     if (filePath) {
       await rememberLastFile(filePath);
     }
@@ -657,16 +792,23 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // ========== CODEMIRROR INIT ==========
+  // CodeMirror init
   function initCodeMirror() {
-    cmEditor = CodeMirror(document.getElementById('editor-wrapper'), {
+    const cmOptions = {
       mode: 'markdown',
       theme: 'material-darker',
       lineNumbers: true,
       lineWrapping: true,
       inputStyle: 'contenteditable',
-      spellcheck: true
-    });
+      spellcheck: true,
+      gutters: ["CodeMirror-linenumbers", "CodeMirror-lint-markers"]
+    };
+
+    if (markdownlintModule) {
+      cmOptions.lint = { getAnnotations: markdownLinter, async: false };
+    }
+
+    cmEditor = CodeMirror(document.getElementById('editor-wrapper'), cmOptions);
 
     cmEditor.on('change', () => {
       updatePreview();
@@ -688,14 +830,31 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // Table detection
     cmEditor.on('cursorActivity', updateTableEditorVisibility);
+
+    // Auto-completion & snippet insertion
+    cmEditor.on('keyup', (cm, event) => {
+      if ((event.ctrlKey || event.metaKey) && event.keyCode === 32) {
+        if (cm.showHint) {
+          cm.showHint({ hint: provideHint, completeSingle: false });
+        }
+      }
+    });
   }
 
-  // ========== PREVIEW & STATUS ==========
+  // Preview & Status
   function updatePreview() {
     if (!cmEditor) return;
-    previewContent.innerHTML = marked.parse(cmEditor.getValue());
+    const markdownText = cmEditor.getValue();
+    previewContent.innerHTML = marked.parse(markdownText);
     updateStatusBar();
+
+    if (window.MathJax) {
+      MathJax.typesetPromise([previewContent]).catch(err => {
+        console.error('MathJax typeset failed: ', err);
+      });
+    }
   }
+
   function updateStatusBar() {
     if (!cmEditor) {
       statusWordCount.textContent = 'Words: 0';
@@ -709,7 +868,7 @@ window.addEventListener('DOMContentLoaded', () => {
     statusReadTime.textContent  = `Read Time: ${readTime} min`;
   }
 
-  // ========== TABLE EDITOR ==========
+  // Table Editor
   function updateTableEditorVisibility() {
     if (!cmEditor) return;
     const lineText = cmEditor.getLine(cmEditor.getCursor().line);
@@ -720,12 +879,137 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function getCurrentTableBlock() {
+    if (!cmEditor) return null;
+    const cursor = cmEditor.getCursor();
+    let startLine = cursor.line;
+    let endLine = cursor.line;
+    const lineCount = cmEditor.lineCount();
+    while (startLine > 0 && cmEditor.getLine(startLine - 1).includes('|')) {
+      startLine--;
+    }
+    while (endLine < lineCount - 1 && cmEditor.getLine(endLine + 1).includes('|')) {
+      endLine++;
+    }
+    const tableText = cmEditor.getRange(
+      { line: startLine, ch: 0 },
+      { line: endLine + 1, ch: 0 }
+    );
+    return { startLine, endLine, tableText };
+  }
+
+  function parseTable(tableText) {
+    const lines = tableText.trim().split('\n').map(line => line.trim());
+    return lines.map(line => {
+      if (line.startsWith('|')) line = line.slice(1);
+      if (line.endsWith('|')) line = line.slice(0, -1);
+      return line.split('|').map(cell => cell.trim());
+    });
+  }
+
+  function formatTable(rows) {
+    return rows.map(row => '| ' + row.join(' | ') + ' |').join('\n') + '\n';
+  }
+
+  function tableAddRow() {
+    const block = getCurrentTableBlock();
+    if (!block) return;
+    const { startLine, endLine, tableText } = block;
+    let rows = parseTable(tableText);
+    const colCount = rows[0].length;
+    const newRow = Array(colCount).fill('data');
+    const cursor = cmEditor.getCursor();
+    let relativeLine = cursor.line - startLine;
+    let insertIndex = relativeLine + 1;
+    const isSepRow = row => row.every(cell => /^-+(:)?$/.test(cell));
+    if (relativeLine === 0 && rows.length > 1 && isSepRow(rows[1])) {
+      insertIndex = 2;
+    }
+    rows.splice(insertIndex, 0, newRow);
+    const newText = formatTable(rows);
+    cmEditor.replaceRange(newText, { line: startLine, ch: 0 }, { line: endLine + 1, ch: 0 });
+  }
+
+  function tableRemoveRow() {
+    const block = getCurrentTableBlock();
+    if (!block) return;
+    const { startLine, endLine, tableText } = block;
+    let rows = parseTable(tableText);
+    const cursor = cmEditor.getCursor();
+    let relativeLine = cursor.line - startLine;
+    if (relativeLine < 2) {
+      if (rows.length > 2) {
+        relativeLine = 2;
+      } else {
+        return;
+      }
+    }
+    if (rows.length <= 3) return;
+    rows.splice(relativeLine, 1);
+    const newText = formatTable(rows);
+    cmEditor.replaceRange(newText, { line: startLine, ch: 0 }, { line: endLine + 1, ch: 0 });
+  }
+
+  function tableAddColumn() {
+    const block = getCurrentTableBlock();
+    if (!block) return;
+    const { startLine, endLine, tableText } = block;
+    let rows = parseTable(tableText);
+    const colCount = rows[0].length;
+    const isSepRow = row => row.every(cell => /^-+(:)?$/.test(cell));
+    if (rows.length >= 2 && isSepRow(rows[1])) {
+      rows[0].push(`Header${colCount + 1}`);
+      rows[1].push('---');
+      for (let i = 2; i < rows.length; i++) {
+        rows[i].push('data');
+      }
+    } else {
+      rows = rows.map(row => {
+        row.push('data');
+        return row;
+      });
+    }
+    const newText = formatTable(rows);
+    cmEditor.replaceRange(newText, { line: startLine, ch: 0 }, { line: endLine + 1, ch: 0 });
+  }
+
+  function tableRemoveColumn() {
+    const block = getCurrentTableBlock();
+    if (!block) return;
+    const { startLine, endLine, tableText } = block;
+    let rows = parseTable(tableText);
+    if (rows[0].length <= 1) return;
+    const cursor = cmEditor.getCursor();
+    const lineText = cmEditor.getLine(cursor.line);
+    let parts = lineText.split('|').map(part => part.trim());
+    if (parts[0] === '') parts.shift();
+    if (parts[parts.length - 1] === '') parts.pop();
+    let ch = cursor.ch;
+    let colIndex = 0;
+    let pos = 0;
+    for (let i = 0; i < parts.length; i++) {
+      pos += parts[i].length + 3;
+      if (pos > ch) {
+        colIndex = i;
+        break;
+      }
+    }
+    rows = rows.map(row => {
+      if (row.length > colIndex) {
+        row.splice(colIndex, 1);
+      }
+      return row;
+    });
+    const newText = formatTable(rows);
+    cmEditor.replaceRange(newText, { line: startLine, ch: 0 }, { line: endLine + 1, ch: 0 });
+  }
+
   addRowBtn.addEventListener('click', () => tableAddRow());
   removeRowBtn.addEventListener('click', () => tableRemoveRow());
   addColBtn.addEventListener('click', () => tableAddColumn());
   removeColBtn.addEventListener('click', () => tableRemoveColumn());
 
-  // ========== LINK DIALOG ==========
+  // Link Dialog
   function showLinkDialog() {
     linkTextInput.value = '';
     linkUrlInput.value = 'https://';
@@ -752,7 +1036,63 @@ window.addEventListener('DOMContentLoaded', () => {
     linkCancelBtn.addEventListener('click', onCancel);
   }
 
-  // ========== TABLE DIALOG ==========
+  // Media Wizard
+  function showMediaDialog() {
+    mediaAlt.value = '';
+    mediaUrl.value = 'https://';
+    mediaDialog.style.display = 'flex';
+
+    function cleanup() {
+      mediaDialog.style.display = 'none';
+      mediaOk.removeEventListener('click', onOk);
+      mediaCancel.removeEventListener('click', onCancel);
+      mediaBrowse.removeEventListener('click', onBrowse);
+    }
+    function onOk() {
+      const altText = mediaAlt.value.trim() || 'Image';
+      let url = mediaUrl.value.trim() || '#';
+
+      // Convert GitHub file URLs to raw URLs if needed
+      if (url.includes("github.com") && url.includes("/blob/")) {
+        url = url.replace("github.com", "raw.githubusercontent.com").replace("/blob", "");
+      }
+      // Ensure URL starts with "http", "https", or "file://"
+      if (!/^https?:\/\//.test(url) && !url.startsWith('file://')) {
+        url = 'https://' + url;
+      }
+      cleanup();
+      if (cmEditor) {
+        cmEditor.replaceSelection(`![${altText}](${url})`);
+        cmEditor.focus();
+      }
+    }
+
+    async function onBrowse() {
+      try {
+        const filePath = await ipcRenderer.invoke('open-file-dialog', {
+          filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif', 'svg'] }]
+        });
+        if (filePath) {
+          mediaUrl.value = `file://${filePath}`;
+        }
+      } catch (err) {
+        console.error('Error browsing for media:', err);
+      }
+    }
+
+    function onCancel() {
+      cleanup();
+    }
+
+    mediaOk.addEventListener('click', onOk);
+    mediaCancel.addEventListener('click', onCancel);
+    mediaBrowse.addEventListener('click', onBrowse);
+  }
+  if (btnMedia) {
+    btnMedia.addEventListener('click', showMediaDialog);
+  }
+
+  // Table Dialog
   function showTableDialog() {
     tableRowsInput.value = '3';
     tableColsInput.value = '3';
@@ -777,6 +1117,7 @@ window.addEventListener('DOMContentLoaded', () => {
     tableOkBtn.addEventListener('click', onOk);
     tableCancelBtn.addEventListener('click', onCancel);
   }
+
   function insertTable(rows, cols, hasHeader) {
     if (!cmEditor) return;
     let out = '';
@@ -808,7 +1149,7 @@ window.addEventListener('DOMContentLoaded', () => {
     cmEditor.focus();
   }
 
-  // ========== DRAG & DROP .md ==========
+  // DRAG & DROP .md
   document.addEventListener('dragover', (e) => {
     e.preventDefault();
   });
@@ -823,7 +1164,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // ========== FORMAT BUTTONS ==========
+  // Format buttons
   function wrapSelection(before, after = before) {
     if (!cmEditor) return;
     cmEditor.operation(() => {
@@ -839,11 +1180,11 @@ window.addEventListener('DOMContentLoaded', () => {
     });
     cmEditor.focus();
   }
-  btnBold.addEventListener('click', () => wrapSelection('**'));
-  btnItalic.addEventListener('click', () => wrapSelection('*'));
-  btnCode.addEventListener('click', () => wrapSelection('`'));
-  btnLink.addEventListener('click', showLinkDialog);
-  btnHeading.addEventListener('click', () => {
+  btnBold?.addEventListener('click', () => wrapSelection('**'));
+  btnItalic?.addEventListener('click', () => wrapSelection('*'));
+  btnCode?.addEventListener('click', () => wrapSelection('`'));
+  btnLink?.addEventListener('click', showLinkDialog);
+  btnHeading?.addEventListener('click', () => {
     if (!cmEditor) return;
     cmEditor.operation(() => {
       cmEditor.listSelections().forEach(sel => {
@@ -854,14 +1195,26 @@ window.addEventListener('DOMContentLoaded', () => {
     });
     cmEditor.focus();
   });
-  btnTable.addEventListener('click', showTableDialog);
+  btnTable?.addEventListener('click', showTableDialog);
 
-  // ========== WINDOW CONTROLS & File Tools ==========
-  minButton.addEventListener('click', () => ipcRenderer.send('minimize-window'));
-  maxButton.addEventListener('click', () => ipcRenderer.send('maximize-window'));
-  closeButton.addEventListener('click', () => ipcRenderer.send('close-window'));
+  // Alignment
+  alignLeftBtn?.addEventListener('click', () => alignSelection("left"));
+  alignCenterBtn?.addEventListener('click', () => alignSelection("center"));
+  alignRightBtn?.addEventListener('click', () => alignSelection("right"));
 
-  newFileBtn.addEventListener('click', async () => {
+  // GitHub menu
+  if (githubMenuBtn) {
+    githubMenuBtn.addEventListener('click', async () => {
+      await ipcRenderer.invoke('open-github-window');
+    });
+  }
+
+  // Window controls & file tools
+  minButton?.addEventListener('click', () => ipcRenderer.send('minimize-window'));
+  maxButton?.addEventListener('click', () => ipcRenderer.send('maximize-window'));
+  closeButton?.addEventListener('click', () => ipcRenderer.send('close-window'));
+
+  newFileBtn?.addEventListener('click', async () => {
     const defaultName = `untitled-${Date.now()}.md`;
     const userFilename = await customPrompt('Enter file name:', defaultName);
     if (!userFilename) return;
@@ -876,19 +1229,17 @@ window.addEventListener('DOMContentLoaded', () => {
       createOrActivateTab(filePath, finalName, '');
       refreshFileList();
     } catch (err) {
-      console.error('Error creating file:', err);
       customAlert(`Failed to create file.\n${err.message}`);
     }
   });
 
-  openFileBtn.addEventListener('click', async () => {
+  openFileBtn?.addEventListener('click', async () => {
     try {
       const chosen = await ipcRenderer.invoke('open-file-dialog');
       if (chosen) {
         loadFile(chosen);
       }
     } catch (err) {
-      console.error('Error opening file:', err);
       customAlert(`Failed to open file.\n${err.message}`);
     }
   });
@@ -903,9 +1254,9 @@ window.addEventListener('DOMContentLoaded', () => {
     await saveSpecificTab(activeTab);
     refreshFileList();
   }
-  saveFileBtn.addEventListener('click', saveCurrentTab);
+  saveFileBtn?.addEventListener('click', saveCurrentTab);
 
-  renameFileBtn.addEventListener('click', async () => {
+  renameFileBtn?.addEventListener('click', async () => {
     if (!activeTab) {
       customAlert('No file loaded to rename.');
       return;
@@ -935,14 +1286,14 @@ window.addEventListener('DOMContentLoaded', () => {
         }
         customAlert('File renamed successfully.');
       } catch (err) {
-        console.error('Error renaming file:', err);
         customAlert(`Failed to rename file.\n${err.message}`);
       }
     }
   });
 
-  refreshFilesBtn.addEventListener('click', refreshFileList);
-  copyPreviewBtn.addEventListener('click', () => {
+  refreshFilesBtn?.addEventListener('click', refreshFileList);
+
+  copyPreviewBtn?.addEventListener('click', () => {
     if (!cmEditor) return;
     const text = cmEditor.getValue();
     navigator.clipboard.writeText(text)
@@ -950,28 +1301,25 @@ window.addEventListener('DOMContentLoaded', () => {
       .catch(err => console.error('Error copying text:', err));
   });
 
-  aboutBtn.addEventListener('click', async () => {
+  aboutBtn?.addEventListener('click', async () => {
     await ipcRenderer.invoke('open-about-window');
   });
 
-  settingsBtn.addEventListener('click', async () => {
+  settingsBtn?.addEventListener('click', async () => {
     await ipcRenderer.invoke('open-settings-window');
   });
 
-  // ========== SEARCH & REPLACE BAR ==========
-  btnSearch.addEventListener('click', () => {
+  // Search & Replace
+  btnSearch?.addEventListener('click', () => {
     searchBar.classList.toggle('hidden');
-    console.log("[DEBUG] Toggled search bar, now hidden?", searchBar.classList.contains('hidden'));
   });
 
-  searchCloseBtn.addEventListener('click', () => {
-    console.log("[DEBUG] searchCloseBtn clicked - hide bar");
+  searchCloseBtn?.addEventListener('click', () => {
     searchBar.classList.add('hidden');
     clearSearchHighlights();
   });
 
   function clearSearchHighlights() {
-    console.log("[DEBUG] Clearing old search highlights");
     searchMarks.forEach(mark => mark.clear());
     searchMarks = [];
     currentSearchCursor = null;
@@ -984,7 +1332,6 @@ window.addEventListener('DOMContentLoaded', () => {
   function highlightAll(query) {
     clearSearchHighlights();
     if (!cmEditor || !query) return;
-    console.log("[DEBUG] highlightAll with query:", query);
     const cursor = cmEditor.getSearchCursor(query, { line: 0, ch: 0 });
     while (cursor.findNext()) {
       const from = cursor.from();
@@ -995,7 +1342,6 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   function findNext(query) {
-    console.log("[DEBUG] findNext:", query);
     if (!currentSearchCursor) {
       currentSearchCursor = cmEditor.getSearchCursor(query, { line: 0, ch: 0 });
     }
@@ -1008,22 +1354,17 @@ window.addEventListener('DOMContentLoaded', () => {
       if (currentSearchMatch) currentSearchMatch.clear();
       currentSearchMatch = cmEditor.markText(from, to, { className: 'cm-searching-active' });
       cmEditor.scrollIntoView({ from, to }, 60);
-      console.log("[DEBUG] Found next match at:", from, to);
-    } else {
-      console.log("[DEBUG] No more matches found");
     }
   }
 
-  searchNextBtn.addEventListener('click', () => {
-    console.log("[DEBUG] searchNextBtn clicked");
+  searchNextBtn?.addEventListener('click', () => {
     const query = searchInput.value;
     if (!query) return;
     if (!currentSearchCursor) highlightAll(query);
     findNext(query);
   });
 
-  searchReplaceBtn.addEventListener('click', () => {
-    console.log("[DEBUG] searchReplaceBtn clicked");
+  searchReplaceBtn?.addEventListener('click', () => {
     const query = searchInput.value;
     if (!query) return;
     if (!currentSearchCursor) {
@@ -1035,7 +1376,6 @@ window.addEventListener('DOMContentLoaded', () => {
       findNext(query);
       return;
     }
-    // replace current match
     const from = currentSearchCursor.from();
     const to   = currentSearchCursor.to();
     const replacement = replaceInput.value;
@@ -1046,23 +1386,19 @@ window.addEventListener('DOMContentLoaded', () => {
     findNext(query);
   });
 
-  searchReplaceAllBtn.addEventListener('click', () => {
-    console.log("[DEBUG] searchReplaceAllBtn clicked");
+  searchReplaceAllBtn?.addEventListener('click', () => {
     const query = searchInput.value;
     if (!query) return;
     const replacement = replaceInput.value;
     clearSearchHighlights();
     const cursor = cmEditor.getSearchCursor(query, { line: 0, ch: 0 });
-    let replacedCount = 0;
     while (cursor.findNext()) {
       cursor.replace(replacement);
-      replacedCount++;
     }
-    console.log("[DEBUG] Replaced all matches, count=", replacedCount);
     highlightAll(query);
   });
 
-  // ========== INIT APP ==========
+  // Init
   (async () => {
     console.log("[DEBUG] init app...");
     try {
@@ -1070,8 +1406,6 @@ window.addEventListener('DOMContentLoaded', () => {
     } catch (err) {
       console.error('Failed to get userData path:', err);
     }
-
-    // Load user settings so we can use defaultFolder, lastFile
     try {
       userSettings = await ipcRenderer.invoke('load-app-settings');
       console.log("[DEBUG] Loaded user settings:", userSettings);
@@ -1085,7 +1419,6 @@ window.addEventListener('DOMContentLoaded', () => {
     refreshFileList();
     updatePreview();
 
-    // If lastFile is set, load it automatically if it still exists
     if (userSettings.lastFile) {
       try {
         if (fs.existsSync(userSettings.lastFile)) {
@@ -1097,4 +1430,16 @@ window.addEventListener('DOMContentLoaded', () => {
       }
     }
   })();
+
+  // Provide a global function to insert GitHub markdown on a new line
+  window.insertGitHubMarkdown = function(markdown) {
+    if (!cmEditor) {
+      console.error("No cmEditor to insert GitHub markdown.");
+      return;
+    }
+    const cur = cmEditor.getCursor();
+    cmEditor.replaceRange('\n' + markdown + '\n', cur);
+    cmEditor.focus();
+    updatePreview();
+  };
 });

@@ -9,6 +9,7 @@ let mainWindow = null;
 let aboutWindow = null;
 let splashWindow = null;
 let settingsWindow = null;
+let githubWindow = null; // Added for GitHub modal
 
 /**
  * Utility: get the path to settings.json in userData
@@ -97,19 +98,14 @@ function createMainWindow() {
 
   // Intercept the window "close" event to check for dirty file
   mainWindow.on('close', async (e) => {
-    // Ask renderer if we can close or if user wants to save
     e.preventDefault(); // keep the window open until user decides
     try {
       const result = await mainWindow.webContents.executeJavaScript('window.attemptAppCloseFromMain()');
-      // result => 'proceed' or 'cancel'
       if (result === 'proceed') {
-        // user either saved or chose dontsave
         mainWindow.destroy();
       }
-      // else if result === 'cancel', do nothing
     } catch (err) {
       console.error('[MAIN] Error while prompting to close:', err);
-      // If something fails, just close
       mainWindow.destroy();
     }
   });
@@ -238,6 +234,52 @@ ipcMain.handle('load-app-settings', () => {
 ipcMain.handle('save-app-settings', (event, newSettings) => {
   saveAppSettings(newSettings);
   return 'ok';
+});
+
+/**
+ * IPC handler for GitHub modal.
+ * Opens a modal window to load github.html with GitHub markdown features,
+ * with "show: false" and a dark background to minimize flicker.
+ */
+ipcMain.handle('open-github-window', () => {
+  if (githubWindow) {
+    githubWindow.focus();
+    return;
+  }
+  githubWindow = new BrowserWindow({
+    width: 1000,
+    height: 725,
+    modal: true,
+    parent: mainWindow,
+    frame: false,
+    show: false, // Hide initially
+    backgroundColor: '#0f1722', // Dark background to reduce white flicker
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false
+    }
+  });
+
+  githubWindow.loadFile('github.html');
+
+  // Show once ready, minimizing flicker
+  githubWindow.once('ready-to-show', () => {
+    githubWindow.show();
+  });
+
+  githubWindow.on('closed', () => {
+    githubWindow = null;
+  });
+});
+
+/**
+ * IPC handler for inserting GitHub markdown.
+ * Receives markdown from the GitHub modal and sends it to the main window.
+ */
+ipcMain.on('insert-markdown', (event, markdown) => {
+  if (mainWindow && mainWindow.webContents) {
+    mainWindow.webContents.send('insert-github-markdown', markdown);
+  }
 });
 
 /**

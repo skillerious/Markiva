@@ -1,6 +1,6 @@
 {
   "name": "markiva",
-  "version": "1.0.0",
+  "version": "3.1.0",
   "description": "Markiva - a markdown editor with color syntax highlighting, multi-tab support, enhanced preview, and persistent notes.",
   "author": "Robin Doak <example@example.com>",
   "main": "main.js",
@@ -11,7 +11,7 @@
   "build": {
     "productName": "Markiva",
     "appId": "com.markiva.app",
-    "asar": false, 
+    "asar": false,
     "files": [
       "**/*"
     ],
@@ -27,9 +27,11 @@
     }
   },
   "dependencies": {
-    "marked": "^5.0.0",
+    "codemirror": "^5.65.9",
     "highlight.js": "^11.7.0",
-    "codemirror": "^5.65.9"
+    "markdownlint": "^0.37.4",
+    "marked": "^5.0.0",
+    "mathjax": "^3.2.2"
   },
   "devDependencies": {
     "electron": "^24.0.0",

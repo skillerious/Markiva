@@ -397,10 +397,14 @@ html, body {
   background-color: #0f1722;
   padding: 0 4px;
 }
+/* The file browser section will take up half the height under notes */
 .file-browser-section {
   flex: 1;
   overflow-y: auto;
 }
+
+/* PROJECT FILES HEADER */
+/* Reverted the header text color from white to green (#05c46b) */
 #file-browser-header {
   text-align: center;
   margin-bottom: 8px;
@@ -410,7 +414,7 @@ html, body {
 #file-browser-header h4 {
   margin: 0;
   font-size: 13px;
-  color: #fff;
+  color: #05c46b;
   position: relative;
   display: inline-block;
   padding: 0.2em 0.5em;
@@ -437,6 +441,7 @@ html, body {
   background: #05c46b;
   border-radius: 1px;
 }
+/* (Retaining the original input style in case it is used elsewhere) */
 #file-browser-header input {
   width: 90%;
   margin-top: 4px;
@@ -448,11 +453,49 @@ html, body {
   background-color: #141f2d;
   color: #e2e8f0;
 }
+
+/* NEW FILE SEARCH EDITOR FOR PROJECT FILES */
+/* Separates the search field from the header and adds a plus button */
+.file-search-editor {
+  padding: 10px;
+  border-bottom: 1px solid #1f2b3d;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+#file-search {
+  flex: 1;
+  background-color: #141f2d;
+  border: none;
+  outline: none;
+  padding: 8px;
+  font-size: 14px;
+  color: #05c46b;
+  border-radius: 4px;
+}
+#file-search-btn {
+  background-color: #05c46b;
+  border: none;
+  outline: none;
+  color: #fff;
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+#file-search-btn:hover {
+  background-color: #04a85e;
+}
+
+/* FILE LIST */
 #file-list {
   list-style: none;
   padding-left: 10px;
   border-left: 1px dashed #05c46b;
-  margin: 0;
+  /* Added top margin to separate from the search panel */
+  margin: 10px 0 0 0;
 }
 #file-list li {
   margin-bottom: 6px;

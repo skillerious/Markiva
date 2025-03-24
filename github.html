@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>GitHub Markdown Enhancer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Google Font -->
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome for icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <style>
+      /* RESET */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        background: #0f1722;
+        font-family: 'Roboto', sans-serif;
+        color: #e2e8f0;
+        overflow: hidden; /* We'll let our container handle any scrolling */
+      }
+
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #141f2d;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #05c46b;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #04a85e;
+      }
+
+      /* Draggable titlebar */
+      .github-dragbar {
+        height: 32px;
+        background: linear-gradient(90deg, #0f1722, #141f2d);
+        -webkit-app-region: drag;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding: 0 8px;
+      }
+      .github-close-btn {
+        -webkit-app-region: no-drag;
+        width: 32px;
+        height: 32px;
+        border: none;
+        background: none;
+        color: #fff;
+        font-size: 16px;
+        cursor: pointer;
+        border-radius: 4px;
+        outline: none;
+      }
+      .github-close-btn:hover {
+        background-color: rgba(255, 255, 255, 0.15);
+      }
+
+      /* MAIN LAYOUT */
+      .top-bar {
+        width: 100%;
+        background-color: #141f2d;
+        padding: 8px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        border-bottom: 1px solid #1f2b3d;
+      }
+      .top-bar .field-group {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .top-bar label {
+        font-size: 12px;
+        color: #05c46b;
+      }
+      .top-bar input[type="text"],
+      .top-bar select {
+        width: 140px;
+        padding: 4px 6px;
+        border: 1px solid #333;
+        border-radius: 4px;
+        background-color: #0f1722;
+        color: #e2e8f0;
+        font-size: 12px;
+      }
+      .top-bar button {
+        border: none;
+        background-color: #05c46b;
+        color: #fff;
+        border-radius: 4px;
+        padding: 4px 8px;
+        cursor: pointer;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .top-bar button:hover {
+        background-color: #04a85e;
+      }
+      .github-container {
+        width: 100%;
+        height: calc(100% - 32px);
+        display: flex;
+        flex-direction: row;
+      }
+
+      /* SIDEBAR */
+      .sidebar {
+        width: 240px;
+        background-color: #141f2d;
+        border-right: 1px solid #1f2b3d;
+        overflow-y: auto;
+        padding: 12px;
+      }
+      .sidebar h2 {
+        font-size: 16px;
+        margin-bottom: 8px;
+        color: #05c46b;
+      }
+      .feature-grid {
+        display: grid;
+        /* 2 columns, enough for 6 items => 3 rows x 2 columns */
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+      .feature-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #05c46b;
+        color: #fff;
+        padding: 6px 8px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 13px; /* slightly bigger so text won't get clipped */
+        transition: background 0.2s;
+        text-align: center;
+        min-height: 36px; /* ensures text won't be cut off */
+      }
+      .feature-btn i {
+        margin-right: 4px;
+      }
+      .feature-btn:hover {
+        background-color: #04a85e;
+      }
+      .section {
+        margin-bottom: 16px;
+      }
+
+      /* MAIN CONTENT (Preview area) */
+      .main-content {
+        flex: 1;
+        overflow-y: auto;
+        background: linear-gradient(to bottom right, #0f1722 60%, #151d27 100%);
+        padding: 20px;
+      }
+      .main-content h1 {
+        font-size: 20px;
+        color: #05c46b;
+        margin-bottom: 6px;
+      }
+      .main-content p {
+        font-size: 13px;
+        color: #ccc;
+        margin-bottom: 16px;
+      }
+      .section-header {
+        font-size: 18px;
+        color: #05c46b;
+        margin: 16px 0 8px;
+      }
+      .preview-area {
+        background-color: #141f2d;
+        padding: 10px;
+        border-radius: 4px;
+        min-height: 140px;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+      .preview-area img {
+        max-width: 100%;
+      }
+      .insert-section {
+        margin-top: 20px;
+        text-align: center;
+      }
+      .insert-btn {
+        display: inline-block;
+        background-color: #05c46b;
+        color: #fff;
+        padding: 10px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background 0.2s;
+      }
+      .insert-btn:hover {
+        background-color: #04a85e;
+      }
+      .explanatory-text {
+        font-size: 12px;
+        color: #aaa;
+        margin-top: 6px;
+      }
+
+      /* DYNAMIC OPTION PANELS for "Typing", "Quote", and "Icons" */
+      .option-panel {
+        margin-top: 10px;
+        padding: 10px;
+        background: #141f2d;
+        border: 1px solid #1f2b3d;
+        border-radius: 4px;
+        display: none; /* hidden by default */
+      }
+      .option-panel h3 {
+        font-size: 14px;
+        margin-bottom: 6px;
+        color: #05c46b;
+      }
+      .option-panel label {
+        font-size: 12px;
+        color: #ccc;
+      }
+      .option-panel select,
+      .option-panel textarea,
+      .option-panel input {
+        background-color: #0f1722;
+        color: #e2e8f0;
+        border: 1px solid #333;
+        border-radius: 4px;
+        padding: 6px;
+        width: 100%;
+        font-size: 12px;
+        margin-bottom: 8px;
+      }
+      .option-panel button {
+        background-color: #05c46b;
+        border: none;
+        color: #fff;
+        font-size: 12px;
+        padding: 6px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .option-panel button:hover {
+        background-color: #04a85e;
+      }
+      .option-row {
+        margin-bottom: 6px;
+      }
+
+      .icons-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 8px;
+      }
+      .icons-grid img {
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Draggable titlebar -->
+    <div class="github-dragbar">
+      <button class="github-close-btn" id="closeBtn" title="Close">✖</button>
+    </div>
+
+    <!-- TOP BAR: API key, Username, Repo & Releases -->
+    <div class="top-bar">
+      <div class="field-group">
+        <label for="gh-token">PAT:</label>
+        <input type="text" id="gh-token" placeholder="Personal Access Token" />
+        <button id="storeTokenBtn">
+          <i class="fas fa-save"></i>Save
+        </button>
+      </div>
+
+      <div class="field-group">
+        <label for="gh-username">User:</label>
+        <input type="text" id="gh-username" placeholder="username" value="skillerious" />
+        <button id="fetchReposBtn">
+          <i class="fas fa-download"></i>Repos
+        </button>
+      </div>
+
+      <div class="field-group">
+        <label for="repo-select">Repo:</label>
+        <select id="repo-select">
+          <option value="">(none/manual)</option>
+        </select>
+        <!-- Hidden override for advanced usage (if needed) -->
+        <input type="text" id="gh-repo" placeholder="Repo override" value="Markiva" style="display:none;" />
+      </div>
+
+      <div class="field-group">
+        <label for="release-select">Release:</label>
+        <select id="release-select">
+          <option value="">(none/manual)</option>
+        </select>
+        <button id="fetchReleasesBtn">
+          <i class="fas fa-download"></i>Rel
+        </button>
+        <!-- Hidden override for advanced usage (if needed) -->
+        <input type="text" id="gh-release" placeholder="Release override" value="MarkivaV3" style="display:none;" />
+      </div>
+    </div>
+
+    <div class="github-container">
+      <!-- LEFT SIDEBAR (Buttons) -->
+      <div class="sidebar">
+        <!-- BADGE INSERTS -->
+        <div class="section">
+          <h2>Badge Inserts</h2>
+          <div class="feature-grid">
+            <button class="feature-btn" id="insert-release">
+              <i class="fas fa-tag"></i>Release
+            </button>
+            <button class="feature-btn" id="insert-stars">
+              <i class="fas fa-star"></i>Stars
+            </button>
+            <button class="feature-btn" id="insert-issues">
+              <i class="fas fa-exclamation-circle"></i>Issues
+            </button>
+            <button class="feature-btn" id="insert-watchers">
+              <i class="fas fa-eye"></i>Watch
+            </button>
+            <button class="feature-btn" id="insert-forks">
+              <i class="fas fa-code-branch"></i>Forks
+            </button>
+            <button class="feature-btn" id="insert-license">
+              <i class="fas fa-balance-scale"></i>License
+            </button>
+          </div>
+        </div>
+
+        <!-- STATS & EXTRAS -->
+        <div class="section">
+          <h2>Stats & Extras</h2>
+          <div class="feature-grid">
+            <button class="feature-btn" id="insert-stats">
+              <i class="fab fa-github"></i>Stats
+            </button>
+            <button class="feature-btn" id="insert-trophies">
+              <i class="fas fa-trophy"></i>Trophy
+            </button>
+            <button class="feature-btn" id="insert-streak">
+              <i class="fas fa-fire-alt"></i>Streak
+            </button>
+            <button class="feature-btn" id="insert-wakatime">
+              <i class="fab fa-wpexplorer"></i>Waka
+            </button>
+          </div>
+        </div>
+
+        <!-- MORE FUN (1) -->
+        <div class="section">
+          <h2>Fun (1)</h2>
+          <div class="feature-grid">
+            <button class="feature-btn" id="insert-views">
+              <i class="fas fa-eye"></i>Views
+            </button>
+            <button class="feature-btn" id="insert-quote">
+              <i class="fas fa-quote-left"></i>Quote
+            </button>
+            <button class="feature-btn" id="insert-typing">
+              <i class="fas fa-keyboard"></i>Typing
+            </button>
+            <button class="feature-btn" id="insert-skills">
+              <i class="fas fa-code"></i>Skills
+            </button>
+          </div>
+        </div>
+
+        <!-- MORE FUN (2) -->
+        <div class="section">
+          <h2>Fun (2)</h2>
+          <div class="feature-grid">
+            <button class="feature-btn" id="insert-toplangs">
+              <i class="fas fa-language"></i>TopLangs
+            </button>
+            <button class="feature-btn" id="insert-devto">
+              <i class="fab fa-dev"></i>Dev.to
+            </button>
+            <button class="feature-btn" id="insert-summary">
+              <i class="fas fa-list-alt"></i>Summary
+            </button>
+            <button class="feature-btn" id="insert-activity-graph">
+              <i class="fas fa-project-diagram"></i>Graph
+            </button>
+          </div>
+        </div>
+
+        <!-- ICONS from skill-icons (Loaded from icons.json) -->
+        <div class="section">
+          <h2>Icons</h2>
+          <div class="feature-grid">
+            <button class="feature-btn" id="btn-icons">
+              <i class="fas fa-icons"></i>Icons
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAIN CONTENT -->
+      <div class="main-content">
+        <h1>GitHub Markdown Enhancer</h1>
+        <p>
+          Generate or pick from a variety of
+          <strong>GitHub README</strong> snippets below.
+          <br />
+          Token + username => auto fetch repos or type manually.
+        </p>
+
+        <h2 class="section-header">Preview</h2>
+        <div class="preview-area" id="badge-preview">
+          <!-- Generated snippet preview appears here -->
+        </div>
+
+        <!-- TYPING OPTIONS -->
+        <div id="typing-panel" class="option-panel">
+          <h3>Typing SVG Options</h3>
+          <div class="option-row">
+            <label for="typing-lines">Enter lines (one per line):</label>
+            <textarea id="typing-lines" rows="3" placeholder="Hello World&#10;This is Markdown&#10;Have Fun!"></textarea>
+          </div>
+          <button id="typing-update-btn">Update Preview</button>
+        </div>
+
+        <!-- QUOTE OPTIONS -->
+        <div id="quote-panel" class="option-panel">
+          <h3>Quote Options</h3>
+          <div class="option-row">
+            <label for="quote-text">Custom text (leave empty for random):</label>
+            <textarea id="quote-text" rows="2" placeholder="Enter your custom quote here"></textarea>
+          </div>
+          <div class="option-row">
+            <label for="quote-orientation">Orientation (random service only):</label>
+            <select id="quote-orientation">
+              <option value="horizontal">Horizontal</option>
+              <option value="vertical">Vertical</option>
+            </select>
+          </div>
+          <div class="option-row">
+            <label for="quote-theme">Theme (random service only):</label>
+            <select id="quote-theme">
+              <option value="dark">dark</option>
+              <option value="light">light</option>
+              <option value="radical">radical</option>
+              <option value="tokyonight">tokyonight</option>
+              <option value="dracula">dracula</option>
+              <option value="material">material</option>
+            </select>
+          </div>
+          <button id="quote-update-btn">Update Preview</button>
+        </div>
+
+        <!-- ICONS PANEL (fetched from icons.json) -->
+        <div id="icons-panel" class="option-panel">
+          <h3>Skill Icons (Massive List)</h3>
+          <p style="font-size:12px; margin-bottom:6px;">
+            Select an icon below and click “Add Icon.” You can add multiple.
+            Then “Insert Icons” to place them in your editor.
+            <br>
+            <strong>Note:</strong> If some .svg filenames are incorrect, they might 404 in the preview.
+          </p>
+
+          <div class="option-row">
+            <label for="icon-select">Choose an icon:</label>
+            <select id="icon-select" size="8" style="height:auto;"></select>
+          </div>
+          <div class="option-row" id="icon-preview-container">
+            <!-- A small preview image of the selected icon -->
+          </div>
+          <button id="icons-add-btn" style="margin-bottom:8px;">Add Icon</button>
+
+          <!-- We'll show the user's chosen icons here -->
+          <div class="icons-grid" id="icons-chosen"></div>
+          <button id="icons-insert-btn" style="margin-top:10px;">Insert Icons</button>
+        </div>
+
+        <div class="insert-section">
+          <button class="insert-btn" id="insertBtn">
+            Insert into Editor
+          </button>
+          <p class="explanatory-text">
+            This adds the generated markdown snippet to your Markiva document.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const { ipcRenderer } = require('electron');
+
+      // Window Close
+      document.getElementById('closeBtn').addEventListener('click', () => window.close());
+
+      let generatedMarkdown = '';
+      let userToken = '';
+      let skillIconsList = [];
+      let chosenIcons = [];
+
+      /************************************************************
+       * 1) LOAD ICONS FROM icons.json
+       ************************************************************/
+      async function loadIconsFromJSON() {
+        try {
+          const response = await fetch('icons.json'); // or './path/icons.json'
+          if (!response.ok) {
+            throw new Error(`Failed to fetch icons.json: ${response.status} ${response.statusText}`);
+          }
+          skillIconsList = await response.json();
+          console.log(`Loaded ${skillIconsList.length} icons from icons.json`);
+        } catch (err) {
+          console.error('Error loading icons.json:', err);
+          skillIconsList = [];
+        }
+      }
+
+      /************************************************************
+       * Hide/Show Panels
+       ************************************************************/
+      function hideAllPanels() {
+        document.getElementById('typing-panel').style.display = 'none';
+        document.getElementById('quote-panel').style.display = 'none';
+        document.getElementById('icons-panel').style.display = 'none';
+      }
+
+      // The big "Insert into Editor" at the bottom
+      const insertBtn = document.getElementById('insertBtn');
+      insertBtn.addEventListener('click', () => {
+        if (generatedMarkdown) {
+          ipcRenderer.send('insert-markdown', generatedMarkdown);
+        } else {
+          console.log("No markdown generated to insert.");
+        }
+        window.close();
+      });
+
+      /************************************************************
+       * Icons Panel
+       ************************************************************/
+      const iconsPanel = document.getElementById('icons-panel');
+      const btnIcons = document.getElementById('btn-icons');
+      const iconSelect = document.getElementById('icon-select');
+      const iconPreviewContainer = document.getElementById('icon-preview-container');
+      const iconsAddBtn = document.getElementById('icons-add-btn');
+      const iconsChosenDiv = document.getElementById('icons-chosen');
+      const iconsInsertBtn = document.getElementById('icons-insert-btn');
+
+      btnIcons.addEventListener('click', () => {
+        const visible = (iconsPanel.style.display === 'block');
+        hideAllPanels();
+        if (!visible) {
+          iconsPanel.style.display = 'block';
+          initIconsSelect(); // fill the <select> with loaded icons
+          updateIconPreview();
+        } else {
+          iconsPanel.style.display = 'none';
+        }
+      });
+
+      function initIconsSelect() {
+        iconSelect.innerHTML = '';
+        skillIconsList.forEach(icon => {
+          const opt = document.createElement('option');
+          opt.value = icon.name;
+          opt.textContent = icon.name;
+          iconSelect.appendChild(opt);
+        });
+      }
+
+      function updateIconPreview() {
+        const selectedName = iconSelect.value;
+        const found = skillIconsList.find(i => i.name === selectedName);
+        iconPreviewContainer.innerHTML = '';
+        if (found) {
+          const img = document.createElement('img');
+          img.src = found.url;
+          img.alt = found.name;
+          img.style.width = '60px';
+          img.style.height = '60px';
+          iconPreviewContainer.appendChild(img);
+        }
+      }
+      iconSelect.addEventListener('change', updateIconPreview);
+
+      iconsAddBtn.addEventListener('click', () => {
+        const selectedName = iconSelect.value;
+        const found = skillIconsList.find(i => i.name === selectedName);
+        if (!found) return;
+        chosenIcons.push(found);
+        renderChosenIcons();
+      });
+
+      function renderChosenIcons() {
+        iconsChosenDiv.innerHTML = '';
+        let snippet = '';
+        chosenIcons.forEach((iconObj, index) => {
+          // show icon in grid
+          const img = document.createElement('img');
+          img.src = iconObj.url;
+          img.alt = iconObj.name;
+          img.title = iconObj.name;
+          // remove if user clicks
+          img.addEventListener('click', () => {
+            chosenIcons.splice(index, 1);
+            renderChosenIcons();
+          });
+          iconsChosenDiv.appendChild(img);
+
+          // build snippet line
+          snippet += `[<img src="${iconObj.url}" alt="${iconObj.name}" width="40px" height="40px" />](${iconObj.link})\n`;
+        });
+        generatedMarkdown = snippet.trim();
+        document.getElementById('badge-preview').innerHTML = generatedMarkdown
+          .split('\n')
+          .map(line => line)
+          .join('<br/>');
+      }
+
+      iconsInsertBtn.addEventListener('click', () => {
+        if (!generatedMarkdown) {
+          console.log("No icons chosen");
+          return;
+        }
+        ipcRenderer.send('insert-markdown', generatedMarkdown);
+        window.close();
+      });
+
+      /************************************************************
+       * Typing Panel
+       ************************************************************/
+      const typingPanel = document.getElementById('typing-panel');
+      const typingLines = document.getElementById('typing-lines');
+      const typingUpdateBtn = document.getElementById('typing-update-btn');
+      const insertTypingBtn = document.getElementById('insert-typing');
+      let typingPanelVisible = false;
+
+      insertTypingBtn.addEventListener('click', () => {
+        typingPanelVisible = !typingPanelVisible;
+        if (typingPanelVisible) {
+          hideAllPanels();
+          typingPanel.style.display = 'block';
+          generateTypingPreview();
+        } else {
+          typingPanel.style.display = 'none';
+        }
+      });
+
+      function generateTypingPreview() {
+        let linesRaw = typingLines.value.trim();
+        if (!linesRaw) {
+          linesRaw = "Hello World\nThis is Markdown\nHave Fun!";
+          typingLines.value = linesRaw;
+        }
+        const linesArr = linesRaw
+          .split('\n')
+          .map(l => encodeURIComponent(l.trim()))
+          .filter(l => l.length > 0);
+        const linesParam = linesArr.join(';');
+        const url = `https://readme-typing-svg.demolab.com?lines=${linesParam}`;
+        const snippet = `[![Typing SVG](${url})](https://git.io/typing-svg)`;
+        generatedMarkdown = snippet;
+        document.getElementById('badge-preview').innerHTML = `<img src="${url}" alt="Typing SVG" />`;
+      }
+      typingUpdateBtn.addEventListener('click', generateTypingPreview);
+
+      /************************************************************
+       * Quote Panel
+       ************************************************************/
+      const quotePanel = document.getElementById('quote-panel');
+      const quoteText = document.getElementById('quote-text');
+      const quoteOrientation = document.getElementById('quote-orientation');
+      const quoteTheme = document.getElementById('quote-theme');
+      const quoteUpdateBtn = document.getElementById('quote-update-btn');
+      const insertQuoteBtn = document.getElementById('insert-quote');
+
+      let quotePanelVisible = false;
+      insertQuoteBtn.addEventListener('click', () => {
+        quotePanelVisible = !quotePanelVisible;
+        if (quotePanelVisible) {
+          hideAllPanels();
+          quotePanel.style.display = 'block';
+          generateQuotePreview();
+        } else {
+          quotePanel.style.display = 'none';
+        }
+      });
+
+      function generateQuotePreview() {
+        const customText = quoteText.value.trim();
+        if (customText) {
+          // multiline => blockquote
+          const lines = customText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+          let blockquote = lines.map(l => `> ${l}`).join('\n');
+          generatedMarkdown = blockquote;
+          document.getElementById('badge-preview').innerHTML =
+            `<pre style="font-size:14px; line-height:1.4;">${blockquote}</pre>`;
+        } else {
+          // random from quotes-github-readme
+          const orientation = quoteOrientation.value;
+          const theme = quoteTheme.value;
+          const url = `https://quotes-github-readme.vercel.app/api?type=${orientation}&theme=${theme}`;
+          const snippet = `![Quote](${url})`;
+          generatedMarkdown = snippet;
+          document.getElementById('badge-preview').innerHTML = `<img src="${url}" alt="Random Quote" />`;
+        }
+      }
+      quoteUpdateBtn.addEventListener('click', generateQuotePreview);
+
+      /************************************************************
+       * BADGES, STATS, ETC.
+       ************************************************************/
+      function getInputs() {
+        const username = document.getElementById('gh-username').value.trim() || 'skillerious';
+        const chosenRepo = document.getElementById('repo-select').value.trim()
+          || document.getElementById('gh-repo').value.trim()
+          || 'Markiva';
+        const chosenRelease = document.getElementById('release-select').value.trim()
+          || document.getElementById('gh-release').value.trim()
+          || 'MarkivaV3';
+        return { username, repo: chosenRepo, release: chosenRelease };
+      }
+
+      async function loadTokenFromSettings() {
+        try {
+          const settings = await ipcRenderer.invoke('load-app-settings');
+          if (settings && settings.gitHubToken) {
+            userToken = settings.gitHubToken;
+            document.getElementById('gh-token').value = userToken;
+            const username = document.getElementById('gh-username').value.trim();
+            if (userToken && username) {
+              fetchRepos();
+            }
+          }
+        } catch (err) {
+          console.error('Failed to load token from settings:', err);
+        }
+      }
+      document.getElementById('storeTokenBtn').addEventListener('click', async () => {
+        userToken = document.getElementById('gh-token').value.trim();
+        try {
+          const settings = await ipcRenderer.invoke('load-app-settings') || {};
+          settings.gitHubToken = userToken;
+          await ipcRenderer.invoke('save-app-settings', settings);
+          console.log("API token saved (no popups).");
+          const username = document.getElementById('gh-username').value.trim();
+          if (userToken && username) {
+            fetchRepos();
+          }
+        } catch (err) {
+          console.error('Failed to store token:', err);
+        }
+      });
+
+      async function fetchRepos() {
+        const username = document.getElementById('gh-username').value.trim() || '';
+        if (!username) {
+          console.log("No username set. Can't fetch repos.");
+          return;
+        }
+        try {
+          const url = `https://api.github.com/users/${username}/repos?per_page=100`;
+          const headers = userToken ? { Authorization: `token ${userToken}` } : {};
+          const response = await fetch(url, { headers });
+          if (!response.ok) {
+            throw new Error(`Fetch Repos Error: ${response.statusText}`);
+          }
+          const data = await response.json();
+          const repoSelect = document.getElementById('repo-select');
+          repoSelect.innerHTML = `<option value="">(none/manual)</option>`;
+          data.forEach(repo => {
+            const opt = document.createElement('option');
+            opt.value = repo.name;
+            opt.textContent = repo.name;
+            repoSelect.appendChild(opt);
+          });
+          console.log(`Fetched ${data.length} repos.`);
+        } catch (err) {
+          console.error('Error fetching repos:', err);
+        }
+      }
+      document.getElementById('fetchReposBtn').addEventListener('click', fetchRepos);
+
+      async function fetchReleases() {
+        const username = document.getElementById('gh-username').value.trim() || '';
+        const chosenRepo = document.getElementById('repo-select').value.trim();
+        if (!username || !chosenRepo) {
+          console.log("Need username & repo to fetch releases.");
+          return;
+        }
+        try {
+          const url = `https://api.github.com/repos/${username}/${chosenRepo}/releases?per_page=50`;
+          const headers = userToken ? { Authorization: `token ${userToken}` } : {};
+          const response = await fetch(url, { headers });
+          if (!response.ok) {
+            throw new Error(`Fetch Releases Error: ${response.statusText}`);
+          }
+          const data = await response.json();
+          const releaseSelect = document.getElementById('release-select');
+          releaseSelect.innerHTML = `<option value="">(none/manual)</option>`;
+          data.forEach(rel => {
+            const opt = document.createElement('option');
+            opt.value = rel.tag_name;
+            opt.textContent = rel.tag_name;
+            releaseSelect.appendChild(opt);
+          });
+          console.log(`Fetched ${data.length} releases.`);
+        } catch (err) {
+          console.error('Error fetching releases:', err);
+        }
+      }
+      document.getElementById('fetchReleasesBtn').addEventListener('click', fetchReleases);
+
+      function generateBadge(type) {
+        hideAllPanels();
+        const { username, repo, release } = getInputs();
+        let snippet = '';
+        if (type === 'release') {
+          snippet = `<a href="https://github.com/${username}/${repo}/releases/tag/${release}">
+  <img src="https://img.shields.io/github/v/release/${username}/${repo}?label=Release&amp;color=green&amp;style=for-the-badge" />
+</a>`;
+        } else if (type === 'stars') {
+          snippet = `<a href="https://github.com/${username}/${repo}">
+  <img src="https://img.shields.io/github/stars/${username}/${repo}?style=for-the-badge" />
+</a>`;
+        } else if (type === 'issues') {
+          snippet = `<a href="https://github.com/${username}/${repo}/issues">
+  <img src="https://img.shields.io/github/issues/${username}/${repo}?style=for-the-badge" />
+</a>`;
+        } else if (type === 'watchers') {
+          snippet = `<a href="https://github.com/${username}/${repo}/watchers">
+  <img src="https://img.shields.io/github/watchers/${username}/${repo}?style=for-the-badge" />
+</a>`;
+        } else if (type === 'forks') {
+          snippet = `<a href="https://github.com/${username}/${repo}/fork">
+  <img src="https://img.shields.io/github/forks/${username}/${repo}?style=for-the-badge" />
+</a>`;
+        } else if (type === 'license') {
+          snippet = `<a href="https://github.com/${username}/${repo}/blob/master/LICENSE">
+  <img src="https://img.shields.io/github/license/${username}/${repo}?style=for-the-badge" />
+</a>`;
+        }
+        generatedMarkdown = snippet;
+        document.getElementById('badge-preview').innerHTML = snippet;
+      }
+      document.getElementById('insert-release').addEventListener('click', () => generateBadge('release'));
+      document.getElementById('insert-stars').addEventListener('click', () => generateBadge('stars'));
+      document.getElementById('insert-issues').addEventListener('click', () => generateBadge('issues'));
+      document.getElementById('insert-watchers').addEventListener('click', () => generateBadge('watchers'));
+      document.getElementById('insert-forks').addEventListener('click', () => generateBadge('forks'));
+      document.getElementById('insert-license').addEventListener('click', () => generateBadge('license'));
+
+      // Stats
+      function generateStats() {
+        hideAllPanels();
+        const { username } = getInputs();
+        const snippet = `![${username}'s GitHub stats](https://github-readme-stats.vercel.app/api?username=${username}&show_icons=true&theme=radical)`;
+        generatedMarkdown = snippet;
+        document.getElementById('badge-preview').innerHTML = `<img src="https://github-readme-stats.vercel.app/api?username=${username}&show_icons=true&theme=radical" />`;
+      }
+      function generateTrophies() {
+        hideAllPanels();
+        const { username } = getInputs();
+        const snippet = `![trophy](https://github-profile-trophy.vercel.app/?username=${username}&theme=onedark)`;
+        generatedMarkdown = snippet;
+        document.getElementById('badge-preview').innerHTML = `<img src="https://github-profile-trophy.vercel.app/?username=${username}&theme=onedark" />`;
+      }
+      function generateStreak() {
+        hideAllPanels();
+        const { username } = getInputs();
+        const snippet = `![GitHub Streak](https://github-readme-streak-stats.herokuapp.com/?user=${username}&theme=radical)`;
+        generatedMarkdown = snippet;
+        document.getElementById('badge-preview').innerHTML = `<img src="https://github-readme-streak-stats.herokuapp.com/?user=${username}&theme=radical" />`;
+      }
+      function generateWakaTime() {
+        hideAllPanels();
+        const { username } = getInputs();
+        const snippet = `![${username}'s wakatime stats](https://github-readme-stats.vercel.app/api/wakatime?username=${username})`;
+        generatedMarkdown = snippet;
+        document.getElementById('badge-preview').innerHTML = `<img src="https://github-readme-stats.vercel.app/api/wakatime?username=${username}" />`;
+      }
+      document.getElementById('insert-stats').addEventListener('click', generateStats);
+      document.getElementById('insert-trophies').addEventListener('click', generateTrophies);
+      document.getElementById('insert-streak').addEventListener('click', generateStreak);
+      document.getElementById('insert-wakatime').addEventListener('click', generateWakaTime);
+
+      // Fun(1)
+      function generateViews() {
+        hideAllPanels();
+        const { username } = getInputs();
+        const snippet = `![](https://komarev.com/ghpvc/?username=${username})`;
+        generatedMarkdown = snippet;
+        document.getElementById('badge-preview').innerHTML = `<img src="https://komarev.com/ghpvc/?username=${username}" />`;
+      }
+      document.getElementById('insert-views').addEventListener('click', generateViews);
+
+      function generateSkills() {
+        hideAllPanels();
+        const snippet = `**Languages & Tools:**  
+<p>
+  <img src="https://img.shields.io/badge/Editor-VSCode-blue?logo=visual-studio-code&logoColor=white" alt="VSCode" />
+  <img src="https://img.shields.io/badge/JS-JavaScript-yellow?logo=javascript&logoColor=white" alt="JS" />
+  <img src="https://img.shields.io/badge/Node.js-339933?logo=node.js&logoColor=white" alt="Node.js" />
+  <img src="https://img.shields.io/badge/Markdown-000000?logo=markdown&logoColor=white" alt="Markdown" />
+</p>`;
+        generatedMarkdown = snippet;
+        document.getElementById('badge-preview').innerHTML = `
+<p>
+  <img src="https://img.shields.io/badge/Editor-VSCode-blue?logo=visual-studio-code&logoColor=white" alt="VSCode" />
+  <img src="https://img.shields.io/badge/JS-JavaScript-yellow?logo=javascript&logoColor=white" alt="JS" />
+  <img src="https://img.shields.io/badge/Node.js-339933?logo=node.js&logoColor=white" alt="Node.js" />
+  <img src="https://img.shields.io/badge/Markdown-000000?logo=markdown&logoColor=white" alt="Markdown" />
+</p>`;
+      }
+      document.getElementById('insert-skills').addEventListener('click', generateSkills);
+
+      // Fun(2)
+      function generateTopLangs() {
+        hideAllPanels();
+        const { username } = getInputs();
+        const snippet = `[![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=${username}&layout=compact)](https://github.com/anuraghazra/github-readme-stats)`;
+        generatedMarkdown = snippet;
+        document.getElementById('badge-preview').innerHTML = `<img src="https://github-readme-stats.vercel.app/api/top-langs/?username=${username}&layout=compact" alt="Top Langs" />`;
+      }
+      function generateDevTo() {
+        hideAllPanels();
+        const { username } = getInputs();
+        const snippet = `[![DEV Badge](https://img.shields.io/badge/DEV-@${username}-black?style=for-the-badge&logo=dev.to)](https://dev.to/${username})`;
+        generatedMarkdown = snippet;
+        document.getElementById('badge-preview').innerHTML = `
+<a href="https://dev.to/${username}" target="_blank">
+  <img src="https://img.shields.io/badge/DEV-@${username}-black?style=for-the-badge&logo=dev.to" alt="dev.to badge" />
+</a>`;
+      }
+      function generateSummaryCard() {
+        hideAllPanels();
+        const { username } = getInputs();
+        const snippet = `[![](http://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=${username}&theme=github)](https://github.com/vn7n24fzkq/github-profile-summary-cards)`;
+        generatedMarkdown = snippet;
+        document.getElementById('badge-preview').innerHTML = `<img src="http://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=${username}&theme=github" alt="Profile Summary Card" />`;
+      }
+      function generateActivityGraph() {
+        hideAllPanels();
+        const { username } = getInputs();
+        const snippet = `[![${username}'s Activity Graph](https://github-readme-activity-graph.vercel.app/graph?username=${username}&theme=github)](https://github.com/${username})`;
+        generatedMarkdown = snippet;
+        document.getElementById('badge-preview').innerHTML = `<img src="https://github-readme-activity-graph.vercel.app/graph?username=${username}&theme=github" alt="Activity Graph" />`;
+      }
+      document.getElementById('insert-toplangs').addEventListener('click', generateTopLangs);
+      document.getElementById('insert-devto').addEventListener('click', generateDevTo);
+      document.getElementById('insert-summary').addEventListener('click', generateSummaryCard);
+      document.getElementById('insert-activity-graph').addEventListener('click', generateActivityGraph);
+
+      // On load
+      (async function init() {
+        // 1) Load icons from icons.json
+        await loadIconsFromJSON();
+
+        // 2) Load GitHub token from settings
+        await loadTokenFromSettings();
+      })();
+    </script>
+  </body>
+</html>

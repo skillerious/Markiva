@@ -1,310 +1,424 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Markiva</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <head>
+    <meta charset="UTF-8" />
+    <title>Markiva</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Google Font -->
-  <link
-    href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap"
-    rel="stylesheet"
-  />
+    <!-- Google Font -->
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap"
+      rel="stylesheet"
+    />
 
-  <!-- Font Awesome for icons -->
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-    crossorigin="anonymous"
-    referrerpolicy="no-referrer"
-  />
+    <!-- Font Awesome for icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
 
-  <!-- CodeMirror core + theme (material-darker) -->
-  <!-- Must load these BEFORE the searchcursor addon -->
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.9/codemirror.min.css"
-  />
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.9/theme/material-darker.min.css"
-  />
+    <!-- CodeMirror core + theme (material-darker) -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.9/codemirror.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.9/theme/material-darker.min.css"
+    />
+    <!-- CodeMirror addons for lint and hint -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.9/addon/lint/lint.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.9/addon/hint/show-hint.css"
+    />
 
-  <!-- Our main style -->
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <div id="app">
-    <!-- Title Bar -->
-    <div id="titlebar">
-      <div class="titlebar-left">
-        <div id="app-logo">M↓</div>
-        <div id="app-title">Markiva</div>
-        <div id="glass-tabs"></div>
-      </div>
+    <!-- Our main style -->
+    <link rel="stylesheet" href="style.css" />
 
-      <!-- Window Controls -->
-      <!-- Editor / Split / Preview buttons, then Min/Max/Close -->
-      <div id="window-controls">
-        <button
-          id="btn-editor-only"
-          class="view-mode-btn"
-          title="Editor Only"
-        >
-          <i class="fas fa-file-code"></i>
-        </button>
-        <button
-          id="btn-split-view"
-          class="view-mode-btn"
-          title="Split View"
-        >
-          <i class="fas fa-columns"></i>
-        </button>
-        <button
-          id="btn-preview-only"
-          class="view-mode-btn"
-          title="Preview Only"
-        >
-          <i class="fas fa-eye"></i>
-        </button>
+    <!-- MathJax configuration & loading -->
+    <script>
+      window.MathJax = {
+        tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+        svg: { fontCache: 'global' }
+      };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 
-        <button id="min-button" title="Minimize">&#8211;</button>
-        <button id="max-button" title="Maximize/Restore">&#9744;</button>
-        <button id="close-button" title="Close">&#10005;</button>
-      </div>
-    </div>
-
-    <!-- Search & Replace Bar (slides from top) -->
-    <div id="search-replace-bar" class="search-replace-bar hidden">
-      <div class="search-replace-content">
-        <label for="search-input">Find:</label>
-        <input type="text" id="search-input" />
-        <label for="replace-input">Replace:</label>
-        <input type="text" id="replace-input" />
-        <!-- Icons for the buttons -->
-        <button id="search-next-btn" title="Next">
-          <i class="fas fa-chevron-down"></i>
-        </button>
-        <button id="search-replace-btn" title="Replace">
-          <i class="fas fa-exchange-alt"></i>
-        </button>
-        <button id="search-replace-all-btn" title="Replace All">
-          <i class="fas fa-sync-alt"></i>
-        </button>
-        <button id="search-close-btn" title="Close">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-    </div>
-
-    <!-- Main Layout: Sidebar + Content -->
-    <div id="main-layout">
-      <!-- Sidebar -->
-      <div id="sidebar">
-        <!-- Top Group: File Tool Buttons -->
-        <div class="sidebar-top">
-          <div class="sidebar-icon file-tool-btn" id="new-file-btn" title="New File">
-            <i class="fas fa-plus"></i>
-          </div>
-          <div class="sidebar-icon file-tool-btn" id="open-file-btn" title="Open File">
-            <i class="fas fa-folder-open"></i>
-          </div>
-          <div class="sidebar-icon file-tool-btn" id="save-file-btn" title="Save">
-            <i class="fas fa-save"></i>
-          </div>
-          <div class="sidebar-icon file-tool-btn" id="rename-file-btn" title="Rename">
-            <i class="fas fa-edit"></i>
-          </div>
-          <div class="sidebar-icon file-tool-btn" id="refresh-files-btn" title="Refresh Files">
-            <i class="fas fa-sync"></i>
-          </div>
-          <div class="sidebar-icon file-tool-btn" id="copy-preview-btn" title="Copy Preview">
-            <i class="fas fa-copy"></i>
-          </div>
+    <!-- Inline CSS for status alignment buttons and GitHub popover -->
+    <style>
+      /* Status Bar Alignment Buttons */
+      #status-align button {
+        background: none;
+        border: none;
+        color: grey;
+        font-size: 16px;
+        cursor: pointer;
+        margin-right: 5px;
+      }
+      #status-align button:hover {
+        color: #05c46b;
+      }
+      /* GitHub Popover Styles */
+      #github-popover {
+        display: none;
+        position: absolute;
+        background: #141f2d;
+        border: 1px solid #333;
+        border-radius: 4px;
+        padding: 10px;
+        z-index: 1000;
+        width: 250px;
+      }
+      #github-popover .popover-content {
+        color: #e2e8f0;
+      }
+      #github-popover h3 {
+        margin-top: 0;
+        font-size: 16px;
+      }
+      #github-popover label {
+        font-size: 12px;
+        display: block;
+        margin-bottom: 5px;
+      }
+      #github-popover input {
+        width: 100%;
+        padding: 4px;
+        margin-bottom: 10px;
+        font-size: 12px;
+      }
+      #github-popover .github-features div {
+        margin-bottom: 5px;
+      }
+      #github-popover .insert-btn {
+        background: #333;
+        color: #e2e8f0;
+        padding: 4px;
+        font-size: 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        display: inline-block;
+      }
+      #github-popover .insert-btn:hover {
+        background: #05c46b;
+      }
+      #github-popover-close {
+        float: right;
+        cursor: pointer;
+        font-size: 16px;
+        color: #e2e8f0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <!-- Title Bar -->
+      <div id="titlebar">
+        <div class="titlebar-left">
+          <div id="app-logo">M↓</div>
+          <div id="app-title">Markiva</div>
+          <div id="glass-tabs"></div>
         </div>
-        <!-- Middle Group: Editor Formatting + Search -->
-        <div class="sidebar-middle">
-          <div class="sidebar-icon format-btn" id="btn-bold" title="Bold">
-            <i class="fas fa-bold"></i>
-          </div>
-          <div class="sidebar-icon format-btn" id="btn-italic" title="Italic">
-            <i class="fas fa-italic"></i>
-          </div>
-          <div class="sidebar-icon format-btn" id="btn-code" title="Code">
-            <i class="fas fa-code"></i>
-          </div>
-          <div class="sidebar-icon format-btn" id="btn-link" title="Link">
-            <i class="fas fa-link"></i>
-          </div>
-          <div class="sidebar-icon format-btn" id="btn-heading" title="Heading">
-            <i class="fas fa-heading"></i>
-          </div>
-          <div class="sidebar-icon format-btn" id="btn-table" title="Table">
-            <i class="fas fa-table"></i>
-          </div>
-          <!-- The Search button triggers our custom search bar -->
-          <div class="sidebar-icon format-btn" id="btn-search" title="Search & Replace">
-            <i class="fas fa-search"></i>
-          </div>
-        </div>
-        <!-- Bottom Group: Settings and About -->
-        <div class="sidebar-bottom">
-          <div class="sidebar-icon" id="settings-btn" title="Settings">
-            <i class="fas fa-cog"></i>
-          </div>
-          <div class="sidebar-icon" id="about-btn" title="About">
-            <i class="fas fa-info-circle"></i>
-          </div>
+        <!-- Window Controls -->
+        <div id="window-controls">
+          <button id="btn-editor-only" class="view-mode-btn" title="Editor Only">
+            <i class="fas fa-file-code"></i>
+          </button>
+          <button id="btn-split-view" class="view-mode-btn" title="Split View">
+            <i class="fas fa-columns"></i>
+          </button>
+          <button id="btn-preview-only" class="view-mode-btn" title="Preview Only">
+            <i class="fas fa-eye"></i>
+          </button>
+          <button id="min-button" title="Minimize">&#8211;</button>
+          <button id="max-button" title="Maximize/Restore">&#9744;</button>
+          <button id="close-button" title="Close">&#10005;</button>
         </div>
       </div>
 
-      <!-- Content Area -->
-      <div id="content-area">
-        <div id="split-pane">
-          <!-- Editor Column -->
-          <div id="editor-container">
-            <div class="editor-header">
-              <h3>Markiva Editor</h3>
+      <!-- Search & Replace Bar (slides from top) -->
+      <div id="search-replace-bar" class="search-replace-bar hidden">
+        <div class="search-replace-content">
+          <label for="search-input">Find:</label>
+          <input type="text" id="search-input" />
+          <label for="replace-input">Replace:</label>
+          <input type="text" id="replace-input" />
+          <button id="search-next-btn" title="Next">
+            <i class="fas fa-chevron-down"></i>
+          </button>
+          <button id="search-replace-btn" title="Replace">
+            <i class="fas fa-exchange-alt"></i>
+          </button>
+          <button id="search-replace-all-btn" title="Replace All">
+            <i class="fas fa-sync-alt"></i>
+          </button>
+          <button id="search-close-btn" title="Close">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Layout -->
+      <div id="main-layout">
+        <!-- Sidebar -->
+        <div id="sidebar">
+          <!-- Top Group: File Tool Buttons -->
+          <div class="sidebar-top">
+            <div class="sidebar-icon file-tool-btn" id="new-file-btn" title="New File">
+              <i class="fas fa-plus"></i>
             </div>
-            <div id="editor-wrapper"></div>
-            <!-- Table Editor Panel -->
-            <div id="table-editor-panel">
-              <h4>Table Editor</h4>
-              <button id="table-add-row">Add Row</button>
-              <button id="table-remove-row">Remove Row</button>
-              <button id="table-add-col">Add Column</button>
-              <button id="table-remove-col">Remove Column</button>
+            <div class="sidebar-icon file-tool-btn" id="open-file-btn" title="Open File">
+              <i class="fas fa-folder-open"></i>
+            </div>
+            <div class="sidebar-icon file-tool-btn" id="save-file-btn" title="Save">
+              <i class="fas fa-save"></i>
+            </div>
+            <div class="sidebar-icon file-tool-btn" id="rename-file-btn" title="Rename">
+              <i class="fas fa-edit"></i>
+            </div>
+            <div class="sidebar-icon file-tool-btn" id="refresh-files-btn" title="Refresh Files">
+              <i class="fas fa-sync"></i>
+            </div>
+            <div class="sidebar-icon file-tool-btn" id="copy-preview-btn" title="Copy Preview">
+              <i class="fas fa-copy"></i>
             </div>
           </div>
-
-          <!-- Preview Column -->
-          <div id="preview-container">
-            <div class="preview-header">
-              <div class="preview-tab active">Preview</div>
+          <!-- Middle Group: Editor Formatting + Search -->
+          <div class="sidebar-middle">
+            <div class="sidebar-icon format-btn" id="btn-bold" title="Bold">
+              <i class="fas fa-bold"></i>
             </div>
-            <div id="preview-content"></div>
+            <div class="sidebar-icon format-btn" id="btn-italic" title="Italic">
+              <i class="fas fa-italic"></i>
+            </div>
+            <div class="sidebar-icon format-btn" id="btn-code" title="Code">
+              <i class="fas fa-code"></i>
+            </div>
+            <div class="sidebar-icon format-btn" id="btn-link" title="Link">
+              <i class="fas fa-link"></i>
+            </div>
+            <div class="sidebar-icon format-btn" id="btn-heading" title="Heading">
+              <i class="fas fa-heading"></i>
+            </div>
+            <div class="sidebar-icon format-btn" id="btn-table" title="Table">
+              <i class="fas fa-table"></i>
+            </div>
+            <!-- New button for Image & Media Insertion Wizard -->
+            <div class="sidebar-icon format-btn" id="btn-media" title="Insert Image/Media">
+              <i class="fas fa-image"></i>
+            </div>
+            <!-- Search Button -->
+            <div class="sidebar-icon format-btn" id="btn-search" title="Search & Replace">
+              <i class="fas fa-search"></i>
+            </div>
           </div>
+          <!-- Bottom Group: Settings and About -->
+          <div class="sidebar-bottom">
+            <div class="sidebar-icon" id="settings-btn" title="Settings">
+              <i class="fas fa-cog"></i>
+            </div>
+            <div class="sidebar-icon" id="about-btn" title="About">
+              <i class="fas fa-info-circle"></i>
+            </div>
+          </div>
+        </div>
 
-          <!-- Notes + File Browser Column -->
-          <div id="notes-container">
-            <div id="notes-panel">
-              <!-- Notes Section -->
-              <div class="notes-section">
-                <div class="notes-header">
-                  <h3>Notes</h3>
-                </div>
-                <div class="notes-editor">
-                  <input type="text" id="new-note-input" placeholder="Enter a new note..." />
-                  <button id="add-note-button">
-                    <i class="fas fa-plus"></i>
-                  </button>
-                </div>
-                <ul id="notes-list"></ul>
+        <!-- Content Area -->
+        <div id="content-area">
+          <div id="split-pane">
+            <!-- Editor Column -->
+            <div id="editor-container">
+              <div class="editor-header">
+                <h3>Markiva Editor</h3>
               </div>
-              <!-- Draggable Splitter -->
-              <div id="notes-splitter"><i class="fas fa-grip-lines"></i></div>
-              <!-- File Browser Section -->
-              <div class="file-browser-section">
-                <div id="file-browser-header">
-                  <h4>Project Files</h4>
-                  <input type="text" id="file-search" placeholder="Search files..." />
+              <div id="editor-wrapper"></div>
+              <!-- Table Editor Panel -->
+              <div id="table-editor-panel">
+                <h4>Table Editor</h4>
+                <button id="table-add-row">Add Row</button>
+                <button id="table-remove-row">Remove Row</button>
+                <button id="table-add-col">Add Column</button>
+                <button id="table-remove-col">Remove Column</button>
+              </div>
+            </div>
+
+            <!-- Preview Column -->
+            <div id="preview-container">
+              <div class="preview-header">
+                <div class="preview-tab active">Preview</div>
+              </div>
+              <div id="preview-content"></div>
+            </div>
+
+            <!-- Notes & File Browser Column -->
+            <div id="notes-container">
+              <div id="notes-panel">
+                <!-- Notes Section -->
+                <div class="notes-section">
+                  <div class="notes-header">
+                    <h3>Notes</h3>
+                  </div>
+                  <div class="notes-editor">
+                    <input type="text" id="new-note-input" placeholder="Enter a new note..." />
+                    <button id="add-note-button">
+                      <i class="fas fa-plus"></i>
+                    </button>
+                  </div>
+                  <ul id="notes-list"></ul>
                 </div>
-                <ul id="file-list"></ul>
+                <!-- File Browser Section (half height) -->
+                <div class="file-browser-section">
+                  <div class="notes-header" id="file-browser-header">
+                    <h3>Project Files</h3>
+                  </div>
+                  <div class="file-search-editor">
+                    <input type="text" id="file-search" placeholder="Search files..." />
+                    <button id="file-search-btn">
+                      <i class="fas fa-search"></i>
+                    </button>
+                  </div>
+                  <ul id="file-list"></ul>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Status Bar -->
-    <div id="status-bar">
-      <span id="version-status">V3</span>
-      <div id="status-info">
-        <span id="word-count">Words: 0</span>
-        <span id="read-time">Read Time: 0 min</span>
+      <!-- Status Bar -->
+      <div id="status-bar">
+        <div id="status-align">
+          <button id="align-left" title="Align Left"><i class="fas fa-align-left"></i></button>
+          <button id="align-center" title="Align Center"><i class="fas fa-align-center"></i></button>
+          <button id="align-right" title="Align Right"><i class="fas fa-align-right"></i></button>
+          <button id="github-menu" title="GitHub Markdown Features"><i class="fab fa-github"></i></button>
+        </div>
+        <div id="status-info">
+          <span id="word-count">Words: 0</span>
+          <span id="read-time">Read Time: 0 min</span>
+        </div>
+      </div>
+
+      <!-- GitHub Popover -->
+      <div id="github-popover" class="custom-popover">
+        <div class="popover-content">
+          <span id="github-popover-close">&times;</span>
+          <h3>GitHub Markdown</h3>
+          <label for="github-username">GitHub Username:</label>
+          <input type="text" id="github-username" placeholder="Enter GitHub username" />
+          <div class="github-features">
+            <div data-feature="release">
+              <span class="insert-btn">Insert Release Badge</span>
+            </div>
+            <div data-feature="stars">
+              <span class="insert-btn">Insert Stars Badge</span>
+            </div>
+            <div data-feature="issues">
+              <span class="insert-btn">Insert Issues Badge</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Custom Prompt Modal -->
+      <div id="custom-prompt" class="custom-prompt">
+        <div class="prompt-content">
+          <div class="prompt-message"></div>
+          <input type="text" id="prompt-input" />
+          <div class="prompt-buttons">
+            <button id="prompt-ok">OK</button>
+            <button id="prompt-cancel">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Link Dialog -->
+      <div id="link-dialog" class="custom-prompt">
+        <div class="prompt-content">
+          <h2>Add Link</h2>
+          <label>Link Text:</label>
+          <input type="text" id="link-text" />
+          <label>Link URL:</label>
+          <input type="text" id="link-url" value="https://" />
+          <div class="prompt-buttons">
+            <button id="link-ok">OK</button>
+            <button id="link-cancel">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table Dialog -->
+      <div id="table-dialog" class="custom-prompt">
+        <div class="prompt-content">
+          <h2>Insert Table</h2>
+          <label>Rows:</label>
+          <input type="number" id="table-rows" value="3" min="1" />
+          <label>Columns:</label>
+          <input type="number" id="table-cols" value="3" min="1" />
+          <div>
+            <input type="checkbox" id="table-header" checked />
+            <label for="table-header">Include Header Row</label>
+          </div>
+          <div class="prompt-buttons">
+            <button id="table-ok">OK</button>
+            <button id="table-cancel">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Image & Media Insertion Wizard -->
+      <div id="media-dialog" class="custom-prompt">
+        <div class="prompt-content">
+          <h2>Insert Image/Media</h2>
+          <label>Alt Text:</label>
+          <input type="text" id="media-alt" placeholder="Image description" />
+          <label>URL or File Path:</label>
+          <input type="text" id="media-url" value="https://" />
+          <div class="prompt-buttons">
+            <button id="media-ok">Insert</button>
+            <button id="media-cancel">Cancel</button>
+            <button id="media-browse">Browse...</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Save Changes Dialog -->
+      <div id="save-changes-dialog" class="custom-prompt">
+        <div class="prompt-content">
+          <div class="prompt-message">
+            <p id="save-changes-filename" style="font-weight: bold;"></p>
+            <p>Do you want to save your changes before closing?</p>
+          </div>
+          <div class="prompt-buttons">
+            <button id="save-changes-save-btn">Save</button>
+            <button id="save-changes-dontsave-btn">Don't Save</button>
+            <button id="save-changes-cancel-btn">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Context Menu for Project Files -->
+      <div id="file-context-menu" class="context-menu">
+        <ul>
+          <li data-action="open">Open</li>
+          <li data-action="rename">Rename</li>
+          <li data-action="delete">Delete</li>
+        </ul>
       </div>
     </div>
 
-    <!-- Custom Prompt Modal -->
-    <div id="custom-prompt" class="custom-prompt">
-      <div class="prompt-content">
-        <div class="prompt-message"></div>
-        <input type="text" id="prompt-input" />
-        <div class="prompt-buttons">
-          <button id="prompt-ok">OK</button>
-          <button id="prompt-cancel">Cancel</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Link Dialog -->
-    <div id="link-dialog" class="custom-prompt">
-      <div class="prompt-content">
-        <h2>Add Link</h2>
-        <label>Link Text:</label>
-        <input type="text" id="link-text" />
-        <label>Link URL:</label>
-        <input type="text" id="link-url" value="https://" />
-        <div class="prompt-buttons">
-          <button id="link-ok">OK</button>
-          <button id="link-cancel">Cancel</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Table Dialog -->
-    <div id="table-dialog" class="custom-prompt">
-      <div class="prompt-content">
-        <h2>Insert Table</h2>
-        <label>Rows:</label>
-        <input type="number" id="table-rows" value="3" min="1" />
-        <label>Columns:</label>
-        <input type="number" id="table-cols" value="3" min="1" />
-        <div>
-          <input type="checkbox" id="table-header" checked />
-          <label for="table-header">Include Header Row</label>
-        </div>
-        <div class="prompt-buttons">
-          <button id="table-ok">OK</button>
-          <button id="table-cancel">Cancel</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Save Changes Dialog (3-button) -->
-    <div id="save-changes-dialog" class="custom-prompt">
-      <div class="prompt-content">
-        <div class="prompt-message">
-          <p id="save-changes-filename" style="font-weight: bold;"></p>
-          <p>Do you want to save your changes before closing?</p>
-        </div>
-        <div class="prompt-buttons">
-          <button id="save-changes-save-btn">Save</button>
-          <button id="save-changes-dontsave-btn">Don't Save</button>
-          <button id="save-changes-cancel-btn">Cancel</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Context Menu for Project Files -->
-    <div id="file-context-menu" class="context-menu">
-      <ul>
-        <li data-action="open">Open</li>
-        <li data-action="rename">Rename</li>
-        <li data-action="delete">Delete</li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- Scripts: Load CodeMirror first, then searchcursor, then our code -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.9/codemirror.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.9/mode/markdown/markdown.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.9/addon/edit/continuelist.min.js"></script>
-  <!-- Must load AFTER codemirror is defined -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.9/addon/search/searchcursor.min.js"></script>
-
-  <!-- Our main app logic (with custom search, context menu, load last file) -->
-  <script src="renderer.js"></script>
-</body>
+    <!-- Scripts: Load CodeMirror first, then addons -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.9/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.9/mode/markdown/markdown.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.9/addon/edit/continuelist.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.9/addon/search/searchcursor.min.js"></script>
+    <!-- Our main app logic -->
+    <script src="renderer.js"></script>
+  </body>
 </html>

@@ -1,0 +1,1953 @@
+[
+    {
+      "name": "aws-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/AWS-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "aws-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/AWS-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "ableton-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Ableton-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "ableton-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Ableton-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "activitypub-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/ActivityPub-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "activitypub-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/ActivityPub-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "actix-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Actix-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "actix-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Actix-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "adonis",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Adonis.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "aftereffects",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/AfterEffects.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "aiscript-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/AiScript-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "aiscript-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/AiScript-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "alpinejs-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/AlpineJS-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "alpinejs-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/AlpineJS-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "anaconda-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Anaconda-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "anaconda-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Anaconda-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "androidstudio-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/AndroidStudio-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "androidstudio-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/AndroidStudio-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "angular-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Angular-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "angular-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Angular-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "ansible",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Ansible.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "apollo",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Apollo.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "apple-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Apple-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "apple-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Apple-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "appwrite",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Appwrite.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "arch-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Arch-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "arch-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Arch-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "arduino",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Arduino.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "astro",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Astro.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "atom",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Atom.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "audition",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Audition.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "autocad-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/AutoCAD-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "autocad-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/AutoCAD-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "azul",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Azul.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "azure-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Azure-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "azure-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Azure-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "bsd-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/BSD-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "bsd-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/BSD-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "babel",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Babel.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "bash-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Bash-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "bash-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Bash-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "bevy-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Bevy-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "bevy-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Bevy-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "bitbucket-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/BitBucket-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "bitbucket-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/BitBucket-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "blender-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Blender-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "blender-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Blender-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "bootstrap",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Bootstrap.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "bun-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Bun-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "bun-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Bun-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "c",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/C.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "clion-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/CLion-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "clion-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/CLion-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "cmake-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/CMake-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "cmake-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/CMake-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "cpp",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/CPP.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "cs",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/CS.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "css",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/CSS.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "cassandra-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Cassandra-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "cassandra-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Cassandra-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "clojure-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Clojure-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "clojure-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Clojure-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "cloudflare-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Cloudflare-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "cloudflare-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Cloudflare-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "codepen-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/CodePen-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "codepen-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/CodePen-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "coffeescript-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/CoffeeScript-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "coffeescript-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/CoffeeScript-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "crystal-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Crystal-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "crystal-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Crystal-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "cypress-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Cypress-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "cypress-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Cypress-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "d3-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/D3-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "d3-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/D3-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "dart-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Dart-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "dart-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Dart-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "debian-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Debian-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "debian-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Debian-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "deno-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/DENO-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "deno-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/DENO-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "devto-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/DevTo-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "devto-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/DevTo-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "discord",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Discord.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "bots",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/DiscordBots.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "discordjs-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/DiscordJS-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "discordjs-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/DiscordJS-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "django",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Django.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "docker",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Docker.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "dotnet",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/DotNet.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "dynamodb-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/DynamoDB-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "dynamodb-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/DynamoDB-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "eclipse-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Eclipse-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "eclipse-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Eclipse-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "elasticsearch-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Elasticsearch-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "elasticsearch-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Elasticsearch-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "electron",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Electron.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "elixir-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Elixir-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "elixir-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Elixir-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "elysia-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Elysia-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "elysia-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Elysia-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "emacs",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Emacs.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "ember",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Ember.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "emotion-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Emotion-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "emotion-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Emotion-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "expressjs-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/ExpressJS-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "expressjs-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/ExpressJS-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "fastapi",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/FastAPI.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "fediverse-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Fediverse-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "fediverse-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Fediverse-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "figma-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Figma-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "figma-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Figma-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "firebase-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Firebase-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "firebase-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Firebase-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "flask-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Flask-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "flask-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Flask-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "flutter-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Flutter-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "flutter-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Flutter-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "forth",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Forth.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "fortran",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Fortran.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "gamemakerstudio",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/GameMakerStudio.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "gatsby",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Gatsby.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "gcp-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/GCP-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "gcp-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/GCP-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "git",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Git.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "github-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Github-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "github-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Github-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "githubactions-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/GithubActions-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "githubactions-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/GithubActions-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "gitlab-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/GitLab-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "gitlab-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/GitLab-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "gmail-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Gmail-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "gmail-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Gmail-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "gherkin-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Gherkin-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "gherkin-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Gherkin-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "go",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/GoLang.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "godot-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Godot-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "godot-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Godot-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "gradle-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Gradle-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "gradle-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Gradle-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "grafana-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Grafana-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "grafana-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Grafana-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "graphql-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/GraphQL-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "graphql-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/GraphQL-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "gtk-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/GTK-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "gtk-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/GTK-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "gulp",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Gulp.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "html",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/HTML.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "haskell-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Haskell-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "haskell-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Haskell-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "haxe-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Haxe-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "haxe-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Haxe-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "haxeflixel-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/HaxeFlixel-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "haxeflixel-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/HaxeFlixel-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "heroku",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Heroku.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "hibernate-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Hibernate-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "hibernate-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Hibernate-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "htmx-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Htmx-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "htmx-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Htmx-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "ipfs-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/IPFS-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "ipfs-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/IPFS-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "idea-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Idea-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "idea-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Idea-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "illustrator",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Illustrator.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "instagram",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Instagram.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "java-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Java-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "java-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Java-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "js",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/JavaScript.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "jenkins-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Jenkins-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "jenkins-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Jenkins-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "jest",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Jest.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "jquery",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/JQuery.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "kafka",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Kafka.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "kali-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Kali-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "kali-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Kali-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "kotlin-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Kotlin-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "kotlin-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Kotlin-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "ktor-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Ktor-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "ktor-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Ktor-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "kubernetes",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Kubernetes.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "laravel-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Laravel-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "laravel-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Laravel-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "latex-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/LaTeX-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "latex-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/LaTeX-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "less-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Less-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "less-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Less-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "linkedin",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/LinkedIn.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "linux-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Linux-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "linux-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Linux-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "lit-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Lit-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "lit-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Lit-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "lua-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Lua-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "lua-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Lua-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "markdown-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Markdown-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "markdown-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Markdown-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "mastodon-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Mastodon-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "mastodon-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Mastodon-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "materialui-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/MaterialUI-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "materialui-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/MaterialUI-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "matlab-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Matlab-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "matlab-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Matlab-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "maven-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Maven-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "maven-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Maven-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "mint-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Mint-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "mint-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Mint-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "misskey-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Misskey-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "misskey-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Misskey-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "mongodb",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/MongoDB.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "mysql-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/MySQL-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "mysql-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/MySQL-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "neovim-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/NeoVim-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "neovim-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/NeoVim-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "nestjs-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/NestJS-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "nestjs-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/NestJS-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "netlify-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Netlify-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "netlify-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Netlify-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "nextjs-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/NextJS-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "nextjs-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/NextJS-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "nginx",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/NGINX.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "nim-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Nim-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "nim-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Nim-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "nix-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Nix-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "nix-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Nix-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "nodejs-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/NodeJS-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "nodejs-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/NodeJS-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "notion-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Notion-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "notion-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Notion-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "npm-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Npm-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "npm-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Npm-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "nuxtjs-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/NuxtJS-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "nuxtjs-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/NuxtJS-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "ocaml",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/OCaml.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "obsidian-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Obsidian-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "obsidian-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Obsidian-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "octave-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Octave-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "octave-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Octave-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "opencv-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/OpenCV-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "opencv-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/OpenCV-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "openshift",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/OpenShift.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "openstack-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/OpenStack-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "openstack-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/OpenStack-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "php-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/PHP-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "php-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/PHP-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "perl",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Perl.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "photoshop",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Photoshop.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "phpstorm-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/PhpStorm-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "phpstorm-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/PhpStorm-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "pinia-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Pinia-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "pinia-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Pinia-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "pkl-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Pkl-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "pkl-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Pkl-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "plan9-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Plan9-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "plan9-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Plan9-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "planetscale-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/PlanetScale-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "planetscale-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/PlanetScale-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "pnpm-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Pnpm-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "pnpm-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Pnpm-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "postgresql-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/PostgreSQL-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "postgresql-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/PostgreSQL-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "postman",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Postman.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "powershell-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/PowerShell-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "powershell-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/PowerShell-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "premiere",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Premiere.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "prisma",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Prisma.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "processing-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Processing-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "processing-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Processing-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "prometheus",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Prometheus.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "pug-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Pug-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "pug-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Pug-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "pycharm-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/PyCharm-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "pycharm-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/PyCharm-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "pytorch-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/PyTorch-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "pytorch-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/PyTorch-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "python-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Python-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "python-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Python-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "qt-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/QT-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "qt-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/QT-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "r-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/R-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "r-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/R-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "ros-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/ROS-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "ros-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/ROS-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "rabbitmq-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/RabbitMQ-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "rabbitmq-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/RabbitMQ-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "rails",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Rails.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "raspberrypi-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/RaspberryPi-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "raspberrypi-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/RaspberryPi-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "react-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/React-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "react-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/React-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "reactivex-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/ReactiveX-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "reactivex-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/ReactiveX-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "redhat-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/RedHat-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "redhat-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/RedHat-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "redis-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Redis-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "redis-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Redis-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "redux",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Redux.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "regex-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Regex-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "regex-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Regex-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "remix-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Remix-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "remix-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Remix-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "replit-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Replit-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "replit-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Replit-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "rider-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Rider-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "rider-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Rider-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "robloxstudio",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/RobloxStudio.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "rocket",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Rocket.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "rollupjs-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/RollupJS-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "rollupjs-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/RollupJS-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "ruby",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Ruby.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "rust",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Rust.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "sqlite",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/SQLite.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "svg-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/SVG-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "svg-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/SVG-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "sass",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Sass.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "scala-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Scala-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "scala-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Scala-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "scikitlearn-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/ScikitLearn-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "scikitlearn-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/SciKitLearn-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "selenium",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Selenium.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "sentry",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Sentry.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "sequelize-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Sequelize-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "sequelize-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Sequelize-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "sketchup-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Sketchup-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "sketchup-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Sketchup-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "solidjs-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/SolidJS-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "solidjs-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/SolidJS-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "solidity",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Solidity.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "spring-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Spring-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "spring-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Spring-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "stackoverflow-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/StackOverflow-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "stackoverflow-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/StackOverflow-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "styledcomponents",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/StyledComponents.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "sublime-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Sublime-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "sublime-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Sublime-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "supabase-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Supabase-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "supabase-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Supabase-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "svelte",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Svelte.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "swift",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Swift.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "symfony-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Symfony-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "symfony-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Symfony-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "tailwindcss-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/TailwindCSS-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "tailwindcss-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/TailwindCSS-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "tauri-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Tauri-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "tauri-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Tauri-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "tensorflow-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/TensorFlow-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "tensorflow-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/TensorFlow-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "terraform-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Terraform-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "terraform-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Terraform-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "threejs-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/ThreeJS-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "threejs-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/ThreeJS-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "twitter",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Twitter.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "typescript",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/TypeScript.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "ubuntu-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Ubuntu-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "ubuntu-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Ubuntu-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "unity-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Unity-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "unity-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Unity-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "unrealengine",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/UnrealEngine.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "v-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/V-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "v-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/V-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "vim-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/VIM-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "vim-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/VIM-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "visualstudio-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/VisualStudio-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "visualstudio-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/VisualStudio-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "vite-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Vite-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "vite-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Vite-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "vitest-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Vitest-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "vitest-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Vitest-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "vuejs-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/VueJS-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "vuejs-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/VueJS-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "vuetify-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Vuetify-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "vuetify-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Vuetify-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "webassembly",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/WebAssembly.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "webstorm-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/WebStorm-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "webstorm-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/WebStorm-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "webflow",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Webflow.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "webpack-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Webpack-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "webpack-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Webpack-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "windicss-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/WindiCSS-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "windicss-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/WindiCSS-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "windows-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Windows-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "windows-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Windows-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "wordpress",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Wordpress.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "workers-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Workers-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "workers-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Workers-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "xd",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/XD.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "yarn-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Yarn-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "yarn-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Yarn-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "yew-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Yew-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "yew-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Yew-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "zig-dark",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Zig-Dark.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "zig-light",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/Zig-Light.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    },
+    {
+      "name": "p5js",
+      "url": "https://raw.githubusercontent.com/tandpfun/skill-icons/main/icons/p5js.svg",
+      "link": "https://github.com/tandpfun/skill-icons"
+    }
+  ]
+  
