@@ -15,6 +15,9 @@
   <a href="https://github.com/skillerious/Markiva/issues">
     <img src="https://img.shields.io/github/issues/skillerious/Markiva?style=for-the-badge" />
   </a>
+  <a href="https://github.com/skillerious/Markiva/graphs/contributors">
+    <img src="https://img.shields.io/github/contributors/skillerious/Markiva?style=for-the-badge" />
+  </a>
 </p>
 
 ---
@@ -29,21 +32,21 @@ We are thrilled to announce a **major** transformation of Markiva. Formerly buil
 
 ## 🔥 Key Features at a Glance
 
-- ⚡ **Multi-tab Interface**  
-- 📝 **Live Markdown Preview**  
-- 🧠 **Persistent Notes Sidebar**  
-- 📚 **Smart File Explorer**  
-- 💡 **Floating Find & Replace Toolbar**  
-- 🎛 **Settings Modal with Auto Save**  
-- 🪟 **Custom Layout Modes (Editor / Split / Preview)**  
-- 📷 **Dark Mode + Sleek UI + Iconic Controls**  
-- 🧩 **Drag & Drop Markdown File Support**  
-- 🧮 **Word Count & Read Time Tracking**  
-- ✅ **Unsaved Changes Detection + Save Prompt**  
-- 🗑️ **Contextual Menu for Files (Rename/Delete)**  
-- 💾 **Remembers Last Opened File on Launch**  
-- 🧲 **Text Alignment Toolbar (Left, Center, Right)**  
-- 🌐 **Dynamic GitHub Icon System via JSON (icons.json)**
+- ⚡ **Multi-tab Interface**
+- 📝 **Live Markdown Preview**
+- 🧠 **Persistent Notes Sidebar**
+- 📚 **Smart File Explorer**
+- 💡 **Floating Find & Replace Toolbar**
+- 🎛 **Settings Modal with Auto Save**
+- 🪟 **Custom Layout Modes (Editor / Split / Preview)**
+- 🖼️ **Text Alignment Options (Left, Center, Right)**
+- 📷 **Dark Mode + Sleek UI + Iconic Controls**
+- 🧩 **Drag & Drop Markdown File Support**
+- 🧮 **Word Count & Read Time Tracking**
+- ✅ **Unsaved Changes Detection + Save Prompt**
+- 🗑️ **Contextual Menu for Files (Rename/Delete)**
+- 💾 **Remembers Last Opened File on Launch**
+- 🐙 **Integrated GitHub Icon Browser for UI Customization**
 
 ---
 
@@ -87,7 +90,7 @@ npm start
 
 ---
 
-## 📘 Features in Detail
+## 🧠 Features in Detail
 
 ### 🧩 Markdown Goodness
 - Bold / Italic / Headings / Code / Link support
@@ -99,8 +102,8 @@ npm start
 ### 🎨 Layout Modes
 - **Editor Only**
 - **Split Mode (Editor + Preview)**
-- **Preview Only**  
-Easily switch via title bar icons (à la VSCode style).
+- **Preview Only**
+- **Text Alignment Controls** — Align content left, center, or right via intuitive buttons
 
 ### 🧠 Notes Panel
 - Persistent session-based notes
@@ -115,16 +118,6 @@ Easily switch via title bar icons (à la VSCode style).
 - Live search
 - Rename, delete files
 - Remembers last opened file
-
-### 🧲 Alignment Toolbar
-- Left-align, center-align, right-align buttons
-- Live toggle and markdown rendering support
-- Seamlessly works across layout modes
-
-### 🌐 GitHub Icons Integration
-- Icon bar now dynamically powered by `icons.json`
-- Cleaner organization and easy updates
-- No more inline clutter
 
 ---
 
@@ -148,9 +141,23 @@ Easily switch via title bar icons (à la VSCode style).
 
 ---
 
+## 🐙 GitHub Features
+
+- GitHub-powered **icon browser** for customizing your workspace using `icons.json`
+- GitHub Actions integration for builds & CI
+- Shields.io badges for dynamic repo metrics
+- Contributor graph for recognizing community support
+- Issue & pull request tracking directly in the UI (coming soon!)
+
+---
+
 ## 🤝 Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you'd like to change.
+
+### 📦 Suggestions & Feedback
+
+Open an [issue](https://github.com/skillerious/Markiva/issues) or start a [discussion](https://github.com/skillerious/Markiva/discussions) — we'd love to hear from you!
 
 ---
 
@@ -162,4 +169,4 @@ This project is licensed under the [MIT License](LICENSE).
 
 <p align="center">
   <strong>Built with ❤️ by Robin Doak</strong>
-</p> 
+</p>
