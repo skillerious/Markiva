@@ -41,7 +41,9 @@ We are thrilled to announce a **major** transformation of Markiva. Formerly buil
 - 🧮 **Word Count & Read Time Tracking**  
 - ✅ **Unsaved Changes Detection + Save Prompt**  
 - 🗑️ **Contextual Menu for Files (Rename/Delete)**  
-- 💾 **Remembers Last Opened File on Launch**
+- 💾 **Remembers Last Opened File on Launch**  
+- 🧲 **Text Alignment Toolbar (Left, Center, Right)**  
+- 🌐 **Dynamic GitHub Icon System via JSON (icons.json)**
 
 ---
 
@@ -114,6 +116,16 @@ Easily switch via title bar icons (à la VSCode style).
 - Rename, delete files
 - Remembers last opened file
 
+### 🧲 Alignment Toolbar
+- Left-align, center-align, right-align buttons
+- Live toggle and markdown rendering support
+- Seamlessly works across layout modes
+
+### 🌐 GitHub Icons Integration
+- Icon bar now dynamically powered by `icons.json`
+- Cleaner organization and easy updates
+- No more inline clutter
+
 ---
 
 ## 🤖 Keyboard Shortcuts
@@ -150,4 +162,4 @@ This project is licensed under the [MIT License](LICENSE).
 
 <p align="center">
   <strong>Built with ❤️ by Robin Doak</strong>
-</p>
+</p> 
