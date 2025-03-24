@@ -52,13 +52,13 @@ We are thrilled to announce a **major** transformation of Markiva. Formerly buil
 
 ## 🖼️ Screenshots
 
-| Main UI | Settings | Find & Replace |
+| Main UI | Editor | Preview |
 |--------|----------|----------------|
-| ![Main](https://github.com/skillerious/Markiva/blob/main/screenshots/Screenshot%202025-03-22%20201331.png) | ![Settings](https://github.com/skillerious/Markiva/blob/main/screenshots/Screenshot%202025-03-22%20201343.png) | ![Find](https://github.com/skillerious/Markiva/blob/main/screenshots/Screenshot%202025-03-22%20201355.png) |
+| ![Main](https://github.com/skillerious/Markiva/blob/main/screenshots/MarkivaHome.png) | ![Editor](https://github.com/skillerious/Markiva/blob/main/screenshots/MarkivaEditor.png) | ![Preview](https://github.com/skillerious/Markiva/blob/main/screenshots/MarkivaPreview.png) |
 
-| Layout Switch | Notes Panel |
+| GitHub | Notes Panel |
 |---------------|-------------|
-| ![Layout](https://github.com/skillerious/Markiva/blob/main/screenshots/Screenshot%202025-03-22%20201404.png) | ![Notes](https://github.com/skillerious/Markiva/blob/main/screenshots/Screenshot%202025-03-22%20201435.png) |
+| ![Github](https://github.com/skillerious/Markiva/blob/main/screenshots/MarkivaGitHub.png) | ![Notes](https://github.com/skillerious/Markiva/blob/main/screenshots/Screenshot%202025-03-22%20201435.png) |
 
 ---
 
