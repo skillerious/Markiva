@@ -66,7 +66,7 @@ We are thrilled to announce a **major** transformation of Markiva. Formerly buil
 
 ### 📦 From Releases
 
-Head over to [**Markiva Releases**](https://github.com/skillerious/Markiva/releases/tag/MarkivaV3) and download the prebuilt binary for your OS.
+Head over to [**Markiva Releases**](https://github.com/skillerious/Markiva/releases/tag/MarkivaV3.1.0) and download the prebuilt binary for your OS.
 
 ---
 
