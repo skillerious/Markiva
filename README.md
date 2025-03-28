@@ -6,7 +6,7 @@
 <p align="center"><i>A Beautifully Crafted Markdown Editor for Creators, Developers & Writers</i></p>
 
 <p align="center">
-  <a href="https://github.com/skillerious/Markiva/releases/tag/MarkivaV3">
+  <a href="https://github.com/skillerious/Markiva/releases/tag/MarkivaV3.1.0">
     <img src="https://img.shields.io/github/v/release/skillerious/Markiva?label=Release&color=green&style=for-the-badge" />
   </a>
   <a href="https://github.com/skillerious/Markiva">
