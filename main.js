@@ -9,7 +9,7 @@ let mainWindow = null;
 let aboutWindow = null;
 let splashWindow = null;
 let settingsWindow = null;
-let githubWindow = null; // Added for GitHub modal
+let githubWindow = null; // For GitHub modal
 
 /**
  * Utility: get the path to settings.json in userData
@@ -153,7 +153,7 @@ ipcMain.handle('get-user-data-path', () => {
 });
 
 /**
- * Open about.html in a frameless window with no flicker
+ * Open about.html in a frameless window
  */
 ipcMain.handle('open-about-window', () => {
   if (aboutWindow) {
@@ -161,13 +161,13 @@ ipcMain.handle('open-about-window', () => {
     return;
   }
   aboutWindow = new BrowserWindow({
-    width: 600,
-    height: 550,
+    width: 540,
+    height: 700,
     resizable: false,
     frame: false,
     transparent: false,
     alwaysOnTop: true,
-    show: false, // hide until ready
+    show: false, 
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false
@@ -238,8 +238,6 @@ ipcMain.handle('save-app-settings', (event, newSettings) => {
 
 /**
  * IPC handler for GitHub modal.
- * Opens a modal window to load github.html with GitHub markdown features,
- * with "show: false" and a dark background to minimize flicker.
  */
 ipcMain.handle('open-github-window', () => {
   if (githubWindow) {
@@ -252,8 +250,8 @@ ipcMain.handle('open-github-window', () => {
     modal: true,
     parent: mainWindow,
     frame: false,
-    show: false, // Hide initially
-    backgroundColor: '#0f1722', // Dark background to reduce white flicker
+    show: false,
+    backgroundColor: '#0f1722',
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false
@@ -261,24 +259,113 @@ ipcMain.handle('open-github-window', () => {
   });
 
   githubWindow.loadFile('github.html');
-
-  // Show once ready, minimizing flicker
   githubWindow.once('ready-to-show', () => {
     githubWindow.show();
   });
-
   githubWindow.on('closed', () => {
     githubWindow = null;
   });
 });
 
-/**
- * IPC handler for inserting GitHub markdown.
- * Receives markdown from the GitHub modal and sends it to the main window.
- */
 ipcMain.on('insert-markdown', (event, markdown) => {
   if (mainWindow && mainWindow.webContents) {
     mainWindow.webContents.send('insert-github-markdown', markdown);
+  }
+});
+
+/**
+ * Example: print-document
+ */
+ipcMain.handle('print-document', async () => {
+  if (!mainWindow) {
+    return 'no-main-window';
+  }
+  try {
+    mainWindow.webContents.print({ silent: false, printBackground: true });
+    return 'ok';
+  } catch (err) {
+    console.error('[MAIN] print-document error:', err);
+    return `error: ${err.message}`;
+  }
+});
+
+/**
+ * Export PDF:
+ * 1) Show a "Save As" dialog for the user to pick a path
+ * 2) Create a hidden window
+ * 3) Load the provided "renderedHTML" into that window
+ * 4) printToPDF
+ * 5) Write the PDF to the chosen path
+ */
+ipcMain.handle('export-pdf', async (event, renderedHTML) => {
+  try {
+    const { canceled, filePath } = await dialog.showSaveDialog({
+      title: 'Save PDF',
+      buttonLabel: 'Export',
+      filters: [{ name: 'PDF Files', extensions: ['pdf'] }]
+    });
+    if (canceled || !filePath) {
+      return 'error: user canceled save dialog';
+    }
+    const hiddenWin = new BrowserWindow({
+      show: false,
+      webPreferences: {
+        nodeIntegration: true,
+        contextIsolation: false
+      }
+    });
+    const dataURL = 'data:text/html;charset=utf-8,' + encodeURIComponent(renderedHTML);
+    await hiddenWin.loadURL(dataURL);
+    const pdfData = await hiddenWin.webContents.printToPDF({
+      marginsType: 0,
+      pageSize: 'A4',
+      printBackground: true,
+      landscape: false
+    });
+    fs.writeFileSync(filePath, pdfData);
+    hiddenWin.close();
+    console.log('[MAIN] PDF exported to =>', filePath);
+    return 'ok';
+  } catch (err) {
+    console.error('[MAIN] export-pdf error:', err);
+    return `error: ${err.message}`;
+  }
+});
+
+/**
+ * Spellcheck toggle
+ */
+ipcMain.handle('toggle-spellcheck', () => {
+  try {
+    const current = loadAppSettings();
+    const newVal = !current.spellCheck;
+    current.spellCheck = newVal;
+    saveAppSettings(current);
+    console.log('[MAIN] Toggled spellCheck =>', newVal);
+    return newVal;
+  } catch (err) {
+    console.error('[MAIN] toggle-spellcheck failed:', err);
+    return false;
+  }
+});
+
+/**
+ * Switch theme
+ */
+ipcMain.handle('switch-theme', () => {
+  try {
+    const current = loadAppSettings();
+    let newTheme = 'dark';
+    if (!current.theme || current.theme === 'dark') {
+      newTheme = 'light';
+    }
+    current.theme = newTheme;
+    saveAppSettings(current);
+    console.log('[MAIN] Switched theme =>', newTheme);
+    return newTheme;
+  } catch (err) {
+    console.error('[MAIN] switch-theme failed:', err);
+    return 'dark';
   }
 });
 
@@ -288,7 +375,6 @@ ipcMain.on('insert-markdown', (event, markdown) => {
 app.whenReady().then(() => {
   createSplashWindow();
   createMainWindow();
-
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createSplashWindow();

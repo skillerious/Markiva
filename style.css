@@ -3,7 +3,8 @@
   Dark/green theme for Markiva main window,
   pinned notes, empty notes center,
   table editor, about window logic replaced by about.html,
-  now includes a 3-button "save changes" dialog styling.
+  includes a 3-button "save changes" dialog styling, plus
+  the new .status-separator in the status bar.
 */
 
 /* 1) Prevent text selection by default, allow in editor/preview */
@@ -44,8 +45,6 @@ html, body {
   -webkit-app-region: drag;
   padding: 0 0 0 10px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.4);
-
-  /* Ensure the title bar is above the search bar */
   position: relative;
   z-index: 10;
 }
@@ -381,37 +380,19 @@ html, body {
   display: flex;
   flex-direction: column;
 }
-#notes-splitter {
-  height: 2px;
-  background-color: #aaa;
-  cursor: ns-resize;
-  position: relative;
-}
-#notes-splitter i {
-  position: absolute;
-  top: -7px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 12px;
-  color: #777;
-  background-color: #0f1722;
-  padding: 0 4px;
-}
-/* The file browser section will take up half the height under notes */
 .file-browser-section {
   flex: 1;
   overflow-y: auto;
 }
 
 /* PROJECT FILES HEADER */
-/* Reverted the header text color from white to green (#05c46b) */
 #file-browser-header {
   text-align: center;
   margin-bottom: 8px;
   position: relative;
   padding: 6px 0;
 }
-#file-browser-header h4 {
+#file-browser-header h3 {
   margin: 0;
   font-size: 13px;
   color: #05c46b;
@@ -419,43 +400,8 @@ html, body {
   display: inline-block;
   padding: 0.2em 0.5em;
 }
-#file-browser-header h4::after {
-  content: "";
-  position: absolute;
-  bottom: -4px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0;
-  height: 0;
-  border: 4px solid transparent;
-  border-top-color: #05c46b;
-}
-#file-browser-header h4::before {
-  content: "";
-  position: absolute;
-  bottom: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 8px;
-  height: 2px;
-  background: #05c46b;
-  border-radius: 1px;
-}
-/* (Retaining the original input style in case it is used elsewhere) */
-#file-browser-header input {
-  width: 90%;
-  margin-top: 4px;
-  padding: 4px 6px;
-  font-size: 12px;
-  border: none;
-  outline: none;
-  border-radius: 4px;
-  background-color: #141f2d;
-  color: #e2e8f0;
-}
 
-/* NEW FILE SEARCH EDITOR FOR PROJECT FILES */
-/* Separates the search field from the header and adds a plus button */
+/* FILE SEARCH EDITOR */
 .file-search-editor {
   padding: 10px;
   border-bottom: 1px solid #1f2b3d;
@@ -494,7 +440,6 @@ html, body {
   list-style: none;
   padding-left: 10px;
   border-left: 1px dashed #05c46b;
-  /* Added top margin to separate from the search panel */
   margin: 10px 0 0 0;
 }
 #file-list li {
@@ -570,7 +515,6 @@ html, body {
   margin: 0;
   flex: 1;
 }
-/* If empty notes => center an image + text */
 #notes-list.notes-empty {
   display: flex;
   justify-content: center;
@@ -636,7 +580,7 @@ html, body {
   color: #05c46b;
   background-color: #141f2d;
   border-top: 1px solid #1f2b3d;
-  padding: 4px 10px 4px 10px;
+  padding: 4px 10px;
   min-height: 26px;
 }
 #version-status {
@@ -645,6 +589,50 @@ html, body {
 #status-info span {
   margin-left: 16px;
 }
+
+/* Ensure all controls in the status bar are on one line */
+#status-align {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+/* Vertical separator for status bar */
+.status-separator {
+  display: block;
+  width: 2px;
+  height: 20px;
+  margin: 0 8px;
+  z-index: 9999;
+  border-radius: 2px;
+  background: linear-gradient(
+    to bottom,
+    #05c46b7e 0%,
+    #05c46b7e 100%
+  );
+  box-shadow: 0 0 3px rgba(5, 196, 107, 0.6);
+}
+
+/* VIEW MODE BUTTONS */
+.view-mode-btn {
+  background-color: #141f2d;
+  border: none;
+  padding: 6px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  /* Keep the button background and text color unchanged */
+}
+
+.view-mode-btn i {
+  color: #aaa;
+  transition: color 0.3s ease;
+}
+
+/* When the button is active, only change the icon’s color */
+.view-mode-btn.active i {
+  color: #05c46b !important;
+}
+
 
 /* SCROLLBAR */
 ::-webkit-scrollbar {
@@ -661,10 +649,11 @@ html, body {
   background: #4c5e73;
 }
 
-/* CUSTOM PROMPTS (multi) */
+/* CUSTOM PROMPTS */
 .custom-prompt {
   position: fixed;
-  top: 0; left: 0;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   background: rgba(0,0,0,0.5);
@@ -728,32 +717,22 @@ html, body {
 .cm-s-material-darker.CodeMirror .CodeMirror-linenumber {
   color: #02C16F !important;
 }
-/* Example overrides for more colorful markdown syntax in CodeMirror */
-.cm-s-material-darker.CodeMirror {
-  background-color: #0F1722 !important;
-  color: #e2e8f0 !important;
-}
-/* Headings */
 .cm-header {
-  color: #ffcc00 !important; /* bright gold for headings */
+  color: #ffcc00 !important;
   font-weight: bold;
 }
-/* Bold text tokens */
 .cm-strong {
-  color: #ffa500 !important; /* orange */
+  color: #ffa500 !important;
   font-weight: bold;
 }
-/* Italic text tokens */
 .cm-em {
-  color: #66ffcc !important; /* tealish */
+  color: #66ffcc !important;
   font-style: italic;
 }
-/* Link text */
 .cm-link {
   color: #66ccff !important;
   text-decoration: underline;
 }
-/* Code blocks, inline code */
 .cm-code {
   background-color: #1e1e1e !important;
   color: #05c46b !important;
@@ -762,21 +741,13 @@ html, body {
 }
 
 /* Search & Replace Bar */
-/*
-  By default, behind the 42px title bar at transform: translateY(-42px).
-  The bar is physically below the bar in DOM, but has a lower z-index (1)
-  while the title bar has z-index: 10. So it appears behind the bar.
-  When hidden => remain at -42px offset (invisible).
-  When shown => slide to +42px, fully below the bar.
-  Also hide the green border until it's open.
-*/
 .search-replace-bar {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   background-color: #141f2d;
-  border-bottom: 2px solid transparent; /* hidden green line at start */
+  border-bottom: 2px solid transparent;
   padding: 8px;
   display: flex;
   justify-content: center;
@@ -784,30 +755,21 @@ html, body {
   transition: transform 0.3s ease, border-bottom-color 0.3s ease;
   pointer-events: auto;
   -webkit-app-region: no-drag;
-
-  /* Lower than the title bar so it slides behind it */
   z-index: 1;
 }
-.search-replace-bar * {
-  -webkit-app-region: no-drag;
-}
-
 .search-replace-bar.hidden {
   transform: translateY(-42px);
   border-bottom-color: transparent;
 }
-
 .search-replace-bar:not(.hidden) {
   transform: translateY(42px);
-  border-bottom-color: #05c46b; /* show green line once open */
+  border-bottom-color: #05c46b;
 }
-
 .search-replace-bar .search-replace-content {
   display: flex;
   align-items: center;
   gap: 6px;
 }
-
 #search-input, #replace-input {
   width: 150px;
   padding: 4px;
@@ -817,7 +779,6 @@ html, body {
   border-radius: 4px;
   outline: none;
 }
-
 #search-replace-bar button {
   background-color: #05c46b;
   border: none;
@@ -829,38 +790,37 @@ html, body {
 #search-replace-bar button:hover {
   background-color: #04a85e;
 }
-
-/* CodeMirror highlight classes for custom searching */
 .cm-searching {
-  background-color: rgba(255, 230, 0, 0.4); /* yellow highlight */
+  background-color: rgba(255, 230, 0, 0.4);
 }
 .cm-searching-active {
-  background-color: rgba(255, 0, 0, 0.4);   /* red highlight for active match */
+  background-color: rgba(255, 0, 0, 0.4);
 }
+
 /* Context Menu for Project Files */
 .context-menu {
   position: absolute;
-  display: none; /* hidden by default */
+  display: none;
   background-color: #1f2b3d;
   border: 1px solid #333;
   border-radius: 4px;
   z-index: 9999;
   width: 120px;
 }
-
 .context-menu ul {
   list-style: none;
   margin: 0;
   padding: 0;
 }
-
 .context-menu li {
   padding: 8px;
   cursor: pointer;
   color: #fff;
   font-size: 14px;
 }
-
 .context-menu li:hover {
   background-color: #3b4a5c;
+}
+.toggle-active {
+  color: #05c46b !important;
 }

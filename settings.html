@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <title>Markiva Settings</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- Font Awesome for icons -->
   <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
@@ -12,7 +11,6 @@
     referrerpolicy="no-referrer"
   />
   <style>
-    /* Root style matching Markiva's dark/green theme */
     * {
       box-sizing: border-box;
       user-select: none;
@@ -26,8 +24,6 @@
       color: #e2e8f0;
       overflow: hidden;
     }
-
-    /* Title Bar */
     #settings-titlebar {
       display: flex;
       align-items: center;
@@ -56,15 +52,11 @@
     #settings-close-btn:hover {
       background-color: rgba(255, 255, 255, 0.1);
     }
-
-    /* Main Layout: Sidebar + Content */
     #settings-layout {
       display: flex;
       width: 100%;
       height: calc(100% - 42px);
     }
-
-    /* Sidebar */
     #settings-sidebar {
       width: 200px;
       background-color: #131d2f;
@@ -126,8 +118,6 @@
       background-color: #05c46b;
       color: #fff;
     }
-
-    /* Content */
     #settings-content {
       flex: 1;
       background-color: #0f1722;
@@ -166,7 +156,7 @@
       color: #e2e8f0;
       font-size: 14px;
       margin-right: 8px;
-      width: 180px; /* consistent label width */
+      width: 180px;
     }
     .settings-item input[type="text"],
     .settings-item input[type="number"],
@@ -193,21 +183,16 @@
     .settings-item button.browse-btn:hover {
       background-color: #04a85e;
     }
-
-    /* Checkboxes, toggles */
-    .settings-item .toggle-label {
+    .toggle-label {
       display: inline-flex;
       align-items: center;
       cursor: pointer;
-      user-select: none;
     }
-    .settings-item .toggle-label input[type="checkbox"] {
+    .toggle-label input[type="checkbox"] {
       margin-right: 8px;
       transform: scale(1.2);
       cursor: pointer;
     }
-
-    /* Footer (Save/Cancel) */
     #settings-footer {
       margin-top: 20px;
       text-align: right;
@@ -227,30 +212,60 @@
     #settings-footer button:hover {
       background-color: #04a85e;
     }
-
-    /* Category sections hidden by default except .active */
     .category-section {
       display: none;
     }
     .category-section.active {
       display: block;
     }
+
+    /* Thanks Section */
+    .thanks-list {
+      padding-left: 20px;
+      font-size: 14px;
+    }
+    .thanks-list li {
+      margin-bottom: 6px;
+    }
+
+    /* Social Cards */
+    .social-card {
+      background-color: #141f2d;
+      border: 1px solid #1f2b3d;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+      transition: background 0.2s ease;
+    }
+    .social-card:hover {
+      background-color: #1f2b3d;
+    }
+    .social-card img {
+      width: 32px;
+      height: 32px;
+      border-radius: 4px;
+    }
+    .social-card a {
+      color: #05c46b;
+      font-weight: bold;
+      text-decoration: none;
+    }
+    .social-card a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
-  <!-- Title Bar -->
   <div id="settings-titlebar">
     <div class="title-text">Settings</div>
-    <button id="settings-close-btn" title="Close">×</button>
+    <button id="settings-close-btn">×</button>
   </div>
-
-  <!-- Main Layout: Sidebar + Content -->
   <div id="settings-layout">
-    <!-- Sidebar with icons + categories -->
     <div id="settings-sidebar">
-      <div class="sidebar-top">
-        <h3>Categories</h3>
-      </div>
+      <div class="sidebar-top"><h3>Categories</h3></div>
       <div class="settings-nav">
         <ul>
           <li><button data-category="general" class="active"><i class="fas fa-home"></i> General</button></li>
@@ -258,15 +273,15 @@
           <li><button data-category="editor"><i class="fas fa-edit"></i> Editor</button></li>
           <li><button data-category="project"><i class="fas fa-folder"></i> Project</button></li>
           <li><button data-category="advanced"><i class="fas fa-cogs"></i> Advanced</button></li>
+          <li><button data-category="thanks"><i class="fas fa-heart"></i> Thanks</button></li>
+          <li><button data-category="socials"><i class="fas fa-share-alt"></i> Socials</button></li>
         </ul>
       </div>
     </div>
 
-    <!-- Content area -->
     <div id="settings-content">
       <h2>Markiva Preferences</h2>
 
-      <!-- General -->
       <div id="category-general" class="category-section active">
         <div class="settings-section">
           <h3>General Settings</h3>
@@ -284,7 +299,6 @@
         </div>
       </div>
 
-      <!-- Appearance -->
       <div id="category-appearance" class="category-section">
         <div class="settings-section">
           <h3>Theme & Fonts</h3>
@@ -303,7 +317,6 @@
         </div>
       </div>
 
-      <!-- Editor -->
       <div id="category-editor" class="category-section">
         <div class="settings-section">
           <h3>Editor Preferences</h3>
@@ -324,7 +337,6 @@
         </div>
       </div>
 
-      <!-- Project -->
       <div id="category-project" class="category-section">
         <div class="settings-section">
           <h3>Project Settings</h3>
@@ -343,7 +355,6 @@
         </div>
       </div>
 
-      <!-- Advanced -->
       <div id="category-advanced" class="category-section">
         <div class="settings-section">
           <h3>Advanced Options</h3>
@@ -361,7 +372,42 @@
         </div>
       </div>
 
-      <!-- Footer Buttons -->
+      <div id="category-thanks" class="category-section">
+        <div class="settings-section">
+          <h3>Thanks To</h3>
+          <ul class="thanks-list">
+            <li><strong>Electron</strong> – Core framework</li>
+            <li><strong>CodeMirror</strong> – Markdown editor engine</li>
+            <li><strong>Marked.js</strong> – Markdown parsing</li>
+            <li><strong>Highlight.js</strong> – Syntax highlighting</li>
+            <li><strong>markdownlint</strong> – Markdown linting</li>
+            <li><strong>Font Awesome</strong> – Iconography</li>
+          </ul>
+        </div>
+      </div>
+
+      <div id="category-socials" class="category-section">
+        <div class="settings-section">
+          <h3>Follow Us</h3>
+          <div class="social-card">
+            <img src="assets/github.png" alt="GitHub" />
+            <a href="https://github.com/skillerious" target="_blank">GitHub /skillerious</a>
+          </div>
+          <div class="social-card">
+            <img src="assets/x.png" alt="Twitter (X)" />
+            <a href="https://x.com/markiva" target="_blank">Twitter @markiva</a>
+          </div>
+          <div class="social-card">
+            <img src="assets/youtube.png" alt="YouTube" />
+            <a href="https://youtube.com/@markiva" target="_blank">YouTube Channel</a>
+          </div>
+          <div class="social-card">
+            <img src="assets/facebook.png" alt="Facebook" />
+            <a href="https://facebook.com/markivaapp" target="_blank">Facebook Page</a>
+          </div>
+        </div>
+      </div>
+
       <div id="settings-footer">
         <button id="save-settings-btn">Save</button>
         <button id="cancel-settings-btn">Cancel</button>
@@ -372,99 +418,52 @@
   <script>
     const { ipcRenderer } = require('electron');
 
-    // 1) On load => load settings => fill UI
     window.addEventListener('DOMContentLoaded', async () => {
       const loadedSettings = await ipcRenderer.invoke('load-app-settings');
-      console.log('[SETTINGS] Loaded from file:', loadedSettings);
 
-      // Populate fields
-      document.getElementById('auto-save-interval').value =
-        loadedSettings.autoSaveMins !== undefined ? loadedSettings.autoSaveMins : 5;
-      document.getElementById('spellcheck-toggle').checked =
-        loadedSettings.spellCheck !== undefined ? loadedSettings.spellCheck : true;
-      document.getElementById('theme-select').value =
-        loadedSettings.theme !== undefined ? loadedSettings.theme : 'dark';
-      document.getElementById('font-size-input').value =
-        loadedSettings.fontSize !== undefined ? loadedSettings.fontSize : 14;
-      document.getElementById('auto-brackets-toggle').checked =
-        loadedSettings.autoBrackets !== undefined ? loadedSettings.autoBrackets : false;
-      document.getElementById('line-wrapping-toggle').checked =
-        loadedSettings.lineWrapping !== undefined ? loadedSettings.lineWrapping : true;
-      document.getElementById('default-folder').value =
-        loadedSettings.defaultFolder !== undefined ? loadedSettings.defaultFolder : '';
-      document.getElementById('backup-toggle').checked =
-        loadedSettings.backupToggle !== undefined ? loadedSettings.backupToggle : false;
-      document.getElementById('debug-logging-toggle').checked =
-        loadedSettings.debugLogging !== undefined ? loadedSettings.debugLogging : false;
-      document.getElementById('max-undo-steps').value =
-        loadedSettings.maxUndoSteps !== undefined ? loadedSettings.maxUndoSteps : 500;
+      document.getElementById('auto-save-interval').value = loadedSettings.autoSaveMins ?? 5;
+      document.getElementById('spellcheck-toggle').checked = loadedSettings.spellCheck ?? true;
+      document.getElementById('theme-select').value = loadedSettings.theme ?? 'dark';
+      document.getElementById('font-size-input').value = loadedSettings.fontSize ?? 14;
+      document.getElementById('auto-brackets-toggle').checked = loadedSettings.autoBrackets ?? false;
+      document.getElementById('line-wrapping-toggle').checked = loadedSettings.lineWrapping ?? true;
+      document.getElementById('default-folder').value = loadedSettings.defaultFolder ?? '';
+      document.getElementById('backup-toggle').checked = loadedSettings.backupToggle ?? false;
+      document.getElementById('debug-logging-toggle').checked = loadedSettings.debugLogging ?? false;
+      document.getElementById('max-undo-steps').value = loadedSettings.maxUndoSteps ?? 500;
     });
 
-    // Close button => window.close()
-    document.getElementById('settings-close-btn').addEventListener('click', () => {
-      window.close();
-    });
+    document.getElementById('settings-close-btn').addEventListener('click', () => window.close());
+    document.getElementById('cancel-settings-btn').addEventListener('click', () => window.close());
 
-    // Cancel => just close
-    document.getElementById('cancel-settings-btn').addEventListener('click', () => {
-      window.close();
-    });
-
-    // Save => gather user’s changes => call main to save
     document.getElementById('save-settings-btn').addEventListener('click', async () => {
-      const autoSaveMins = parseInt(document.getElementById('auto-save-interval').value, 10);
-      const spellCheck = document.getElementById('spellcheck-toggle').checked;
-      const theme = document.getElementById('theme-select').value;
-      const fontSize = parseInt(document.getElementById('font-size-input').value, 10);
-      const autoBrackets = document.getElementById('auto-brackets-toggle').checked;
-      const lineWrapping = document.getElementById('line-wrapping-toggle').checked;
-      const defaultFolder = document.getElementById('default-folder').value.trim();
-      const backupToggle = document.getElementById('backup-toggle').checked;
-      const debugLogging = document.getElementById('debug-logging-toggle').checked;
-      const maxUndoSteps = parseInt(document.getElementById('max-undo-steps').value, 10);
-
       const newSettings = {
-        autoSaveMins,
-        spellCheck,
-        theme,
-        fontSize,
-        autoBrackets,
-        lineWrapping,
-        defaultFolder,
-        backupToggle,
-        debugLogging,
-        maxUndoSteps
+        autoSaveMins: parseInt(document.getElementById('auto-save-interval').value, 10),
+        spellCheck: document.getElementById('spellcheck-toggle').checked,
+        theme: document.getElementById('theme-select').value,
+        fontSize: parseInt(document.getElementById('font-size-input').value, 10),
+        autoBrackets: document.getElementById('auto-brackets-toggle').checked,
+        lineWrapping: document.getElementById('line-wrapping-toggle').checked,
+        defaultFolder: document.getElementById('default-folder').value.trim(),
+        backupToggle: document.getElementById('backup-toggle').checked,
+        debugLogging: document.getElementById('debug-logging-toggle').checked,
+        maxUndoSteps: parseInt(document.getElementById('max-undo-steps').value, 10)
       };
-
-      console.log('[SETTINGS] Saving new settings:', newSettings);
-
       await ipcRenderer.invoke('save-app-settings', newSettings);
-
-      // Then close
       window.close();
     });
 
-    // "Browse..." => open folder dialog
     document.getElementById('browse-folder-btn').addEventListener('click', async () => {
       const result = await ipcRenderer.invoke('open-file-dialog', { isFolder: true });
-      if (result) {
-        document.getElementById('default-folder').value = result;
-      }
+      if (result) document.getElementById('default-folder').value = result;
     });
 
-    // Sidebar category switching
-    const navButtons = document.querySelectorAll('.settings-nav li button');
-    navButtons.forEach(btn => {
+    document.querySelectorAll('.settings-nav li button').forEach(btn => {
       btn.addEventListener('click', () => {
-        navButtons.forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.settings-nav li button').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-
-        document.querySelectorAll('.category-section').forEach(sec => {
-          sec.classList.remove('active');
-        });
-
-        const catId = 'category-' + btn.dataset.category;
-        document.getElementById(catId).classList.add('active');
+        document.querySelectorAll('.category-section').forEach(sec => sec.classList.remove('active'));
+        document.getElementById('category-' + btn.dataset.category).classList.add('active');
       });
     });
   </script>

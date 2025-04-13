@@ -2,7 +2,7 @@
   splash.css
   Full-screen splash with two swirling dot layers,
   pinned corner texts, logo, progress bar,
-  improved density of dots.
+  improved density of dots, plus a line for #loading-details text.
 */
 
 /* Reset + full viewport */
@@ -32,41 +32,27 @@ html, body {
 
 /* Layer 1: swirl in one direction */
 .starfield-layer1 {
-  background-image:
-    radial-gradient(#05c46b 1px, transparent 2px);
+  background-image: radial-gradient(#05c46b 1px, transparent 2px);
   background-size: 60px 60px; /* smaller => denser pattern */
   animation: swirl-layer1 10s infinite linear alternate;
 }
 @keyframes swirl-layer1 {
-  0% {
-    background-position: 0 0;
-  }
-  50% {
-    background-position: 30px 40px; /* swirl offset */
-  }
-  100% {
-    background-position: 0 0;
-  }
+  0%   { background-position: 0 0; }
+  50%  { background-position: 30px 40px; }
+  100% { background-position: 0 0; }
 }
 
-/* Layer 2: swirl in the opposite direction, offset differently */
+/* Layer 2: swirl in the opposite direction */
 .starfield-layer2 {
-  background-image:
-    radial-gradient(#05c46b 1px, transparent 2px);
+  background-image: radial-gradient(#05c46b 1px, transparent 2px);
   background-size: 60px 60px;
   mix-blend-mode: screen; /* overlap effect */
   animation: swirl-layer2 12s infinite linear alternate;
 }
 @keyframes swirl-layer2 {
-  0% {
-    background-position: 20px 20px;
-  }
-  50% {
-    background-position: 50px 80px;
-  }
-  100% {
-    background-position: 20px 20px;
-  }
+  0%   { background-position: 20px 20px; }
+  50%  { background-position: 50px 80px; }
+  100% { background-position: 20px 20px; }
 }
 
 /* Center container for the logo + progress bar */
@@ -111,8 +97,18 @@ html, body {
   transition: width 0.3s ease;
 }
 
+/* NEW: quick style for the cycling message block */
+#loading-details {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: #aaa;
+  text-align: center;
+  min-height: 1.2em; /* so it doesn’t jump around while changing text */
+}
+
 /* Bottom corners pinned texts */
-#splash-left, #splash-right {
+#splash-left,
+#splash-right {
   position: absolute;
   bottom: 5px;
   font-size: 14px;

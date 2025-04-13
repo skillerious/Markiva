@@ -1,6 +1,6 @@
 {
   "name": "markiva",
-  "version": "3.1.0",
+  "version": "3.3.0",
   "description": "Markiva - a markdown editor with color syntax highlighting, multi-tab support, enhanced preview, and persistent notes.",
   "author": "Robin Doak <example@example.com>",
   "main": "main.js",

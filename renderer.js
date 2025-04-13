@@ -29,7 +29,7 @@ const markdownSnippets = [
   { text: '**Bold Text**', displayText: 'Bold Text' },
   { text: '*Italic Text*', displayText: 'Italic Text' },
   { text: '~~Strikethrough~~', displayText: 'Strikethrough' },
-  { text: '`Inline Code`', displayText: 'Inline Code' },
+  { text: 'Inline Code', displayText: 'Inline Code' },
   { text: '```language\nCode Block\n```', displayText: 'Code Block' },
   { text: '> Blockquote', displayText: 'Blockquote' },
   { text: '- List Item', displayText: 'List Item' },
@@ -39,7 +39,6 @@ const markdownSnippets = [
   { text: '| Header1 | Header2 |\n| --- | --- |\n| Data1 | Data2 |', displayText: 'Table' }
 ];
 
-// Provide CodeMirror hints from our snippet list
 function provideHint(cm) {
   const cur = cm.getCursor();
   const token = cm.getTokenAt(cur);
@@ -58,7 +57,7 @@ function provideHint(cm) {
   };
 }
 
-// Setup Marked
+// Setup Marked with Highlight.js for code blocks
 marked.setOptions({
   highlight: (code, lang) => {
     if (lang && hljs.getLanguage(lang)) {
@@ -70,7 +69,7 @@ marked.setOptions({
   headerIds: false
 });
 
-// Global State
+// --- Global State ---
 let userDataPath = '';
 let notes = [];
 let tabs = [];
@@ -82,10 +81,10 @@ let searchMarks = [];
 let currentSearchCursor = null;
 let currentSearchMatch = null;
 
-// We'll store user settings (including defaultFolder, lastFile) in this object
+// We'll store user settings in this object
 let userSettings = {};
 
-// Markdownlint function
+// --- Markdownlint function ---
 function markdownLinter(text) {
   if (!markdownlintModule) return [];
   const options = {
@@ -108,91 +107,266 @@ function markdownLinter(text) {
   return annotations;
 }
 
+// --- Debounce Utility ---
+function debounce(func, delay) {
+  let timeout;
+  return function(...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), delay);
+  };
+}
+
 /**
- * Revised alignment function:
- * 1) Remove any existing <div style="text-align:..."> or <p align="..."> or <p style="text-align:...">
- * 2) Strip leading/trailing newlines from the selection, then merge internal newlines into single spaces.
- * 3) Wrap the entire snippet with:
- * 
- * <div style="text-align: alignment;">
- * 
- * snippet
- * </div>
+ * Helper to display AI results in bullet-list format with customAlert.
  */
+function displayAiResults(title, lines) {
+  if (!lines || lines.length === 0) {
+    window.customAlert(`${title}\n\n(No results)`);
+    return;
+  }
+  const bulletList = lines.map(item => `• ${item}`).join('\n');
+  const final = `${title}\n\n${bulletList}`;
+  window.customAlert(final);
+}
+
+// --- AI Tool Functions ---
+async function summarizeText(text) {
+  if (!text.trim()) return [];
+  const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim());
+  const summaryLines = [];
+  paragraphs.forEach(par => {
+    const sentences = par.split(/[.?!]\s+/).filter(s => s.trim());
+    const excerpt = sentences.slice(0, 2).join('. ');
+    if (excerpt) {
+      summaryLines.push(excerpt.trim() + (sentences.length > 2 ? '...' : ''));
+    }
+  });
+  if (summaryLines.length === 0) {
+    summaryLines.push(text.trim().slice(0, 100) + '...');
+  }
+  return summaryLines;
+}
+
+async function suggestHeadings(text) {
+  if (!text.trim()) return [];
+  const lines = text.split('\n');
+  const suggestions = [];
+  const existingHeadings = lines.filter(line => line.trim().match(/^#+\s+/));
+  existingHeadings.forEach(h => {
+    suggestions.push(`${h.trim()} (Already a heading)`);
+  });
+  const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim());
+  paragraphs.forEach(par => {
+    const isHeading = par.trim().match(/^#+\s+/);
+    if (!isHeading && par.trim().length > 80) {
+      const words = par.trim().split(/\s+/).slice(0, 5).join(' ');
+      suggestions.push(`Suggested Heading: ${words}...`);
+    }
+  });
+  if (suggestions.length === 0) {
+    suggestions.push("No headings or suggestions found.");
+  }
+  return suggestions;
+}
+
+async function simplifyText(text) {
+  if (!text.trim()) return [];
+  const fillerWords = ['the','very','just','actually','really','that','so','basically','kind','of'];
+  const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim());
+  const simplifiedLines = [];
+  paragraphs.forEach(par => {
+    let simplified = par.toLowerCase();
+    fillerWords.forEach(word => {
+      const re = new RegExp(`\\b${word}\\b`, 'gi');
+      simplified = simplified.replace(re, '');
+    });
+    simplified = simplified.replace(/\s{2,}/g, ' ').trim();
+    if (simplified) {
+      simplifiedLines.push(simplified);
+    }
+  });
+  if (simplifiedLines.length === 0) {
+    simplifiedLines.push(text.toLowerCase().slice(0, 200) + '...');
+  }
+  return simplifiedLines;
+}
+
+// --- Export Functions ---
+async function exportCurrentTabToPDF() {
+  if (!activeTab) return;
+  const previewEl = document.getElementById('preview-content');
+  if (!previewEl) {
+    console.error("No preview-content => cannot export PDF");
+    return;
+  }
+  const renderedHTML = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>Exported PDF - Markiva</title>
+      <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+      ${previewEl.innerHTML}
+    </body>
+    </html>
+  `;
+  const result = await ipcRenderer.invoke('export-pdf', renderedHTML);
+  if (result.startsWith('error:')) {
+    console.error("PDF export failed =>", result);
+  } else {
+    console.log("PDF exported successfully (no popup).");
+  }
+}
+
+async function exportCurrentTabToHTML() {
+  if (!activeTab) return;
+  const content = cmEditor.getValue();
+  const htmlContent = `
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Exported Markiva Document</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    ${marked.parse(content)}
+  </body>
+  </html>
+  `;
+  const result = await ipcRenderer.invoke('export-html', htmlContent);
+  if(result.startsWith('error:')) {
+    console.error("HTML export failed =>", result);
+  } else {
+    console.log("HTML exported successfully (no popup).");
+  }
+}
+
+// --- Revised Alignment Function ---
 function alignSelection(alignment) {
   if (!cmEditor) return;
-
   cmEditor.operation(() => {
     const selections = cmEditor.listSelections();
-
     selections.forEach(sel => {
       let rawText = cmEditor.getRange(sel.anchor, sel.head);
-
-      // If nothing was selected, select the entire current line
       if (!rawText.trim()) {
         const curLine = cmEditor.getCursor().line;
         rawText = cmEditor.getLine(curLine);
         sel = {
           anchor: { line: curLine, ch: 0 },
-          head:   { line: curLine, ch: rawText.length }
+          head: { line: curLine, ch: rawText.length }
         };
       }
-
-      // 1) Remove any existing alignment wrappers:
       const wrapperRegex = /<(?:div|p)\s+(?:style="text-align:\s*[^"]+"\s*|align="[^"]+"\s*)(?:[^>]*)>([\s\S]*?)<\/(?:div|p)>/gi;
       let cleaned = rawText.replace(wrapperRegex, '$1');
-
-      // 2) Trim leading/trailing newlines, then merge any internal newlines
       cleaned = cleaned.replace(/^\s+|\s+$/g, '');
       cleaned = cleaned.replace(/\r?\n\s*/g, ' ');
-
-      // 3) Build final snippet with a blank line after the opening <div> and a closing </div>
       const finalText = `<div style="text-align: ${alignment};">\n\n${cleaned}\n</div>`;
-
       cmEditor.replaceRange(finalText, sel.anchor, sel.head);
     });
   });
-
   cmEditor.focus();
 }
 
+// --- View Mode Button Helper ---
+function setViewModeActive(mode) {
+  console.log("Setting view mode active:", mode);
+  const buttons = document.querySelectorAll('.view-mode-btn');
+  buttons.forEach(btn => btn.classList.remove('active'));
+  if (mode === 'editor') {
+    document.getElementById('btn-editor-only')?.classList.add('active');
+  } else if (mode === 'split') {
+    document.getElementById('btn-split-view')?.classList.add('active');
+  } else if (mode === 'preview') {
+    document.getElementById('btn-preview-only')?.classList.add('active');
+  }
+}
 
+
+// --- Custom Prompts ---
+window.customAlert = function(message) {
+  return new Promise((resolve) => {
+    const customPromptEl = document.getElementById('custom-prompt');
+    const promptMessageEl = customPromptEl.querySelector('.prompt-message');
+    const promptInputEl = document.getElementById('prompt-input');
+    const promptOkBtn = document.getElementById('prompt-ok');
+    const promptCancelBtn = document.getElementById('prompt-cancel');
+    promptMessageEl.textContent = message;
+    promptInputEl.style.display = 'none';
+    customPromptEl.style.display = 'flex';
+    function cleanup() {
+      customPromptEl.style.display = 'none';
+      promptOkBtn.removeEventListener('click', onOk);
+      promptCancelBtn.removeEventListener('click', onOk);
+      promptInputEl.style.display = '';
+    }
+    function onOk() {
+      cleanup();
+      resolve();
+    }
+    promptOkBtn.addEventListener('click', onOk);
+    promptCancelBtn.addEventListener('click', onOk);
+  });
+};
+
+function customPrompt(message, defaultValue = '') {
+  return new Promise((resolve) => {
+    const customPromptEl = document.getElementById('custom-prompt');
+    const promptMessageEl = customPromptEl.querySelector('.prompt-message');
+    const promptInputEl = document.getElementById('prompt-input');
+    const promptOkBtn = document.getElementById('prompt-ok');
+    const promptCancelBtn = document.getElementById('prompt-cancel');
+    promptMessageEl.textContent = message;
+    promptInputEl.value = defaultValue;
+    promptInputEl.style.display = '';
+    customPromptEl.style.display = 'flex';
+    function cleanup() {
+      customPromptEl.style.display = 'none';
+      promptOkBtn.removeEventListener('click', onOk);
+      promptCancelBtn.removeEventListener('click', onCancel);
+    }
+    function onOk() {
+      cleanup();
+      resolve(promptInputEl.value);
+    }
+    function onCancel() {
+      cleanup();
+      resolve(null);
+    }
+    promptOkBtn.addEventListener('click', onOk);
+    promptCancelBtn.addEventListener('click', onCancel);
+  });
+};
+
+// --- DOMContentLoaded and Event Handlers ---
 window.addEventListener('DOMContentLoaded', () => {
   console.log("[DEBUG] DOM loaded, hooking up events...");
 
-  // DOM references
-  const glassTabs      = document.getElementById('glass-tabs');
+  // Basic references
+  const glassTabs = document.getElementById('glass-tabs');
   const previewContent = document.getElementById('preview-content');
-  const fileSearch     = document.getElementById('file-search');
-  const fileList       = document.getElementById('file-list');
-  const notesList      = document.getElementById('notes-list');
-  const newNoteInput   = document.getElementById('new-note-input');
-  const statusWordCount= document.getElementById('word-count');
+  const fileSearch = document.getElementById('file-search');
+  const fileList = document.getElementById('file-list');
+  const notesList = document.getElementById('notes-list');
+  const newNoteInput = document.getElementById('new-note-input');
+  const statusWordCount = document.getElementById('word-count');
   const statusReadTime = document.getElementById('read-time');
 
-  // Single prompt
   const customPromptEl = document.getElementById('custom-prompt');
-  const promptMessageEl= customPromptEl.querySelector('.prompt-message');
-  const promptInputEl  = document.getElementById('prompt-input');
-  const promptOkBtn    = document.getElementById('prompt-ok');
-  const promptCancelBtn= document.getElementById('prompt-cancel');
+  const promptMessageEl = customPromptEl.querySelector('.prompt-message');
+  const promptInputEl = document.getElementById('prompt-input');
+  const promptOkBtn = document.getElementById('prompt-ok');
+  const promptCancelBtn = document.getElementById('prompt-cancel');
 
-  // Link dialog
-  const linkDialog    = document.getElementById('link-dialog');
-  const linkTextInput = document.getElementById('link-text');
-  const linkUrlInput  = document.getElementById('link-url');
-  const linkOkBtn     = document.getElementById('link-ok');
-  const linkCancelBtn = document.getElementById('link-cancel');
-
-  // Table dialog
-  const tableDialog      = document.getElementById('table-dialog');
-  const tableRowsInput   = document.getElementById('table-rows');
-  const tableColsInput   = document.getElementById('table-cols');
+  const tableDialog = document.getElementById('table-dialog');
+  const tableRowsInput = document.getElementById('table-rows');
+  const tableColsInput = document.getElementById('table-cols');
   const tableHeaderCheck = document.getElementById('table-header');
-  const tableOkBtn       = document.getElementById('table-ok');
-  const tableCancelBtn   = document.getElementById('table-cancel');
+  const tableOkBtn = document.getElementById('table-ok');
+  const tableCancelBtn = document.getElementById('table-cancel');
 
-  // Media insertion wizard
   const mediaDialog = document.getElementById('media-dialog');
   const mediaAlt = document.getElementById('media-alt');
   const mediaUrl = document.getElementById('media-url');
@@ -200,21 +374,18 @@ window.addEventListener('DOMContentLoaded', () => {
   const mediaCancel = document.getElementById('media-cancel');
   const mediaBrowse = document.getElementById('media-browse');
 
-  // Minimal table WYSIWYG
   const tableEditorPanel = document.getElementById('table-editor-panel');
-  const addRowBtn        = document.getElementById('table-add-row');
-  const removeRowBtn     = document.getElementById('table-remove-row');
-  const addColBtn        = document.getElementById('table-add-col');
-  const removeColBtn     = document.getElementById('table-remove-col');
+  const addRowBtn = document.getElementById('table-add-row');
+  const removeRowBtn = document.getElementById('table-remove-row');
+  const addColBtn = document.getElementById('table-add-col');
+  const removeColBtn = document.getElementById('table-remove-col');
 
-  // Save Changes 3-Button Prompt
-  const saveChangesDialog   = document.getElementById('save-changes-dialog');
+  const saveChangesDialog = document.getElementById('save-changes-dialog');
   const saveChangesFilename = document.getElementById('save-changes-filename');
-  const saveChangesSaveBtn  = document.getElementById('save-changes-save-btn');
-  const saveChangesDontBtn  = document.getElementById('save-changes-dontsave-btn');
-  const saveChangesCancelBtn= document.getElementById('save-changes-cancel-btn');
+  const saveChangesSaveBtn = document.getElementById('save-changes-save-btn');
+  const saveChangesDontBtn = document.getElementById('save-changes-dontsave-btn');
+  const saveChangesCancelBtn = document.getElementById('save-changes-cancel-btn');
 
-  // Window controls & file tools
   const minButton = document.getElementById('min-button');
   const maxButton = document.getElementById('max-button');
   const closeButton = document.getElementById('close-button');
@@ -227,57 +398,50 @@ window.addEventListener('DOMContentLoaded', () => {
   const aboutBtn = document.getElementById('about-btn');
   const settingsBtn = document.getElementById('settings-btn');
 
-  // Format buttons
-  const btnBold    = document.getElementById('btn-bold');
-  const btnItalic  = document.getElementById('btn-italic');
-  const btnCode    = document.getElementById('btn-code');
-  const btnLink    = document.getElementById('btn-link');
+  const btnBold = document.getElementById('btn-bold');
+  const btnItalic = document.getElementById('btn-italic');
+  const btnCode = document.getElementById('btn-code');
+  const btnLink = document.getElementById('btn-link');
   const btnHeading = document.getElementById('btn-heading');
-  const btnTable   = document.getElementById('btn-table');
-  const btnMedia   = document.getElementById('btn-media');
+  const btnTable = document.getElementById('btn-table');
+  const btnMedia = document.getElementById('btn-media');
+  const btnSearch = document.getElementById('btn-search');
 
-  // Search & Replace
-  const searchBar           = document.getElementById('search-replace-bar');
-  const searchInput         = document.getElementById('search-input');
-  const replaceInput        = document.getElementById('replace-input');
-  const searchNextBtn       = document.getElementById('search-next-btn');
-  const searchReplaceBtn    = document.getElementById('search-replace-btn');
-  const searchReplaceAllBtn = document.getElementById('search-replace-all-btn');
-  const searchCloseBtn      = document.getElementById('search-close-btn');
-  const btnSearch           = document.getElementById('btn-search');
-
-  // Alignment Buttons
-  const alignLeftBtn   = document.getElementById('align-left');
+  const alignLeftBtn = document.getElementById('align-left');
   const alignCenterBtn = document.getElementById('align-center');
-  const alignRightBtn  = document.getElementById('align-right');
+  const alignRightBtn = document.getElementById('align-right');
 
-  // GitHub menu button
   const githubMenuBtn = document.getElementById('github-menu');
-
-  // View mode references (titlebar icons)
-  const editorContainer  = document.getElementById('editor-container');
+  const editorContainer = document.getElementById('editor-container');
   const previewContainer = document.getElementById('preview-container');
-  const btnEditorOnly    = document.getElementById('btn-editor-only');
-  const btnSplitView     = document.getElementById('btn-split-view');
-  const btnPreviewOnly   = document.getElementById('btn-preview-only');
+  const btnEditorOnly = document.getElementById('btn-editor-only');
+  const btnSplitView = document.getElementById('btn-split-view');
+  const btnPreviewOnly = document.getElementById('btn-preview-only');
 
-  // Context Menu for Project Files
   const fileContextMenu = document.getElementById('file-context-menu');
   let fileContextMenuTargetPath = null;
 
+  // Additional new Buttons
+  const btnPrint = document.getElementById('btn-print');
+  const btnExportPDF = document.getElementById('btn-export-pdf');
+  const btnToggleSpellcheck = document.getElementById('btn-toggle-spellcheck');
+  const btnThemeSwitch = document.getElementById('btn-theme-switch');
+
+  // set the default view mode to split
+  setViewModeActive('split');
   // Hide context menu on any left-click
+
   document.addEventListener('click', () => {
     fileContextMenu.style.display = 'none';
   });
 
-  // Right-click on file list
+  // Right-click file list => context menu
   fileList.addEventListener('contextmenu', async (e) => {
     e.preventDefault();
     const li = e.target.closest('li');
     if (!li) return;
     const anchor = li.querySelector('a');
     if (!anchor) return;
-
     const folder = userSettings.defaultFolder || process.cwd();
     const filename = anchor.textContent.trim();
     const filePath = path.join(folder, filename);
@@ -292,10 +456,8 @@ window.addEventListener('DOMContentLoaded', () => {
     fileContextMenu.style.display = 'none';
     const li = e.target.closest('li');
     if (!li || !fileContextMenuTargetPath) return;
-
     const action = li.getAttribute('data-action');
     if (!action) return;
-
     if (action === 'open') {
       loadFile(fileContextMenuTargetPath);
     } else if (action === 'rename') {
@@ -342,27 +504,23 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Insert GitHub Markdown (IPC from main)
   ipcRenderer.on('insert-github-markdown', (event, markdown) => {
     if (typeof window.insertGitHubMarkdown === 'function') {
       window.insertGitHubMarkdown(markdown);
     } else {
-      console.error("insertGitHubMarkdown is not defined.");
+      console.error("insert-github-markdown is not defined.");
     }
   });
 
-  // Show yes/cancel for file deletion etc.
   async function showYesCancelDialog(message) {
     return new Promise((resolve) => {
       promptMessageEl.textContent = message;
       promptInputEl.style.display = 'none';
       customPromptEl.style.display = 'flex';
-
       const oldOkText = promptOkBtn.textContent;
       const oldCancelText = promptCancelBtn.textContent;
       promptOkBtn.textContent = 'Yes';
       promptCancelBtn.textContent = 'Cancel';
-
       function cleanup(result) {
         customPromptEl.style.display = 'none';
         promptOkBtn.removeEventListener('click', onYes);
@@ -371,39 +529,35 @@ window.addEventListener('DOMContentLoaded', () => {
         promptCancelBtn.textContent = oldCancelText;
         resolve(result);
       }
-      function onYes() {
-        cleanup('yes');
-      }
-      function onCancel() {
-        cleanup('cancel');
-      }
-
+      function onYes() { cleanup('yes'); }
+      function onCancel() { cleanup('cancel'); }
       promptOkBtn.addEventListener('click', onYes);
       promptCancelBtn.addEventListener('click', onCancel);
     });
   }
 
-  // View mode
+  // View Mode Buttons – set active state and adjust display
   btnEditorOnly?.addEventListener('click', () => {
     editorContainer.style.display = 'flex';
     previewContainer.style.display = 'none';
+    setViewModeActive('editor');
   });
   btnSplitView?.addEventListener('click', () => {
     editorContainer.style.display = 'flex';
     previewContainer.style.display = 'flex';
+    setViewModeActive('split');
   });
   btnPreviewOnly?.addEventListener('click', () => {
     editorContainer.style.display = 'none';
     previewContainer.style.display = 'flex';
+    setViewModeActive('preview');
   });
 
-  // Dirty Save Logic (app close)
   window.attemptAppCloseFromMain = async function() {
     const dirtyTab = tabs.find(t => t.isDirty);
     if (!dirtyTab) return 'proceed';
     const active = tabs.find(t => t.filePath === activeTab);
     if (!active) return 'proceed';
-
     const fileName = active.fileName || 'Untitled';
     const choice = await showSaveChangesDialog(fileName);
     if (choice === 'save') {
@@ -423,7 +577,6 @@ window.addEventListener('DOMContentLoaded', () => {
     return new Promise((resolve) => {
       saveChangesFilename.textContent = filename || 'Untitled';
       saveChangesDialog.style.display = 'flex';
-
       function cleanup(result) {
         saveChangesDialog.style.display = 'none';
         saveChangesSaveBtn.removeEventListener('click', onSave);
@@ -431,10 +584,9 @@ window.addEventListener('DOMContentLoaded', () => {
         saveChangesCancelBtn.removeEventListener('click', onCancel);
         resolve(result);
       }
-      function onSave()  { cleanup('save');     }
-      function onDont()  { cleanup('dontsave'); }
-      function onCancel() { cleanup('cancel');  }
-
+      function onSave() { cleanup('save'); }
+      function onDont() { cleanup('dontsave'); }
+      function onCancel() { cleanup('cancel'); }
       saveChangesSaveBtn.addEventListener('click', onSave);
       saveChangesDontBtn.addEventListener('click', onDont);
       saveChangesCancelBtn.addEventListener('click', onCancel);
@@ -447,7 +599,6 @@ window.addEventListener('DOMContentLoaded', () => {
       promptInputEl.value = defaultValue;
       promptInputEl.style.display = '';
       customPromptEl.style.display = 'flex';
-
       function cleanup() {
         customPromptEl.style.display = 'none';
         promptOkBtn.removeEventListener('click', onOk);
@@ -471,7 +622,6 @@ window.addEventListener('DOMContentLoaded', () => {
       promptMessageEl.textContent = message;
       promptInputEl.style.display = 'none';
       customPromptEl.style.display = 'flex';
-
       function cleanup() {
         customPromptEl.style.display = 'none';
         promptOkBtn.removeEventListener('click', onOk);
@@ -508,7 +658,6 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     renderNotes();
   }
-
   function saveNotes() {
     if (!userDataPath) return;
     const notesFile = path.join(userDataPath, 'notes.json');
@@ -518,24 +667,19 @@ window.addEventListener('DOMContentLoaded', () => {
       console.error('Error saving notes:', err);
     }
   }
-
   function renderNotes() {
     if (notes.length === 0) {
       notesList.innerHTML = '';
       notesList.classList.add('notes-empty');
-
       const wrapper = document.createElement('div');
       wrapper.className = 'notes-empty-wrapper';
-
       const emptyImg = document.createElement('img');
       emptyImg.src = 'assets/empty.png';
       emptyImg.alt = 'No notes';
       emptyImg.classList.add('notes-empty-image');
-
       const emptyText = document.createElement('p');
       emptyText.textContent = 'Add a note';
       emptyText.classList.add('notes-empty-text');
-
       wrapper.appendChild(emptyImg);
       wrapper.appendChild(emptyText);
       notesList.appendChild(wrapper);
@@ -543,23 +687,18 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     notesList.classList.remove('notes-empty');
     notesList.innerHTML = '';
-
-    // pinned first, completed last
-    const sorted = notes.slice().sort((a,b) => {
+    const sorted = notes.slice().sort((a, b) => {
       if (a.pinned && !b.pinned) return -1;
       if (!a.pinned && b.pinned) return 1;
       if (a.completed && !b.completed) return 1;
       if (!a.completed && b.completed) return -1;
       return b.id - a.id;
     });
-
     sorted.forEach(note => {
       const li = document.createElement('li');
       if (note.completed) li.classList.add('completed');
-
       const leftDiv = document.createElement('div');
       leftDiv.className = 'note-left';
-
       const pinIcon = document.createElement('i');
       pinIcon.className = 'pin-icon fas fa-thumbt';
       if (note.pinned) pinIcon.classList.add('active');
@@ -569,14 +708,11 @@ window.addEventListener('DOMContentLoaded', () => {
         saveNotes();
         renderNotes();
       });
-
       const textSpan = document.createElement('span');
       textSpan.textContent = note.text;
-
       leftDiv.appendChild(pinIcon);
       leftDiv.appendChild(textSpan);
       li.appendChild(leftDiv);
-
       const removeBtn = document.createElement('button');
       removeBtn.textContent = '✖';
       removeBtn.classList.add('remove-note-btn');
@@ -587,18 +723,14 @@ window.addEventListener('DOMContentLoaded', () => {
         renderNotes();
       });
       li.appendChild(removeBtn);
-
       li.addEventListener('click', () => {
         note.completed = !note.completed;
         saveNotes();
         renderNotes();
       });
-
       notesList.appendChild(li);
     });
   }
-
-  // Add note
   const addNoteButton = document.getElementById('add-note-button');
   if (addNoteButton) {
     addNoteButton.addEventListener('click', () => {
@@ -613,7 +745,6 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Load last file logic
   async function rememberLastFile(filePath) {
     userSettings.lastFile = filePath;
     try {
@@ -624,7 +755,6 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // File browser
   async function refreshFileList() {
     fileList.innerHTML = '';
     const folder = userSettings.defaultFolder || process.cwd();
@@ -639,7 +769,6 @@ window.addEventListener('DOMContentLoaded', () => {
     const mdFiles = all.filter(f =>
       f.toLowerCase().endsWith('.md') && f.toLowerCase().includes(filter)
     ).sort();
-
     if (mdFiles.length === 0) {
       const li = document.createElement('li');
       li.textContent = 'No markdown files found.';
@@ -675,7 +804,6 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // TABS + Dirty Save
   function createOrActivateTab(filePath, fileName, content) {
     const existing = tabs.find(t => t.filePath === filePath);
     if (existing) {
@@ -691,12 +819,10 @@ window.addEventListener('DOMContentLoaded', () => {
       tabEl: null
     };
     tabs.push(newTab);
-
     const tabEl = document.createElement('div');
     tabEl.className = 'glass-tab';
     tabEl.innerHTML = `<span class="tab-text">${fileName}</span><span class="close-tab">×</span>`;
     glassTabs.appendChild(tabEl);
-
     tabEl.addEventListener('click', (e) => {
       if (e.target.classList.contains('close-tab')) return;
       switchTab(filePath);
@@ -706,7 +832,6 @@ window.addEventListener('DOMContentLoaded', () => {
       e.stopPropagation();
       await attemptCloseTab(filePath);
     });
-
     newTab.tabEl = tabEl;
     switchTab(filePath);
   }
@@ -716,7 +841,7 @@ window.addEventListener('DOMContentLoaded', () => {
       const oldTab = tabs.find(t => t.filePath === activeTab);
       if (oldTab && cmEditor) {
         oldTab.content = cmEditor.getValue();
-        oldTab.isDirty = (oldTab.content !== oldTab.originalContent);
+        oldTab.isDirty = (cmEditor.getValue() !== oldTab.originalContent);
       }
     }
     activeTab = filePath;
@@ -766,7 +891,6 @@ window.addEventListener('DOMContentLoaded', () => {
       glassTabs.removeChild(tabObj.tabEl);
     }
     tabs.splice(idx, 1);
-
     if (activeTab === filePath) {
       if (tabs.length > 0) {
         switchTab(tabs[tabs.length - 1].filePath);
@@ -792,7 +916,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // CodeMirror init
+  // Initialize CodeMirror
   function initCodeMirror() {
     const cmOptions = {
       mode: 'markdown',
@@ -803,13 +927,10 @@ window.addEventListener('DOMContentLoaded', () => {
       spellcheck: true,
       gutters: ["CodeMirror-linenumbers", "CodeMirror-lint-markers"]
     };
-
     if (markdownlintModule) {
       cmOptions.lint = { getAnnotations: markdownLinter, async: false };
     }
-
     cmEditor = CodeMirror(document.getElementById('editor-wrapper'), cmOptions);
-
     cmEditor.on('change', () => {
       updatePreview();
       if (activeTab) {
@@ -819,19 +940,14 @@ window.addEventListener('DOMContentLoaded', () => {
         }
       }
     });
-
-    // Scroll sync
+    
     cmEditor.on('scroll', () => {
       const info = cmEditor.getScrollInfo();
       const ratio = info.top / (info.height - info.clientHeight);
       const previewMax = previewContent.scrollHeight - previewContent.clientHeight;
       previewContent.scrollTop = ratio * previewMax;
     });
-
-    // Table detection
     cmEditor.on('cursorActivity', updateTableEditorVisibility);
-
-    // Auto-completion & snippet insertion
     cmEditor.on('keyup', (cm, event) => {
       if ((event.ctrlKey || event.metaKey) && event.keyCode === 32) {
         if (cm.showHint) {
@@ -841,13 +957,13 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Preview & Status
+  // Updated Preview
   function updatePreview() {
     if (!cmEditor) return;
     const markdownText = cmEditor.getValue();
-    previewContent.innerHTML = marked.parse(markdownText);
+    let html = marked.parse(markdownText);
+    previewContent.innerHTML = html;
     updateStatusBar();
-
     if (window.MathJax) {
       MathJax.typesetPromise([previewContent]).catch(err => {
         console.error('MathJax typeset failed: ', err);
@@ -858,25 +974,20 @@ window.addEventListener('DOMContentLoaded', () => {
   function updateStatusBar() {
     if (!cmEditor) {
       statusWordCount.textContent = 'Words: 0';
-      statusReadTime.textContent  = 'Read Time: 0 min';
+      statusReadTime.textContent = 'Read Time: 0 min';
       return;
     }
     const text = cmEditor.getValue().trim();
     const words = text.split(/\s+/).filter(w => w.length > 0).length;
     const readTime = Math.ceil(words / 200);
     statusWordCount.textContent = `Words: ${words}`;
-    statusReadTime.textContent  = `Read Time: ${readTime} min`;
+    statusReadTime.textContent = `Read Time: ${readTime} min`;
   }
 
-  // Table Editor
   function updateTableEditorVisibility() {
     if (!cmEditor) return;
     const lineText = cmEditor.getLine(cmEditor.getCursor().line);
-    if (lineText.includes('|')) {
-      tableEditorPanel.style.display = 'flex';
-    } else {
-      tableEditorPanel.style.display = 'none';
-    }
+    tableEditorPanel.style.display = lineText.includes('|') ? 'flex' : 'none';
   }
 
   function getCurrentTableBlock() {
@@ -891,10 +1002,7 @@ window.addEventListener('DOMContentLoaded', () => {
     while (endLine < lineCount - 1 && cmEditor.getLine(endLine + 1).includes('|')) {
       endLine++;
     }
-    const tableText = cmEditor.getRange(
-      { line: startLine, ch: 0 },
-      { line: endLine + 1, ch: 0 }
-    );
+    const tableText = cmEditor.getRange({ line: startLine, ch: 0 }, { line: endLine + 1, ch: 0 });
     return { startLine, endLine, tableText };
   }
 
@@ -914,8 +1022,8 @@ window.addEventListener('DOMContentLoaded', () => {
   function tableAddRow() {
     const block = getCurrentTableBlock();
     if (!block) return;
-    const { startLine, endLine, tableText } = block;
-    let rows = parseTable(tableText);
+    const { startLine, endLine } = block;
+    let rows = parseTable(block.tableText);
     const colCount = rows[0].length;
     const newRow = Array(colCount).fill('data');
     const cursor = cmEditor.getCursor();
@@ -933,8 +1041,8 @@ window.addEventListener('DOMContentLoaded', () => {
   function tableRemoveRow() {
     const block = getCurrentTableBlock();
     if (!block) return;
-    const { startLine, endLine, tableText } = block;
-    let rows = parseTable(tableText);
+    const { startLine, endLine } = block;
+    let rows = parseTable(block.tableText);
     const cursor = cmEditor.getCursor();
     let relativeLine = cursor.line - startLine;
     if (relativeLine < 2) {
@@ -953,8 +1061,8 @@ window.addEventListener('DOMContentLoaded', () => {
   function tableAddColumn() {
     const block = getCurrentTableBlock();
     if (!block) return;
-    const { startLine, endLine, tableText } = block;
-    let rows = parseTable(tableText);
+    const { startLine, endLine } = block;
+    let rows = parseTable(block.tableText);
     const colCount = rows[0].length;
     const isSepRow = row => row.every(cell => /^-+(:)?$/.test(cell));
     if (rows.length >= 2 && isSepRow(rows[1])) {
@@ -976,8 +1084,8 @@ window.addEventListener('DOMContentLoaded', () => {
   function tableRemoveColumn() {
     const block = getCurrentTableBlock();
     if (!block) return;
-    const { startLine, endLine, tableText } = block;
-    let rows = parseTable(tableText);
+    const { startLine, endLine } = block;
+    let rows = parseTable(block.tableText);
     if (rows[0].length <= 1) return;
     const cursor = cmEditor.getCursor();
     const lineText = cmEditor.getLine(cursor.line);
@@ -1009,12 +1117,11 @@ window.addEventListener('DOMContentLoaded', () => {
   addColBtn.addEventListener('click', () => tableAddColumn());
   removeColBtn.addEventListener('click', () => tableRemoveColumn());
 
-  // Link Dialog
+  // Link, Media, Table dialogs
   function showLinkDialog() {
     linkTextInput.value = '';
     linkUrlInput.value = 'https://';
     linkDialog.style.display = 'flex';
-
     function cleanup() {
       linkDialog.style.display = 'none';
       linkOkBtn.removeEventListener('click', onOk);
@@ -1022,26 +1129,22 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     function onOk() {
       const text = linkTextInput.value.trim() || 'link text';
-      const url  = linkUrlInput.value.trim() || '#';
+      const url = linkUrlInput.value.trim() || '#';
       cleanup();
       if (cmEditor) {
         cmEditor.replaceSelection(`[${text}](${url})`);
         cmEditor.focus();
       }
     }
-    function onCancel() {
-      cleanup();
-    }
+    function onCancel() { cleanup(); }
     linkOkBtn.addEventListener('click', onOk);
     linkCancelBtn.addEventListener('click', onCancel);
   }
 
-  // Media Wizard
   function showMediaDialog() {
     mediaAlt.value = '';
     mediaUrl.value = 'https://';
     mediaDialog.style.display = 'flex';
-
     function cleanup() {
       mediaDialog.style.display = 'none';
       mediaOk.removeEventListener('click', onOk);
@@ -1051,12 +1154,9 @@ window.addEventListener('DOMContentLoaded', () => {
     function onOk() {
       const altText = mediaAlt.value.trim() || 'Image';
       let url = mediaUrl.value.trim() || '#';
-
-      // Convert GitHub file URLs to raw URLs if needed
       if (url.includes("github.com") && url.includes("/blob/")) {
         url = url.replace("github.com", "raw.githubusercontent.com").replace("/blob", "");
       }
-      // Ensure URL starts with "http", "https", or "file://"
       if (!/^https?:\/\//.test(url) && !url.startsWith('file://')) {
         url = 'https://' + url;
       }
@@ -1066,7 +1166,6 @@ window.addEventListener('DOMContentLoaded', () => {
         cmEditor.focus();
       }
     }
-
     async function onBrowse() {
       try {
         const filePath = await ipcRenderer.invoke('open-file-dialog', {
@@ -1079,11 +1178,7 @@ window.addEventListener('DOMContentLoaded', () => {
         console.error('Error browsing for media:', err);
       }
     }
-
-    function onCancel() {
-      cleanup();
-    }
-
+    function onCancel() { cleanup(); }
     mediaOk.addEventListener('click', onOk);
     mediaCancel.addEventListener('click', onCancel);
     mediaBrowse.addEventListener('click', onBrowse);
@@ -1092,13 +1187,11 @@ window.addEventListener('DOMContentLoaded', () => {
     btnMedia.addEventListener('click', showMediaDialog);
   }
 
-  // Table Dialog
   function showTableDialog() {
     tableRowsInput.value = '3';
     tableColsInput.value = '3';
     tableHeaderCheck.checked = true;
     tableDialog.style.display = 'flex';
-
     function cleanup() {
       tableDialog.style.display = 'none';
       tableOkBtn.removeEventListener('click', onOk);
@@ -1111,9 +1204,7 @@ window.addEventListener('DOMContentLoaded', () => {
       cleanup();
       insertTable(rows, cols, hasHeader);
     }
-    function onCancel() {
-      cleanup();
-    }
+    function onCancel() { cleanup(); }
     tableOkBtn.addEventListener('click', onOk);
     tableCancelBtn.addEventListener('click', onCancel);
   }
@@ -1123,10 +1214,10 @@ window.addEventListener('DOMContentLoaded', () => {
     let out = '';
     if (hasHeader) {
       let headerLine = '| ';
-      let dashLine   = '| ';
+      let dashLine = '| ';
       for (let c = 1; c <= cols; c++) {
         headerLine += `Header${c} | `;
-        dashLine   += `--- | `;
+        dashLine += `--- | `;
       }
       out += headerLine.trim() + '\n' + dashLine.trim() + '\n';
       for (let r = 1; r < rows; r++) {
@@ -1145,14 +1236,12 @@ window.addEventListener('DOMContentLoaded', () => {
         out += row.trim() + '\n';
       }
     }
-    cmEditor.replaceSelection(out);
+    cmEditor.replaceRange(out, cmEditor.getCursor());
     cmEditor.focus();
   }
 
-  // DRAG & DROP .md
-  document.addEventListener('dragover', (e) => {
-    e.preventDefault();
-  });
+  // Drag & Drop .md files
+  document.addEventListener('dragover', (e) => { e.preventDefault(); });
   document.addEventListener('drop', (e) => {
     e.preventDefault();
     if (!e.dataTransfer?.files) return;
@@ -1164,7 +1253,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Format buttons
+  // Format Buttons
   function wrapSelection(before, after = before) {
     if (!cmEditor) return;
     cmEditor.operation(() => {
@@ -1180,6 +1269,7 @@ window.addEventListener('DOMContentLoaded', () => {
     });
     cmEditor.focus();
   }
+
   btnBold?.addEventListener('click', () => wrapSelection('**'));
   btnItalic?.addEventListener('click', () => wrapSelection('*'));
   btnCode?.addEventListener('click', () => wrapSelection('`'));
@@ -1197,19 +1287,16 @@ window.addEventListener('DOMContentLoaded', () => {
   });
   btnTable?.addEventListener('click', showTableDialog);
 
-  // Alignment
   alignLeftBtn?.addEventListener('click', () => alignSelection("left"));
   alignCenterBtn?.addEventListener('click', () => alignSelection("center"));
   alignRightBtn?.addEventListener('click', () => alignSelection("right"));
 
-  // GitHub menu
   if (githubMenuBtn) {
     githubMenuBtn.addEventListener('click', async () => {
       await ipcRenderer.invoke('open-github-window');
     });
   }
 
-  // Window controls & file tools
   minButton?.addEventListener('click', () => ipcRenderer.send('minimize-window'));
   maxButton?.addEventListener('click', () => ipcRenderer.send('maximize-window'));
   closeButton?.addEventListener('click', () => ipcRenderer.send('close-window'));
@@ -1232,7 +1319,6 @@ window.addEventListener('DOMContentLoaded', () => {
       customAlert(`Failed to create file.\n${err.message}`);
     }
   });
-
   openFileBtn?.addEventListener('click', async () => {
     try {
       const chosen = await ipcRenderer.invoke('open-file-dialog');
@@ -1309,13 +1395,11 @@ window.addEventListener('DOMContentLoaded', () => {
     await ipcRenderer.invoke('open-settings-window');
   });
 
-  // Search & Replace
   btnSearch?.addEventListener('click', () => {
-    searchBar.classList.toggle('hidden');
+    document.getElementById('search-replace-bar').classList.toggle('hidden');
   });
-
-  searchCloseBtn?.addEventListener('click', () => {
-    searchBar.classList.add('hidden');
+  document.getElementById('search-close-btn')?.addEventListener('click', () => {
+    document.getElementById('search-replace-bar').classList.add('hidden');
     clearSearchHighlights();
   });
 
@@ -1357,15 +1441,15 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  searchNextBtn?.addEventListener('click', () => {
-    const query = searchInput.value;
+  document.getElementById('search-next-btn')?.addEventListener('click', () => {
+    const query = document.getElementById('search-input').value;
     if (!query) return;
     if (!currentSearchCursor) highlightAll(query);
     findNext(query);
   });
 
-  searchReplaceBtn?.addEventListener('click', () => {
-    const query = searchInput.value;
+  document.getElementById('search-replace-btn')?.addEventListener('click', () => {
+    const query = document.getElementById('search-input').value;
     if (!query) return;
     if (!currentSearchCursor) {
       highlightAll(query);
@@ -1377,8 +1461,8 @@ window.addEventListener('DOMContentLoaded', () => {
       return;
     }
     const from = currentSearchCursor.from();
-    const to   = currentSearchCursor.to();
-    const replacement = replaceInput.value;
+    const to = currentSearchCursor.to();
+    const replacement = document.getElementById('replace-input').value;
     cmEditor.replaceRange(replacement, from, to);
     currentSearchMatch.clear();
     currentSearchMatch = null;
@@ -1386,10 +1470,10 @@ window.addEventListener('DOMContentLoaded', () => {
     findNext(query);
   });
 
-  searchReplaceAllBtn?.addEventListener('click', () => {
-    const query = searchInput.value;
+  document.getElementById('search-replace-all-btn')?.addEventListener('click', () => {
+    const query = document.getElementById('search-input').value;
     if (!query) return;
-    const replacement = replaceInput.value;
+    const replacement = document.getElementById('replace-input').value;
     clearSearchHighlights();
     const cursor = cmEditor.getSearchCursor(query, { line: 0, ch: 0 });
     while (cursor.findNext()) {
@@ -1398,7 +1482,99 @@ window.addEventListener('DOMContentLoaded', () => {
     highlightAll(query);
   });
 
-  // Init
+  // AI Tools: Summarize, Simplify, Headings
+  if (document.getElementById('btn-summarize')) {
+    document.getElementById('btn-summarize').addEventListener('click', async () => {
+      const currentText = cmEditor.getValue();
+      const summaryLines = await summarizeText(currentText);
+      displayAiResults("Summary", summaryLines);
+    });
+  }
+  if (document.getElementById('btn-simplify')) {
+    document.getElementById('btn-simplify').addEventListener('click', async () => {
+      const currentText = cmEditor.getValue();
+      const simplifiedLines = await simplifyText(currentText);
+      displayAiResults("Simplified Text", simplifiedLines);
+    });
+  }
+  if (document.getElementById('btn-suggest-headings')) {
+    document.getElementById('btn-suggest-headings').addEventListener('click', async () => {
+      const currentText = cmEditor.getValue();
+      const suggestions = await suggestHeadings(currentText);
+      displayAiResults("Heading Suggestions", suggestions);
+    });
+  }
+
+  // Additional Buttons
+  if (btnPrint) {
+    btnPrint.addEventListener('click', async () => {
+      try {
+        const result = await ipcRenderer.invoke('print-document');
+        if (result.startsWith('error:') || result === 'no-main-window') {
+          console.error("Print failed =>", result);
+        } else {
+          console.log("Printed or user canceled => no popup shown.");
+        }
+      } catch (err) {
+        console.error("Print error =>", err);
+      }
+    });
+  }
+
+  if (btnExportPDF) {
+    btnExportPDF.addEventListener('click', async () => {
+      await exportCurrentTabToPDF();
+    });
+  }
+
+  // Toggling button active state helper
+  function setButtonActive(button, isActive) {
+    if (!button) return;
+    if (isActive) {
+      button.classList.add('toggle-active');
+    } else {
+      button.classList.remove('toggle-active');
+    }
+  }
+
+  if (btnToggleSpellcheck) {
+    btnToggleSpellcheck.addEventListener('click', async () => {
+      try {
+        const newVal = await ipcRenderer.invoke('toggle-spellcheck');
+        if (cmEditor) {
+          cmEditor.setOption('spellcheck', newVal);
+        }
+        setButtonActive(btnToggleSpellcheck, newVal);
+        console.log("Spellcheck =>", newVal ? "ON" : "OFF");
+      } catch (err) {
+        console.error("Toggle Spellcheck failed:", err);
+      }
+    });
+  }
+
+  if (btnThemeSwitch) {
+    btnThemeSwitch.addEventListener('click', async () => {
+      try {
+        const newTheme = await ipcRenderer.invoke('switch-theme');
+        if (cmEditor) {
+          if (newTheme === 'light') {
+            cmEditor.setOption('theme', 'default');
+            document.body.style.backgroundColor = '#f0f0f0';
+            setButtonActive(btnThemeSwitch, true);
+          } else {
+            cmEditor.setOption('theme', 'material-darker');
+            document.body.style.backgroundColor = '#0b131a';
+            setButtonActive(btnThemeSwitch, false);
+          }
+        }
+        console.log("Theme =>", newTheme);
+      } catch (err) {
+        console.error("Switch Theme failed:", err);
+      }
+    });
+  }
+
+  // Init application
   (async () => {
     console.log("[DEBUG] init app...");
     try {
@@ -1413,12 +1589,23 @@ window.addEventListener('DOMContentLoaded', () => {
       console.error("Failed to load user settings:", err);
       userSettings = {};
     }
-
     loadNotes();
     initCodeMirror();
     refreshFileList();
     updatePreview();
-
+    if (typeof userSettings.spellCheck === 'boolean') {
+      cmEditor.setOption('spellcheck', userSettings.spellCheck);
+      setButtonActive(btnToggleSpellcheck, userSettings.spellCheck);
+    }
+    if (userSettings.theme === 'light') {
+      cmEditor.setOption('theme', 'default');
+      document.body.style.backgroundColor = '#f0f0f0';
+      setButtonActive(btnThemeSwitch, true);
+    } else {
+      cmEditor.setOption('theme', 'material-darker');
+      document.body.style.backgroundColor = '#0b131a';
+      setButtonActive(btnThemeSwitch, false);
+    }
     if (userSettings.lastFile) {
       try {
         if (fs.existsSync(userSettings.lastFile)) {
@@ -1431,7 +1618,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   })();
 
-  // Provide a global function to insert GitHub markdown on a new line
+  // Insert GitHub Markdown globally
   window.insertGitHubMarkdown = function(markdown) {
     if (!cmEditor) {
       console.error("No cmEditor to insert GitHub markdown.");

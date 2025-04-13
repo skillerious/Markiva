@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <title>Splash</title>
-  <!-- If you have a splash.css in the same folder, reference it here. -->
+  <!-- Your splash.css for starfield / progress bar -->
   <link rel="stylesheet" href="splash.css" />
 </head>
 <body>
-  <!-- starfield backgrounds from your splash.css -->
+  <!-- Two starfield layers for the animated background -->
   <div class="starfield starfield-layer1"></div>
   <div class="starfield starfield-layer2"></div>
 
+  <!-- Container for the Markiva logo, loading text, and progress -->
   <div id="splash-container">
     <!-- 
-      CRITICAL: 
-      "assets/MarkivaLogo.png" => no leading "./", so it's from the same directory 
-      that "splash.html" is in, plus an "assets" subfolder 
+      Update this path if needed. 
+      The "assets" folder should be inside the same directory or at the correct path for the image
     -->
     <img
       src="assets/MarkivaLogo.png"
@@ -23,18 +23,27 @@
       alt="Markiva Logo"
       onerror="console.error('[DEBUG] MarkivaLogo.png failed to load from', this.src)"
     />
+
+    <!-- Main "Loading..." text -->
     <div id="loading-text">Loading…</div>
+
+    <!-- Progress bar -->
     <div id="progress-bar">
       <div id="progress-fill"></div>
     </div>
+
+    <!-- NEW: a separate element for the quickly cycling messages -->
+    <div id="loading-details"></div>
   </div>
 
+  <!-- Bottom corners pinned texts -->
   <div id="splash-left">Developed by Robin Doak</div>
-  <div id="splash-right">V3.1</div>
+  <div id="splash-right">V3.3</div>
 
+  <!-- Your splash.js script -->
   <script src="splash.js"></script>
   <script>
-    console.log("[DEBUG] splash.html loaded. #logo-image is:", document.getElementById("logo-image"));
+    console.log("[DEBUG] splash.html loaded.");
   </script>
 </body>
 </html>

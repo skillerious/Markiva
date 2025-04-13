@@ -294,11 +294,52 @@
       <!-- Status Bar -->
       <div id="status-bar">
         <div id="status-align">
-          <button id="align-left" title="Align Left"><i class="fas fa-align-left"></i></button>
-          <button id="align-center" title="Align Center"><i class="fas fa-align-center"></i></button>
-          <button id="align-right" title="Align Right"><i class="fas fa-align-right"></i></button>
-          <button id="github-menu" title="GitHub Markdown Features"><i class="fab fa-github"></i></button>
+          <!-- Existing Alignment Buttons -->
+          <button id="align-left" title="Align Left">
+            <i class="fas fa-align-left"></i>
+          </button>
+          <button id="align-center" title="Align Center">
+            <i class="fas fa-align-center"></i>
+          </button>
+          <button id="align-right" title="Align Right">
+            <i class="fas fa-align-right"></i>
+          </button>
+
+          <!-- Separator after Right Align -->
+          <div class="status-separator"></div>
+
+          <!-- GitHub + AI Buttons -->
+          <button id="github-menu" title="GitHub Markdown Features">
+            <i class="fab fa-github"></i>
+          </button>
+          <button id="btn-summarize" title="Summarize">
+            <i class="fas fa-file-contract"></i>
+          </button>
+          <button id="btn-simplify" title="Simplify">
+            <i class="fas fa-text-height"></i>
+          </button>
+          <button id="btn-suggest-headings" title="Suggest Headings">
+            <i class="fas fa-lightbulb"></i>
+          </button>
+
+          <!-- Second separator after the "Suggest Headings" button -->
+          <div class="status-separator"></div>
+
+          <!-- Additional suggested buttons -->
+          <button id="btn-print" title="Print Document">
+            <i class="fas fa-print"></i>
+          </button>
+          <button id="btn-export-pdf" title="Export as PDF">
+            <i class="fas fa-file-pdf"></i>
+          </button>
+          <button id="btn-toggle-spellcheck" title="Toggle Spellcheck">
+            <i class="fas fa-spell-check"></i>
+          </button>
+          <button id="btn-theme-switch" title="Switch Theme">
+            <i class="fas fa-adjust"></i>
+          </button>
         </div>
+
         <div id="status-info">
           <span id="word-count">Words: 0</span>
           <span id="read-time">Read Time: 0 min</span>
