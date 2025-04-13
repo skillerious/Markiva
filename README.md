@@ -2,7 +2,7 @@
   <img src="https://github.com/skillerious/Markiva/blob/main/assets/MarkivaLogo%20(1).png" alt="Markiva Logo" width="200"/>
 </p>
 
-<h1 align="center">🚀 Markiva v3.1 – From Python to Electron</h1>
+<h1 align="center">🚀 Markiva v3.3 – From Python to Electron</h1>
 <p align="center"><i>A Beautifully Crafted Markdown Editor for Creators, Developers & Writers</i></p>
 
 <p align="center">
